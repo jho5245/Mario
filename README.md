@@ -1,2 +1,3 @@
-A Java Edition Mario Game
+Mario
 ---
+A Java Edition Mario Game
