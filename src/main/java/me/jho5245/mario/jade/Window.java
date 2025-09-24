@@ -20,8 +20,6 @@ public class Window
 
 	public float r, g, b, a;
 
-	private boolean fadeToBlack;
-
 	private static Window window = null;
 
 	private static Scene currentScene;
