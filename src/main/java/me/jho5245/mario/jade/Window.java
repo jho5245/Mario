@@ -1,33 +1,40 @@
 package me.jho5245.mario.jade;
 
+import me.jho5245.mario.util.Time;
 import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
-import org.lwjgl.system.*;
-
-import java.nio.*;
 
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
 public class Window
 {
-	private int width, height;
+	private final int width, height;
 
-	private String title;
+	private final String title;
 
 	private long glfwWindow;
 
+	public float r, g, b, a;
+
+	private boolean fadeToBlack;
+
 	private static Window window = null;
+
+	private static Scene currentScene;
 
 	private Window()
 	{
 		this.width = 1366;
 		this.height = 768;
 		this.title = "Mario";
+		r = 1;
+		g = 1;
+		b = 1;
+		a = 1;
 	}
 
 	public static Window getInstance()
@@ -39,12 +46,35 @@ public class Window
 		return window;
 	}
 
+	public static void changeScene(int newScene)
+	{
+		switch (newScene)
+		{
+			case 0 -> currentScene = new LevelEditorScene();
+			case 1 -> currentScene = new LevelScene();
+			default ->
+			{
+				assert false : "Unknown scene '%s'".formatted(newScene);
+			}
+		}
+	}
+
 	public void run()
 	{
-		System.out.println("Hello LWJGL " + Version.getVersion() + "!");
+		System.out.printf("Hello LWJGL %s!%n", Version.getVersion());
 
 		init();
 		loop();
+
+		// Free the memory
+		glfwFreeCallbacks(glfwWindow);
+		glfwDestroyWindow(glfwWindow);
+
+		// Terminate GLFW and the free the error callback
+		glfwTerminate();
+		var callBack = glfwSetErrorCallback(null);
+		if (callBack != null)
+			callBack.free();
 	}
 
 	private void init()
@@ -63,7 +93,7 @@ public class Window
 		glfwDefaultWindowHints();
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-//		glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+		//		glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 
 		// Create the window
 		glfwWindow = glfwCreateWindow(width, height, title, NULL, NULL);
@@ -71,6 +101,14 @@ public class Window
 		{
 			throw new IllegalStateException("Failed to create the GLFW window.");
 		}
+
+		// Mouse Listener
+		glfwSetCursorPosCallback(glfwWindow, MouseListener::mousePosCallback);
+		glfwSetMouseButtonCallback(glfwWindow, MouseListener::mouseButtonCallback);
+		glfwSetScrollCallback(glfwWindow, MouseListener::mouseScrollCallback);
+
+		// Keyboard Listener
+		glfwSetKeyCallback(glfwWindow, KeyListener::keyCallback);
 
 		// Make the OpenGL context current
 		glfwMakeContextCurrent(glfwWindow);
@@ -86,19 +124,34 @@ public class Window
 		// creates the GLCapabilities instance and makes the OpenGL
 		// bindings available for use.
 		GL.createCapabilities();
+
+		Window.changeScene(0);
 	}
 
 	private void loop()
 	{
+		float beginTime = Time.getTime();
+		float endTime;
+		float dt = -1f;
+
 		while (!glfwWindowShouldClose(glfwWindow))
 		{
 			// Poll events
 			glfwPollEvents();
 
-			glClearColor(1f, 0f, 0f, 0f);
+			glClearColor(r, g, b, a);
 			glClear(GL_COLOR_BUFFER_BIT);
 
+			if (dt >= 0)
+			{
+				currentScene.update(dt);
+			}
+
 			glfwSwapBuffers(glfwWindow);
+
+			endTime = Time.getTime();
+			dt = endTime - beginTime;
+			beginTime = endTime;
 		}
 	}
 }
