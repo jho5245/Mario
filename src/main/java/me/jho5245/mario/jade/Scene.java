@@ -2,6 +2,8 @@ package me.jho5245.mario.jade;
 
 public abstract class Scene
 {
+	protected Camera camera;
+
 	public Scene()
 	{
 
