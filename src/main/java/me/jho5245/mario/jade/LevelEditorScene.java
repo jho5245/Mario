@@ -48,8 +48,6 @@ public class LevelEditorScene extends Scene
 		defaultShader = new Shader("assets/shaders/default.glsl");
 		defaultShader.compile();
 
-
-
 		// generate VAO, VBO, EBO buffer object and send to GPU
 		vaoID = glGenVertexArrays();
 		glBindVertexArray(vaoID);
