@@ -1,6 +1,7 @@
 package me.jho5245.mario.jade;
 
 import me.jho5245.mario.renderer.Shader;
+import me.jho5245.mario.util.Time;
 import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
 
@@ -88,10 +89,12 @@ public class LevelEditorScene extends Scene
 	public void update(float dt)
 	{
 		camera.position.x -= dt * 50f;
+		camera.position.y -= dt * 50f;
 
 		defaultShader.use();
 		defaultShader.uploadMat4f("uProjection", camera.getProjectionMatrix());
 		defaultShader.uploadMat4f("uView", camera.getViewMatrix());
+		defaultShader.uploadFloat("uTime", Time.getTime());
 		// Bind the VAO to use
 		glBindVertexArray(vaoID);
 		// Enable VAO pointers
