@@ -1,6 +1,7 @@
 package me.jho5245.mario.jade;
 
 import me.jho5245.mario.renderer.Shader;
+import me.jho5245.mario.renderer.Texture;
 import me.jho5245.mario.util.Time;
 import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
@@ -16,12 +17,14 @@ public class LevelEditorScene extends Scene
 {
 	private Shader defaultShader;
 
+	private Texture testTexture;
+
 	private float[] vertexArray = {
-			// position,                   color
-			50.5f, -50.5f, 0.0f,             1.0f, 0.0f, 0.0f, 1.0f, // Bottom right    0
-			-50.5f, 50.5f, 0.0f,             0.0f, 1.0f, 0.0f, 1.0f, // Top left				1
-			50.5f, 50.5f, 0.0f,              0.0f, 0.0f, 1.0f, 1.0f, // Top right				2
-			-50.5f, -50.5f, 0.0f,            1.0f, 1.0f, 1.0f, 1.0f, // Bottom left			3
+			// position,                  color                        UV Coordinates
+			200f, 100f, 0.0f,             1.0f, 0.0f, 0.0f, 1.0f,      1, 1, // Bottom right   	0
+			100f, 200f, 0.0f,             0.0f, 1.0f, 0.0f, 1.0f,      0, 0, // Top left				1
+			200f, 200f, 0.0f,             0.0f, 0.0f, 1.0f, 1.0f,      1, 0, // Top right				2
+			100f, 100f, 0.0f,             1.0f, 1.0f, 1.0f, 1.0f,      0, 1  // Bottom left			3
 	};
 
 	// must be in counter-clockwise order
@@ -48,6 +51,7 @@ public class LevelEditorScene extends Scene
 		this.camera = new Camera(new Vector2f());
 		defaultShader = new Shader("assets/shaders/default.glsl");
 		defaultShader.compile();
+		this.testTexture = new Texture("assets/images/test.png");
 
 		// generate VAO, VBO, EBO buffer object and send to GPU
 		vaoID = glGenVertexArrays();
@@ -74,27 +78,38 @@ public class LevelEditorScene extends Scene
 		// 어디까지가 position이고 color인지 지시
 		int positionSize = 3; // xyz
 		int colorSize = 4; // rgba
-		int floatSizeBytes = 4;
-		int vertexSizeBytes = (positionSize + colorSize) * floatSizeBytes;
+		int uvSize = 2; // uv
+		int vertexSizeBytes = (positionSize + colorSize + uvSize) * Float.BYTES;
 		// default.glsl의 location = 0 인 곳은 position, 따라서 index에 0 지정
 		glVertexAttribPointer(0, positionSize, GL_FLOAT, false, vertexSizeBytes, 0);
 		glEnableVertexAttribArray(0);
 
 		// default.glsl의 location = 1 인 곳은 color, 따라서 index에 1 지정
-		glVertexAttribPointer(1, colorSize, GL_FLOAT, false, vertexSizeBytes, positionSize * floatSizeBytes);
+		glVertexAttribPointer(1, colorSize, GL_FLOAT, false, vertexSizeBytes, positionSize * Float.BYTES);
 		glEnableVertexAttribArray(1);
+
+		// default.glsl의 location = 2 인 곳은 uv, 따라서 index에 2 지정
+		glVertexAttribPointer(2, uvSize, GL_FLOAT, false, vertexSizeBytes, (positionSize + colorSize) * Float.BYTES);
+		glEnableVertexAttribArray(2);
 	}
 
 	@Override
 	public void update(float dt)
 	{
-		camera.position.x -= dt * 50f;
-		camera.position.y -= dt * 50f;
+//		camera.position.x -= dt * 50f;
+//		camera.position.y -= dt * 50f;
 
 		defaultShader.use();
+
+		// Upload texture to shader
+		defaultShader.uploadTexture("TEXTURE_SAMPLER", 0);
+		glActiveTexture(GL_TEXTURE0);
+		testTexture.bind();
+
 		defaultShader.uploadMat4f("uProjection", camera.getProjectionMatrix());
 		defaultShader.uploadMat4f("uView", camera.getViewMatrix());
 		defaultShader.uploadFloat("uTime", Time.getTime());
+
 		// Bind the VAO to use
 		glBindVertexArray(vaoID);
 		// Enable VAO pointers
