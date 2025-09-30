@@ -48,21 +48,15 @@ public class Window
 	{
 		switch (newScene)
 		{
-			case 0 ->
-			{
-				currentScene = new LevelEditorScene();
-				currentScene.init();
-			}
-			case 1 ->
-			{
-				currentScene = new LevelScene();
-				currentScene.init();
-			}
+			case 0 -> currentScene = new LevelEditorScene();
+			case 1 -> currentScene = new LevelScene();
 			default ->
 			{
 				assert false : "Unknown scene '%s'".formatted(newScene);
 			}
 		}
+		currentScene.init();
+		currentScene.start();
 	}
 
 	public void run()

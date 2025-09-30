@@ -1,5 +1,7 @@
 package me.jho5245.mario.jade;
 
+import me.jho5245.mario.jade.components.FontRenderer;
+import me.jho5245.mario.jade.components.SpriteRenderer;
 import me.jho5245.mario.renderer.Shader;
 import me.jho5245.mario.renderer.Texture;
 import me.jho5245.mario.util.Time;
@@ -18,6 +20,10 @@ public class LevelEditorScene extends Scene
 	private Shader defaultShader;
 
 	private Texture testTexture;
+
+	private GameObject testObject;
+
+	private boolean firstTime;
 
 	private float[] vertexArray = {
 			// position,                  color                        UV Coordinates
@@ -52,6 +58,11 @@ public class LevelEditorScene extends Scene
 		defaultShader = new Shader("assets/shaders/default.glsl");
 		defaultShader.compile();
 		this.testTexture = new Texture("assets/images/test.png");
+		System.out.println("Creating test object");
+		this.testObject = new GameObject("testObject");
+		this.testObject.addComponent(new SpriteRenderer());
+		this.testObject.addComponent(new FontRenderer());
+		this.addGameObject(this.testObject);
 
 		// generate VAO, VBO, EBO buffer object and send to GPU
 		vaoID = glGenVertexArrays();
@@ -123,5 +134,16 @@ public class LevelEditorScene extends Scene
 		glDisableVertexAttribArray(1);
 		glBindVertexArray(0); // bind nothing
 		defaultShader.detach();
+
+		if (!firstTime)
+		{
+			System.out.println("Creating test object 2");
+			firstTime = true;
+			GameObject testObject2 = new GameObject("testObject2");
+			testObject2.addComponent(new SpriteRenderer());
+			this.addGameObject(testObject2);
+		}
+
+		this.gameObjects.forEach(gameObject -> gameObject.update(dt));
 	}
 }
