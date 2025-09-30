@@ -42,7 +42,9 @@ public class Texture
 		{
 			switch (channels.get(0))
 			{
+				// RGB
 				case 3 -> glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width.get(0), height.get(0), 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+				// RGBA
 				case 4 -> glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width.get(0), height.get(0), 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
 				default -> throw new RuntimeException("Unknown texture channel: " + channels.get(0));
 			}
