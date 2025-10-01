@@ -1,10 +1,14 @@
 package me.jho5245.mario.jade;
 
+import me.jho5245.mario.renderer.Renderer;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Scene
 {
+	protected Renderer renderer = new Renderer();
+
 	protected Camera camera;
 
 	protected boolean running = false;
@@ -23,7 +27,11 @@ public abstract class Scene
 
 	public void start()
 	{
-		gameObjects.forEach(GameObject::start);
+		gameObjects.forEach(gameObject ->
+		{
+			gameObject.start();
+			renderer.add(gameObject);
+		});
 		running = true;
 	}
 
@@ -33,8 +41,14 @@ public abstract class Scene
 		if (running)
 		{
 			gameObject.start();
+			renderer.add(gameObject);
 		}
 	}
 
 	public abstract void update(float dt);
+
+	public Camera getCamera()
+	{
+		return camera;
+	}
 }
