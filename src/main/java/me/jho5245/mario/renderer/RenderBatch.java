@@ -2,6 +2,7 @@ package me.jho5245.mario.renderer;
 
 import me.jho5245.mario.jade.Window;
 import me.jho5245.mario.jade.components.SpriteRenderer;
+import me.jho5245.mario.util.AssetPool;
 import org.joml.Vector4f;
 
 import static org.lwjgl.opengl.GL15.*;
@@ -34,8 +35,7 @@ public class RenderBatch
 
 	public RenderBatch(int maxBatchSize)
 	{
-		shader = new Shader("assets/shaders/default.glsl");
-		shader.compile();
+		shader = AssetPool.getShader("assets/shaders/default.glsl");
 		this.sprites = new SpriteRenderer[maxBatchSize];
 		this.maxBatchSize = maxBatchSize;
 
