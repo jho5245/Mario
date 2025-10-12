@@ -1,6 +1,5 @@
 package me.jho5245.mario.jade;
 
-import me.jho5245.mario.util.Time;
 import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
@@ -135,7 +134,7 @@ public class Window
 
 	private void loop()
 	{
-		float beginTime = Time.getTime();
+		float beginTime = (float) glfwGetTime();
 		float endTime;
 		float dt = -1f;
 
@@ -154,7 +153,7 @@ public class Window
 
 			glfwSwapBuffers(glfwWindow);
 
-			endTime = Time.getTime();
+			endTime = (float) glfwGetTime();
 			dt = endTime - beginTime;
 			beginTime = endTime;
 		}
