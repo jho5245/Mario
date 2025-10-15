@@ -14,6 +14,8 @@ public class Texture
 
 	private int textureID;
 
+	private int width, height;
+
 	public Texture(String filePath)
 	{
 		this.filePath = filePath;
@@ -41,6 +43,8 @@ public class Texture
 
 		if (image != null)
 		{
+			this.width = width.get(0);
+			this.height = height.get(0);
 			switch (channels.get(0))
 			{
 				// RGB
@@ -67,5 +71,15 @@ public class Texture
 	public void unbind()
 	{
 		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
+	public int getWidth()
+	{
+		return width;
+	}
+
+	public int getHeight()
+	{
+		return height;
 	}
 }

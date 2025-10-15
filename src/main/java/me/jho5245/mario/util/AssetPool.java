@@ -1,5 +1,6 @@
 package me.jho5245.mario.util;
 
+import me.jho5245.mario.jade.components.SpriteSheet;
 import me.jho5245.mario.renderer.Shader;
 import me.jho5245.mario.renderer.Texture;
 
@@ -12,6 +13,8 @@ public class AssetPool
 	private static final Map<String, Shader> shaders = new HashMap<>();
 
 	private static final Map<String, Texture> textures = new HashMap<>();
+
+	private static final Map<String, SpriteSheet> spritesheets = new HashMap<>();
 
 	public static Shader getShader(String filePath)
 	{
@@ -45,5 +48,24 @@ public class AssetPool
 			textures.put(absolutePath, texture);
 			return texture;
 		}
+	}
+
+	public static void addSpriteSheet(String resourceName, SpriteSheet spriteSheet)
+	{
+		File file = new File(resourceName);
+		if (!spritesheets.containsKey(file.getAbsolutePath()))
+		{
+			spritesheets.put(file.getAbsolutePath(), spriteSheet);
+		}
+	}
+
+	public static SpriteSheet getSpriteSheet(String resourceName)
+	{
+		File file = new File(resourceName);
+		if (!spritesheets.containsKey(file.getAbsolutePath()))
+		{
+			assert false: "No SpriteSheet %s to access".formatted(resourceName);
+		}
+		return spritesheets.getOrDefault(file.getAbsolutePath(), null);
 	}
 }

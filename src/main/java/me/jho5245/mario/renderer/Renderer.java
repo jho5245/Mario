@@ -33,8 +33,14 @@ public class Renderer
 		{
 			if (batch.hasRoom())
 			{
-				batch.addSprite(sprite);
-				added = true;
+				Texture texture = sprite.getTexture();
+				// 텍스처가 없거나 || batch에 텍스처가 있거나 || 새로 추가할 공간이 있을 경우
+				if (texture == null || batch.hasTexture(texture) || batch.hasTextureRoom())
+				{
+					batch.addSprite(sprite);
+					added = true;
+					break;
+				}
 			}
 		}
 
