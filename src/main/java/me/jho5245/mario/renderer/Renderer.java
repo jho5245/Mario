@@ -4,6 +4,7 @@ import me.jho5245.mario.jade.GameObject;
 import me.jho5245.mario.jade.components.SpriteRenderer;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Renderer
@@ -31,7 +32,7 @@ public class Renderer
 		boolean added = false;
 		for (RenderBatch batch : batches)
 		{
-			if (batch.hasRoom())
+			if (batch.hasRoom() && batch.zIndex() == sprite.getGameObject().zIndex())
 			{
 				Texture texture = sprite.getTexture();
 				// 텍스처가 없거나 || batch에 텍스처가 있거나 || 새로 추가할 공간이 있을 경우
@@ -46,10 +47,11 @@ public class Renderer
 
 		if (!added)
 		{
-			RenderBatch newBatch = new RenderBatch(MAX_BATCH_SIZE);
+			RenderBatch newBatch = new RenderBatch(MAX_BATCH_SIZE, sprite.getGameObject().zIndex());
 			newBatch.start();
 			batches.add(newBatch);
 			newBatch.addSprite(sprite);
+			Collections.sort(batches);
 		}
 	}
 
