@@ -1,5 +1,6 @@
 package me.jho5245.mario.jade.components;
 
+import imgui.ImGui;
 import me.jho5245.mario.jade.Component;
 import me.jho5245.mario.jade.Transform;
 import me.jho5245.mario.renderer.Texture;
@@ -46,6 +47,16 @@ public class SpriteRenderer extends Component
 		{
 			this.getGameObject().getTransform().copy(this.lastTransform);
 			isDirty = true;
+		}
+	}
+
+	@Override
+	public void imgui()
+	{
+		float[] imColor = {color.x, color.y, color.z, color.w};
+		if (ImGui.colorPicker4("Color Picker: ", imColor))
+		{
+			setColor(new Vector4f(imColor[0], imColor[1], imColor[2], imColor[3]));
 		}
 	}
 

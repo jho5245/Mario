@@ -8,8 +8,11 @@ import java.util.List;
 public class GameObject
 {
 	private String name;
+
 	private List<Component> components;
+
 	private Transform transform;
+
 	private int zIndex;
 
 	public GameObject(String name)
@@ -38,7 +41,7 @@ public class GameObject
 				catch (ClassCastException e)
 				{
 					e.printStackTrace();
-					assert false: "Error casting component";
+					assert false : "Error casting component";
 				}
 			}
 		}
@@ -74,5 +77,10 @@ public class GameObject
 	public int zIndex()
 	{
 		return this.zIndex;
+	}
+
+	public void imgui()
+	{
+		components.forEach(Component::imgui);
 	}
 }

@@ -1,5 +1,6 @@
 package me.jho5245.mario.jade;
 
+import imgui.ImGui;
 import me.jho5245.mario.renderer.Renderer;
 
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ public abstract class Scene
 	protected boolean running = false;
 
 	protected final List<GameObject> gameObjects = new ArrayList<>();
+	protected GameObject activeGameObject;
 
 	public Scene()
 	{
@@ -50,5 +52,22 @@ public abstract class Scene
 	public Camera getCamera()
 	{
 		return camera;
+	}
+
+	public void sceneImgui()
+	{
+		if (activeGameObject != null)
+		{
+			ImGui.begin("Inspector");
+			activeGameObject.imgui();
+			ImGui.end();
+		}
+
+		imgui();
+	}
+
+	public void imgui()
+	{
+
 	}
 }

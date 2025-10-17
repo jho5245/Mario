@@ -105,6 +105,8 @@ public class Window
 	{
 		initWindow();
 
+		initImGui();
+
 		// Mouse Listener
 		glfwSetCursorPosCallback(glfwWindow, MouseListener::mousePosCallback);
 		glfwSetMouseButtonCallback(glfwWindow, MouseListener::mouseButtonCallback);
@@ -121,8 +123,6 @@ public class Window
 		// alpha blending
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-
-		initImGui();
 
 		Window.changeScene(0);
 	}
@@ -141,7 +141,7 @@ public class Window
 
 		glslVersion = "#version 330 core";
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
 		// Configure GLFW
 		glfwDefaultWindowHints();
@@ -179,6 +179,8 @@ public class Window
 
 	private void destroy()
 	{
+		imGuiLayer.destroyImGui();
+
 		// Free the memory
 		glfwFreeCallbacks(glfwWindow);
 		glfwDestroyWindow(glfwWindow);
@@ -198,7 +200,9 @@ public class Window
 
 		while (!glfwWindowShouldClose(glfwWindow))
 		{
+			// poll events
 			GLFW.glfwPollEvents();
+
 			glClearColor(r, g, b, a);
 			glClear(GL_COLOR_BUFFER_BIT);
 
@@ -207,7 +211,8 @@ public class Window
 				currentScene.update(dt);
 			}
 
-			this.imGuiLayer.update(dt);
+			this.imGuiLayer.update(dt, currentScene);
+
 			GLFW.glfwSwapBuffers(glfwWindow);
 
 			endTime = (float) glfwGetTime();
