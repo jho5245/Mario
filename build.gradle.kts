@@ -1,3 +1,6 @@
+import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.include
+import org.gradle.kotlin.dsl.invoke
+
 plugins {
     id("java")
 }
@@ -10,9 +13,12 @@ repositories {
 }
 
 dependencies {
-    testImplementation(platform("org.junit:junit-bom:5.10.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+//    testImplementation(platform("org.junit:junit-bom:5.10.0"))
+//    testImplementation("org.junit.jupiter:junit-jupiter")
+//    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    // Imgui files
+    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
     var lwjglVersion = "3.2.3"
     var jomlVersion = "1.9.23"

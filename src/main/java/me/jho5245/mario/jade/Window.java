@@ -1,23 +1,27 @@
 package me.jho5245.mario.jade;
 
-import org.lwjgl.*;
-import org.lwjgl.glfw.*;
-import org.lwjgl.opengl.*;
+import org.lwjgl.Version;
+import org.lwjgl.glfw.GLFW;
+import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.opengl.GL;
 
-import static org.lwjgl.glfw.Callbacks.*;
+import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.system.MemoryUtil.*;
+import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Window
 {
-	private final int width, height;
+	private int width, height;
 
 	private final String title;
 
 	private long glfwWindow;
 
 	public float r, g, b, a;
+	private String glslVersion;
+
+	private ImGuiLayer imGuiLayer;
 
 	private static Window window = null;
 
@@ -63,25 +67,67 @@ public class Window
 		return currentScene;
 	}
 
+	public static int getWidth()
+	{
+		return getInstance().width;
+	}
+
+	public static int getHeight()
+	{
+		return getInstance().height;
+	}
+
+	public static void setWidth(int width)
+	{
+		getInstance().width = width;
+	}
+
+	public static void setHeight(int height)
+	{
+		getInstance().height = height;
+	}
+
+	public static String getGLSLVersion()
+	{
+		return getInstance().glslVersion;
+	}
+
 	public void run()
 	{
 		System.out.printf("Hello LWJGL %s!%n", Version.getVersion());
 
 		init();
 		loop();
-
-		// Free the memory
-		glfwFreeCallbacks(glfwWindow);
-		glfwDestroyWindow(glfwWindow);
-
-		// Terminate GLFW and the free the error callback
-		glfwTerminate();
-		var callBack = glfwSetErrorCallback(null);
-		if (callBack != null)
-			callBack.free();
+		destroy();
 	}
 
 	private void init()
+	{
+		initWindow();
+
+		// Mouse Listener
+		glfwSetCursorPosCallback(glfwWindow, MouseListener::mousePosCallback);
+		glfwSetMouseButtonCallback(glfwWindow, MouseListener::mouseButtonCallback);
+		glfwSetScrollCallback(glfwWindow, MouseListener::mouseScrollCallback);
+
+		// Keyboard Listener
+		glfwSetKeyCallback(glfwWindow, KeyListener::keyCallback);
+
+		glfwSetWindowSizeCallback(glfwWindow, (w,  newWidth, newHeight) -> {
+			Window.setWidth(newWidth);
+			Window.setHeight(newHeight);
+		});
+
+		// alpha blending
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
+		initImGui();
+
+		Window.changeScene(0);
+	}
+
+	private void initWindow()
 	{
 		// Setup an error callback. The default implementation
 		// will print the error message in System.err.
@@ -92,6 +138,10 @@ public class Window
 		{
 			throw new IllegalStateException("Could not init GLFW!");
 		}
+
+		glslVersion = "#version 330 core";
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
 		// Configure GLFW
 		glfwDefaultWindowHints();
@@ -106,19 +156,10 @@ public class Window
 			throw new IllegalStateException("Failed to create the GLFW window.");
 		}
 
-		// Mouse Listener
-		glfwSetCursorPosCallback(glfwWindow, MouseListener::mousePosCallback);
-		glfwSetMouseButtonCallback(glfwWindow, MouseListener::mouseButtonCallback);
-		glfwSetScrollCallback(glfwWindow, MouseListener::mouseScrollCallback);
-
-		// Keyboard Listener
-		glfwSetKeyCallback(glfwWindow, KeyListener::keyCallback);
-
 		// Make the OpenGL context current
 		glfwMakeContextCurrent(glfwWindow);
 		// Enable v-sync
 		glfwSwapInterval(1);
-
 		// Make the window visible
 		glfwShowWindow(glfwWindow);
 
@@ -128,12 +169,25 @@ public class Window
 		// creates the GLCapabilities instance and makes the OpenGL
 		// bindings available for use.
 		GL.createCapabilities();
+	}
 
-		// alpha blending
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	private void initImGui()
+	{
+		this.imGuiLayer = new ImGuiLayer(glfwWindow);
+		this.imGuiLayer.initImGui();
+	}
 
-		Window.changeScene(0);
+	private void destroy()
+	{
+		// Free the memory
+		glfwFreeCallbacks(glfwWindow);
+		glfwDestroyWindow(glfwWindow);
+
+		// Terminate GLFW and the free the error callback
+		glfwTerminate();
+		var callBack = glfwSetErrorCallback(null);
+		if (callBack != null)
+			callBack.free();
 	}
 
 	private void loop()
@@ -144,9 +198,7 @@ public class Window
 
 		while (!glfwWindowShouldClose(glfwWindow))
 		{
-			// Poll events
-			glfwPollEvents();
-
+			GLFW.glfwPollEvents();
 			glClearColor(r, g, b, a);
 			glClear(GL_COLOR_BUFFER_BIT);
 
@@ -155,7 +207,8 @@ public class Window
 				currentScene.update(dt);
 			}
 
-			glfwSwapBuffers(glfwWindow);
+			this.imGuiLayer.update(dt);
+			GLFW.glfwSwapBuffers(glfwWindow);
 
 			endTime = (float) glfwGetTime();
 			dt = endTime - beginTime;
