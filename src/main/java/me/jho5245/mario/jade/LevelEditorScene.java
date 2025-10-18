@@ -35,8 +35,7 @@ public class LevelEditorScene extends Scene
 		obj1 = new GameObject("Object 1", new Transform(new Vector2f(200, 100), new Vector2f(256, 256), new Vector2f(256, 256)), 4);
 
 		SpriteRenderer renderer1 = new SpriteRenderer(), renderer2 = new SpriteRenderer();
-		Sprite sprite = new Sprite();
-		sprite.setTexture(AssetPool.getTexture("assets/images/test.png"));
+		Sprite sprite = new Sprite(AssetPool.getTexture("assets/images/test.png"));
 		renderer1.setColor(new Vector4f(1, 0, 0, 1));
 		renderer2.setColor(new Vector4f(1, 0, 0, 1));
 		renderer2.setSprite(sprite);
