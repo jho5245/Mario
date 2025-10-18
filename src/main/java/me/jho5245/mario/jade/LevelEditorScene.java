@@ -10,6 +10,8 @@ import me.jho5245.mario.util.AssetPool;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 
+import java.awt.event.ComponentAdapter;
+
 public class LevelEditorScene extends Scene
 {
 	private GameObject obj1;
@@ -24,8 +26,9 @@ public class LevelEditorScene extends Scene
 	public void init()
 	{
 		loadResources();
-
 		this.camera = new Camera(new Vector2f(-250, -100));
+		if (levelLoaded)
+			return;
 
 		spriteSheet = AssetPool.getSpriteSheet("assets/images/spritesheet.png");
 
@@ -46,9 +49,15 @@ public class LevelEditorScene extends Scene
 
 		Gson gson = new GsonBuilder()
 				.setPrettyPrinting()
+				.registerTypeAdapter(Component.class, new ComponentDeserializer())
+				.registerTypeAdapter(GameObject.class, new GameObjectDeserializer())
 				.create();
 
-		System.out.println(gson.toJson(obj1));
+		String json = gson.toJson(obj1);
+		System.out.println(json);
+		GameObject deserialized = gson.fromJson(json, GameObject.class);
+		System.out.println(deserialized);
+
 	}
 
 	private void loadResources()
