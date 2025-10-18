@@ -95,7 +95,7 @@ public abstract class Scene
 
 		try
 		{
-			FileWriter writer = new FileWriter("level.txt");
+			FileWriter writer = new FileWriter("level.json");
 			writer.write(gson.toJson(gameObjects));
 			writer.close();
 		}
@@ -116,7 +116,7 @@ public abstract class Scene
 		String inFile;
 		try
 		{
-			inFile = new String(Files.readAllBytes(Paths.get("level.txt")));
+			inFile = new String(Files.readAllBytes(Paths.get("level.json")));
 		}
 		catch (IOException e)
 		{
@@ -126,8 +126,28 @@ public abstract class Scene
 
 		if (!inFile.isEmpty())
 		{
+			int maxGameObjectId = -1;
+			int maxComponentId = -1;
 			GameObject[] gameObjects = gson.fromJson(inFile, GameObject[].class);
-			Arrays.stream(gameObjects).forEach(this::addGameObject);
+			for (GameObject gameObject : gameObjects) {
+				addGameObject(gameObject);
+				for (Component component : gameObject.getAllComponents())
+				{
+					if (component.getUid() > maxComponentId)
+					{
+						maxComponentId = component.getUid();
+					}
+				}
+
+				if (gameObject.getUid() > maxGameObjectId)
+				{
+					maxGameObjectId = gameObject.getUid();
+				}
+			}
+			maxGameObjectId++;
+			maxComponentId++;
+			GameObject.init(maxGameObjectId);
+			Component.init(maxComponentId);
 			this.levelLoaded = true;
 		}
 	}

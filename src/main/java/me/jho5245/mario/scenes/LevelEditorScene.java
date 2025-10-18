@@ -2,13 +2,11 @@ package me.jho5245.mario.scenes;
 
 import imgui.ImGui;
 import imgui.ImVec2;
+import me.jho5245.mario.components.*;
 import me.jho5245.mario.jade.Camera;
 import me.jho5245.mario.jade.GameObject;
+import me.jho5245.mario.jade.Prefabs;
 import me.jho5245.mario.jade.Transform;
-import me.jho5245.mario.components.RigidBody;
-import me.jho5245.mario.components.Sprite;
-import me.jho5245.mario.components.SpriteRenderer;
-import me.jho5245.mario.components.SpriteSheet;
 import me.jho5245.mario.util.AssetPool;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
@@ -16,6 +14,8 @@ import org.joml.Vector4f;
 public class LevelEditorScene extends Scene
 {
 	private SpriteSheet spriteSheet;
+
+	MouseControls mouseControls = new MouseControls();
 
 	public LevelEditorScene()
 	{
@@ -41,7 +41,7 @@ public class LevelEditorScene extends Scene
 		renderer2.setColor(new Vector4f(1, 0, 0, 1));
 		renderer2.setSprite(sprite);
 		obj1.addComponent(renderer1);
-		obj1.addComponent(new RigidBody());
+		obj1.addComponent(new Rigidbody());
 		this.addGameObject(obj1);
 		GameObject obj2 = new GameObject("Object 1", new Transform(new Vector2f(400, 100), new Vector2f(256, 256), new Vector2f(256, 256)), 2);
 		obj2.addComponent(renderer2);
@@ -60,6 +60,7 @@ public class LevelEditorScene extends Scene
 	@Override
 	public void update(float dt)
 	{
+		mouseControls.update(dt);
 		this.gameObjects.forEach(gameObject -> gameObject.update(dt));
 		this.renderer.render();
 	}
@@ -87,7 +88,9 @@ public class LevelEditorScene extends Scene
 			ImGui.pushID(i);
 			if (ImGui.imageButton(id, spriteWidth, spriteHeight, texCoords[0].x, texCoords[0].y, texCoords[2].x, texCoords[2].y))
 			{
-				System.out.printf("button %s pressed%n", i);
+				GameObject gameObject = Prefabs.generateSpriteObject(sprite, spriteWidth, spriteHeight);
+				// Attach gameObject to the mouse cursor
+				mouseControls.pickUpObject(gameObject);
 			}
 			ImGui.popID();
 

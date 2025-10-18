@@ -7,6 +7,9 @@ import java.util.List;
 
 public class GameObject
 {
+	private static int ID_COUNTER = 0;
+	private int uid = -1;
+
 	private String name;
 
 	private List<Component> components;
@@ -15,17 +18,13 @@ public class GameObject
 
 	private int zIndex;
 
-	public GameObject(String name)
-	{
-		this(name, new Transform(), 0);
-	}
-
 	public GameObject(String name, Transform transform, int zIndex)
 	{
 		this.name = name;
 		this.components = new ArrayList<>();
 		this.transform = transform;
 		this.zIndex = zIndex;
+		this.uid = GameObject.ID_COUNTER++;
 	}
 
 	public <T extends Component> T getComponent(Class<T> clazz)
@@ -55,6 +54,7 @@ public class GameObject
 
 	public void addComponent(Component component)
 	{
+		component.generateId();
 		components.add(component);
 		component.gameObject = this;
 	}
@@ -82,5 +82,20 @@ public class GameObject
 	public void imgui()
 	{
 		components.forEach(Component::imgui);
+	}
+
+	public int getUid()
+	{
+		return this.uid;
+	}
+
+	public List<Component> getAllComponents()
+	{
+		return this.components;
+	}
+
+	public static void init(int maxId)
+	{
+		ID_COUNTER = maxId;
 	}
 }
