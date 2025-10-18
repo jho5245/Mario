@@ -1,5 +1,6 @@
 package me.jho5245.mario.jade;
 
+import me.jho5245.mario.renderer.DebugDraw;
 import me.jho5245.mario.scenes.LevelEditorScene;
 import me.jho5245.mario.scenes.LevelScene;
 import me.jho5245.mario.scenes.Scene;
@@ -205,19 +206,23 @@ public class Window
 		while (!glfwWindowShouldClose(glfwWindow))
 		{
 			// poll events
-			GLFW.glfwPollEvents();
+			glfwPollEvents();
+
+			// Debug Draw
+			DebugDraw.beginFrame();
 
 			glClearColor(r, g, b, a);
 			glClear(GL_COLOR_BUFFER_BIT);
 
 			if (dt >= 0)
 			{
+				DebugDraw.draw();
 				currentScene.update(dt);
 			}
 
 			this.imGuiLayer.update(dt, currentScene);
 
-			GLFW.glfwSwapBuffers(glfwWindow);
+			glfwSwapBuffers(glfwWindow);
 
 			endTime = (float) glfwGetTime();
 			dt = endTime - beginTime;

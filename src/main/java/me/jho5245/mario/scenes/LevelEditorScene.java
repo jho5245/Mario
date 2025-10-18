@@ -7,8 +7,10 @@ import me.jho5245.mario.jade.Camera;
 import me.jho5245.mario.jade.GameObject;
 import me.jho5245.mario.jade.Prefabs;
 import me.jho5245.mario.jade.Transform;
+import me.jho5245.mario.renderer.DebugDraw;
 import me.jho5245.mario.util.AssetPool;
 import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 public class LevelEditorScene extends Scene
@@ -46,7 +48,6 @@ public class LevelEditorScene extends Scene
 		GameObject obj2 = new GameObject("Object 1", new Transform(new Vector2f(400, 100), new Vector2f(256, 256), new Vector2f(256, 256)), 2);
 		obj2.addComponent(renderer2);
 		this.addGameObject(obj2);
-
 	}
 
 	private void loadResources()
@@ -57,10 +58,19 @@ public class LevelEditorScene extends Scene
 		AssetPool.getTexture("assets/images/green.png");
 	}
 
+	float t = 0f;
+
 	@Override
 	public void update(float dt)
 	{
 		mouseControls.update(dt);
+
+		float x = ((float) Math.sin(t) * 300f) + 600;
+		float y = ((float) Math.cos(t) * 300f) + 400;
+		t += 0.05f;
+
+		DebugDraw.addLine2D(new Vector2f(600, 400), new Vector2f(x, y), new Vector3f(0, 0, 1), 100);
+
 		this.gameObjects.forEach(gameObject -> gameObject.update(dt));
 		this.renderer.render();
 	}
