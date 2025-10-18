@@ -1,6 +1,6 @@
 package me.jho5245.mario.util;
 
-import me.jho5245.mario.jade.components.SpriteSheet;
+import me.jho5245.mario.components.SpriteSheet;
 import me.jho5245.mario.renderer.Shader;
 import me.jho5245.mario.renderer.Texture;
 

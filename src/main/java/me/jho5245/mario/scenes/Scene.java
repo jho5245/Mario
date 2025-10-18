@@ -6,8 +6,8 @@ import imgui.ImGui;
 import me.jho5245.mario.jade.Camera;
 import me.jho5245.mario.jade.GameObject;
 import me.jho5245.mario.jade.GameObjectDeserializer;
-import me.jho5245.mario.jade.components.Component;
-import me.jho5245.mario.jade.components.ComponentDeserializer;
+import me.jho5245.mario.components.Component;
+import me.jho5245.mario.components.ComponentDeserializer;
 import me.jho5245.mario.renderer.Renderer;
 
 import java.io.FileWriter;

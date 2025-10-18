@@ -1,7 +1,7 @@
 package me.jho5245.mario.renderer;
 
 import me.jho5245.mario.jade.GameObject;
-import me.jho5245.mario.jade.components.SpriteRenderer;
+import me.jho5245.mario.components.SpriteRenderer;
 
 import java.util.ArrayList;
 import java.util.Collections;

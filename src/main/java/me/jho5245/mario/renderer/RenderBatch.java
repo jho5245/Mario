@@ -1,7 +1,7 @@
 package me.jho5245.mario.renderer;
 
 import me.jho5245.mario.jade.Window;
-import me.jho5245.mario.jade.components.SpriteRenderer;
+import me.jho5245.mario.components.SpriteRenderer;
 import me.jho5245.mario.util.AssetPool;
 import org.joml.Vector2f;
 import org.joml.Vector4f;

@@ -1,6 +1,6 @@
 package me.jho5245.mario.jade;
 
-import me.jho5245.mario.jade.components.Component;
+import me.jho5245.mario.components.Component;
 
 import java.util.ArrayList;
 import java.util.List;

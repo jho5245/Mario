@@ -1,4 +1,4 @@
-package me.jho5245.mario.jade.components;
+package me.jho5245.mario.components;
 
 import me.jho5245.mario.renderer.Texture;
 import org.joml.Vector2f;

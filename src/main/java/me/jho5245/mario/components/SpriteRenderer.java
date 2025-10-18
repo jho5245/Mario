@@ -1,4 +1,4 @@
-package me.jho5245.mario.jade.components;
+package me.jho5245.mario.components;
 
 import imgui.ImGui;
 import me.jho5245.mario.jade.Transform;

@@ -1,7 +1,7 @@
 package me.jho5245.mario.jade;
 
 import com.google.gson.*;
-import me.jho5245.mario.jade.components.Component;
+import me.jho5245.mario.components.Component;
 
 import java.lang.reflect.Type;
 
