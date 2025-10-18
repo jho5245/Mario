@@ -58,6 +58,7 @@ public class Window
 				assert false : "Unknown scene '%s'".formatted(newScene);
 			}
 		}
+		currentScene.load();
 		currentScene.init();
 		currentScene.start();
 	}
@@ -198,7 +199,6 @@ public class Window
 		float endTime;
 		float dt = -1f;
 
-		currentScene.load();
 		while (!glfwWindowShouldClose(glfwWindow))
 		{
 			// poll events

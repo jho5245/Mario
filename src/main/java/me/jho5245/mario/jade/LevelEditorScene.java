@@ -3,6 +3,7 @@ package me.jho5245.mario.jade;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import imgui.ImGui;
+import me.jho5245.mario.jade.components.RigidBody;
 import me.jho5245.mario.jade.components.Sprite;
 import me.jho5245.mario.jade.components.SpriteRenderer;
 import me.jho5245.mario.jade.components.SpriteSheet;
@@ -28,42 +29,33 @@ public class LevelEditorScene extends Scene
 		loadResources();
 		this.camera = new Camera(new Vector2f(-250, -100));
 		if (levelLoaded)
+		{
+			this.activeGameObject = gameObjects.getFirst();
 			return;
+		}
 
 		spriteSheet = AssetPool.getSpriteSheet("assets/images/spritesheet.png");
 
 		obj1 = new GameObject("Object 1", new Transform(new Vector2f(200, 100), new Vector2f(256, 256), new Vector2f(256, 256)), 4);
 
-		SpriteRenderer renderer1 = new SpriteRenderer(), renderer2 = new SpriteRenderer();
+		SpriteRenderer renderer1 = new SpriteRenderer(spriteSheet.getSprite(5)), renderer2 = new SpriteRenderer();
 		Sprite sprite = new Sprite(AssetPool.getTexture("assets/images/test.png"));
 		renderer1.setColor(new Vector4f(1, 0, 0, 1));
 		renderer2.setColor(new Vector4f(1, 0, 0, 1));
 		renderer2.setSprite(sprite);
 		obj1.addComponent(renderer1);
+		obj1.addComponent(new RigidBody());
 		this.addGameObject(obj1);
 		GameObject obj2 = new GameObject("Object 1", new Transform(new Vector2f(400, 100), new Vector2f(256, 256), new Vector2f(256, 256)), 2);
 		obj2.addComponent(renderer2);
 		this.addGameObject(obj2);
-		this.activeGameObject = obj1;
-
-		Gson gson = new GsonBuilder()
-				.setPrettyPrinting()
-				.registerTypeAdapter(Component.class, new ComponentDeserializer())
-				.registerTypeAdapter(GameObject.class, new GameObjectDeserializer())
-				.create();
-
-		String json = gson.toJson(obj1);
-		System.out.println(json);
-		GameObject deserialized = gson.fromJson(json, GameObject.class);
-		System.out.println(deserialized);
 
 	}
 
 	private void loadResources()
 	{
 		AssetPool.getShader("assets/shaders/default.glsl");
-		AssetPool.addSpriteSheet("assets/images/spritesheet.png",
-				new SpriteSheet(AssetPool.getTexture("assets/images/spritesheet.png"), 16, 16, 26, 0));
+		AssetPool.addSpriteSheet("assets/images/spritesheet.png", new SpriteSheet(AssetPool.getTexture("assets/images/spritesheet.png"), 16, 16, 26, 0));
 	}
 
 	@Override
