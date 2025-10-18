@@ -1,8 +1,7 @@
 package me.jho5245.mario.jade;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import imgui.ImGui;
+import imgui.ImVec2;
 import me.jho5245.mario.jade.components.RigidBody;
 import me.jho5245.mario.jade.components.Sprite;
 import me.jho5245.mario.jade.components.SpriteRenderer;
@@ -11,12 +10,8 @@ import me.jho5245.mario.util.AssetPool;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 
-import java.awt.event.ComponentAdapter;
-
 public class LevelEditorScene extends Scene
 {
-	private GameObject obj1;
-
 	private SpriteSheet spriteSheet;
 
 	public LevelEditorScene()
@@ -27,19 +22,18 @@ public class LevelEditorScene extends Scene
 	public void init()
 	{
 		loadResources();
-		this.camera = new Camera(new Vector2f(-250, -100));
+		this.camera = new Camera(new Vector2f(-250, 0));
+		spriteSheet = AssetPool.getSpriteSheet("assets/images/spritesheets/decorationsAndBlocks.png");
 		if (levelLoaded)
 		{
 			this.activeGameObject = gameObjects.getFirst();
 			return;
 		}
 
-		spriteSheet = AssetPool.getSpriteSheet("assets/images/spritesheet.png");
-
-		obj1 = new GameObject("Object 1", new Transform(new Vector2f(200, 100), new Vector2f(256, 256), new Vector2f(256, 256)), 4);
+		GameObject obj1 = new GameObject("Object 1", new Transform(new Vector2f(200, 100), new Vector2f(256, 256), new Vector2f(256, 256)), 4);
 
 		SpriteRenderer renderer1 = new SpriteRenderer(spriteSheet.getSprite(5)), renderer2 = new SpriteRenderer();
-		Sprite sprite = new Sprite(AssetPool.getTexture("assets/images/test.png"));
+		Sprite sprite = new Sprite(AssetPool.getTexture("assets/images/red.png"));
 		renderer1.setColor(new Vector4f(1, 0, 0, 1));
 		renderer2.setColor(new Vector4f(1, 0, 0, 1));
 		renderer2.setSprite(sprite);
@@ -55,12 +49,15 @@ public class LevelEditorScene extends Scene
 	private void loadResources()
 	{
 		AssetPool.getShader("assets/shaders/default.glsl");
-		AssetPool.addSpriteSheet("assets/images/spritesheet.png", new SpriteSheet(AssetPool.getTexture("assets/images/spritesheet.png"), 16, 16, 26, 0));
+		AssetPool.addSpriteSheet("assets/images/spritesheets/decorationsAndBlocks.png",
+				new SpriteSheet(AssetPool.getTexture("assets/images/spritesheets/decorationsAndBlocks.png"), 16, 16, 81, 0));
+		AssetPool.getTexture("assets/images/green.png");
 	}
 
 	@Override
 	public void update(float dt)
 	{
+		MouseListener.getOrthoX();
 		this.gameObjects.forEach(gameObject -> gameObject.update(dt));
 		this.renderer.render();
 	}
@@ -69,7 +66,39 @@ public class LevelEditorScene extends Scene
 	public void imgui()
 	{
 		ImGui.begin("test window");
-		ImGui.text("test text");
+
+		ImVec2 windowPos = new ImVec2();
+		ImGui.getWindowPos(windowPos);
+		ImVec2 windowSize = new ImVec2();
+		ImGui.getWindowSize(windowSize);
+		ImVec2 itemSpacing = new ImVec2();
+		ImGui.getStyle().getItemSpacing(itemSpacing);
+
+		float windowX2 = windowPos.x + windowSize.x;
+		for (int i = 0; i < spriteSheet.size(); i++)
+		{
+			Sprite sprite = spriteSheet.getSprite(i);
+			float spriteWidth = sprite.getWidth() * 4, spriteHeight = sprite.getHeight() * 4;
+			int id = sprite.getTexId();
+			Vector2f[] texCoords = sprite.getTexCoords();
+
+			ImGui.pushID(i);
+			if (ImGui.imageButton(id, spriteWidth, spriteHeight, texCoords[0].x, texCoords[0].y, texCoords[2].x, texCoords[2].y))
+			{
+				System.out.printf("button %s pressed%n", i);
+			}
+			ImGui.popID();
+
+			ImVec2 lastButtonPos = new ImVec2();
+			ImGui.getItemRectMax(lastButtonPos);
+			float lastButtonX2 = lastButtonPos.x;
+			float nextButtonX2 = lastButtonX2 + itemSpacing.x + spriteWidth;
+			if (i + 1 < spriteSheet.size() && nextButtonX2 < windowX2)
+			{
+				ImGui.sameLine();
+			}
+		}
+
 		ImGui.end();
 	}
 }
