@@ -1,4 +1,4 @@
-package me.jho5245.mario.jade;
+package me.jho5245.mario.jade.components;
 
 import com.google.gson.*;
 

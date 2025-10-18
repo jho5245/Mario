@@ -1,6 +1,5 @@
 package me.jho5245.mario.jade.components;
 
-import me.jho5245.mario.jade.Component;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 

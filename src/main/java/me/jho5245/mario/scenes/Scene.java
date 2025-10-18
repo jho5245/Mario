@@ -1,8 +1,13 @@
-package me.jho5245.mario.jade;
+package me.jho5245.mario.scenes;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import imgui.ImGui;
+import me.jho5245.mario.jade.Camera;
+import me.jho5245.mario.jade.GameObject;
+import me.jho5245.mario.jade.GameObjectDeserializer;
+import me.jho5245.mario.jade.components.Component;
+import me.jho5245.mario.jade.components.ComponentDeserializer;
 import me.jho5245.mario.renderer.Renderer;
 
 import java.io.FileWriter;

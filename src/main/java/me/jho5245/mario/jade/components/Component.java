@@ -1,6 +1,7 @@
-package me.jho5245.mario.jade;
+package me.jho5245.mario.jade.components;
 
 import imgui.ImGui;
+import me.jho5245.mario.jade.GameObject;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -10,7 +11,7 @@ import java.lang.reflect.Modifier;
 
 public abstract class Component
 {
-	protected transient GameObject gameObject = null;
+	public transient GameObject gameObject = null;
 
 	public void start()
 	{

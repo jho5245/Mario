@@ -1,4 +1,4 @@
-package me.jho5245.mario.jade;
+package me.jho5245.mario.scenes;
 
 public class LevelScene extends Scene
 {

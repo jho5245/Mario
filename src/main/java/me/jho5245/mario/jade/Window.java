@@ -1,5 +1,8 @@
 package me.jho5245.mario.jade;
 
+import me.jho5245.mario.scenes.LevelEditorScene;
+import me.jho5245.mario.scenes.LevelScene;
+import me.jho5245.mario.scenes.Scene;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;

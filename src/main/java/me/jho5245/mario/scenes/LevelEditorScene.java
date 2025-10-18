@@ -1,7 +1,10 @@
-package me.jho5245.mario.jade;
+package me.jho5245.mario.scenes;
 
 import imgui.ImGui;
 import imgui.ImVec2;
+import me.jho5245.mario.jade.Camera;
+import me.jho5245.mario.jade.GameObject;
+import me.jho5245.mario.jade.Transform;
 import me.jho5245.mario.jade.components.RigidBody;
 import me.jho5245.mario.jade.components.Sprite;
 import me.jho5245.mario.jade.components.SpriteRenderer;

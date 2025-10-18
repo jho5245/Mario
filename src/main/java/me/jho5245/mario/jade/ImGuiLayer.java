@@ -12,6 +12,7 @@ import imgui.flag.ImGuiKey;
 import imgui.flag.ImGuiMouseCursor;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;
+import me.jho5245.mario.scenes.Scene;
 import org.lwjgl.glfw.GLFW;
 
 import static org.lwjgl.glfw.GLFW.*;

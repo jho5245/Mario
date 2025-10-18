@@ -1,6 +1,6 @@
 package me.jho5245.mario.jade;
 
-import org.joml.Vector2f;
+import me.jho5245.mario.jade.components.Component;
 
 import java.util.ArrayList;
 import java.util.List;

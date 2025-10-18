@@ -1,7 +1,6 @@
 package me.jho5245.mario.jade.components;
 
 import imgui.ImGui;
-import me.jho5245.mario.jade.Component;
 import me.jho5245.mario.jade.Transform;
 import me.jho5245.mario.renderer.Texture;
 import org.joml.Vector2f;
