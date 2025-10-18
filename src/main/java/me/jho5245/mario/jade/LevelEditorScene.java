@@ -1,11 +1,14 @@
 package me.jho5245.mario.jade;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import imgui.ImGui;
 import me.jho5245.mario.jade.components.Sprite;
 import me.jho5245.mario.jade.components.SpriteRenderer;
 import me.jho5245.mario.jade.components.SpriteSheet;
 import me.jho5245.mario.util.AssetPool;
 import org.joml.Vector2f;
+import org.joml.Vector4f;
 
 public class LevelEditorScene extends Scene
 {
@@ -27,12 +30,25 @@ public class LevelEditorScene extends Scene
 		spriteSheet = AssetPool.getSpriteSheet("assets/images/spritesheet.png");
 
 		obj1 = new GameObject("Object 1", new Transform(new Vector2f(200, 100), new Vector2f(256, 256), new Vector2f(256, 256)), 4);
-		obj1.addComponent(new SpriteRenderer(spriteSheet.getSprite(0)));
+
+		SpriteRenderer renderer1 = new SpriteRenderer(), renderer2 = new SpriteRenderer();
+		Sprite sprite = new Sprite();
+		sprite.setTexture(AssetPool.getTexture("assets/images/test.png"));
+		renderer1.setColor(new Vector4f(1, 0, 0, 1));
+		renderer2.setColor(new Vector4f(1, 0, 0, 1));
+		renderer2.setSprite(sprite);
+		obj1.addComponent(renderer1);
 		this.addGameObject(obj1);
 		GameObject obj2 = new GameObject("Object 1", new Transform(new Vector2f(400, 100), new Vector2f(256, 256), new Vector2f(256, 256)), 2);
-		obj2.addComponent(new SpriteRenderer(spriteSheet.getSprite(15)));
+		obj2.addComponent(renderer2);
 		this.addGameObject(obj2);
 		this.activeGameObject = obj1;
+
+		Gson gson = new GsonBuilder()
+				.setPrettyPrinting()
+				.create();
+
+		System.out.println(gson.toJson(obj1));
 	}
 
 	private void loadResources()

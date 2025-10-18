@@ -2,7 +2,7 @@ package me.jho5245.mario.jade;
 
 public abstract class Component
 {
-	protected GameObject gameObject = null;
+	protected transient GameObject gameObject = null;
 
 	public void start()
 	{

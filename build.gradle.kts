@@ -17,6 +17,9 @@ dependencies {
 //    testImplementation("org.junit.jupiter:junit-jupiter")
 //    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
+    // Gson
+    implementation("com.google.code.gson:gson:2.13.2")
+
     // Imgui files
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
