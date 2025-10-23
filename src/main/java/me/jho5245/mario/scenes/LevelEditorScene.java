@@ -91,7 +91,7 @@ public class LevelEditorScene extends Scene
 		for (int i = 0; i < spriteSheet.size(); i++)
 		{
 			Sprite sprite = spriteSheet.getSprite(i);
-			float spriteWidth = sprite.getWidth() * 4, spriteHeight = sprite.getHeight() * 4;
+			float spriteWidth = sprite.getWidth() * 2, spriteHeight = sprite.getHeight() * 2;
 			int id = sprite.getTexId();
 			Vector2f[] texCoords = sprite.getTexCoords();
 
