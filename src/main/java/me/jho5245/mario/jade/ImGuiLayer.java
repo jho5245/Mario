@@ -140,10 +140,10 @@ public class ImGuiLayer
 			}
 
 			// 가끔 클릭이 안되면 아래 조건문 주석 처리
-//			if (!io.getWantCaptureMouse())
-//			{
-//				MouseListener.mouseButtonCallback(w, button, action, mods);
-//			}
+			if (!io.getWantCaptureMouse())
+			{
+				MouseListener.mouseButtonCallback(w, button, action, mods);
+			}
 		});
 
 		glfwSetScrollCallback(glfwWindow, (w, xOffset, yOffset) ->
