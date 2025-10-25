@@ -4,6 +4,7 @@ import org.lwjgl.BufferUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.Objects;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.stb.STBImage.*;
@@ -86,5 +87,22 @@ public class Texture
 	public int getId()
 	{
 		return textureID;
+	}
+
+	public String getFilePath()
+	{
+		return filePath;
+	}
+
+	@Override
+	public boolean equals(Object o)
+	{
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Texture texture = (Texture) o;
+		if (width != texture.width) return false;
+		if (height != texture.height) return false;
+		if (textureID != texture.textureID) return false;
+		return Objects.equals(filePath, texture.filePath);
 	}
 }
