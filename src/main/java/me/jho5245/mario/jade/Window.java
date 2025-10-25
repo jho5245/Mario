@@ -1,6 +1,7 @@
 package me.jho5245.mario.jade;
 
 import me.jho5245.mario.renderer.DebugDraw;
+import me.jho5245.mario.renderer.FrameBuffer;
 import me.jho5245.mario.scenes.LevelEditorScene;
 import me.jho5245.mario.scenes.LevelScene;
 import me.jho5245.mario.scenes.Scene;
@@ -30,6 +31,8 @@ public class Window
 	private static Window window = null;
 
 	private static Scene currentScene;
+
+	private FrameBuffer frameBuffer;
 
 	private Window()
 	{
@@ -129,6 +132,8 @@ public class Window
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
+//		this.frameBuffer = new FrameBuffer(width, height);
+
 		Window.changeScene(0);
 	}
 
@@ -214,11 +219,15 @@ public class Window
 			glClearColor(r, g, b, a);
 			glClear(GL_COLOR_BUFFER_BIT);
 
+//			this.frameBuffer.bind();
+
 			if (dt >= 0)
 			{
 				DebugDraw.draw();
 				currentScene.update(dt);
 			}
+
+//			this.frameBuffer.unbind();
 
 			this.imGuiLayer.update(dt, currentScene);
 
