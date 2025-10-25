@@ -2,6 +2,7 @@ package me.jho5245.mario.renderer;
 
 import me.jho5245.mario.jade.Window;
 import me.jho5245.mario.util.AssetPool;
+import me.jho5245.mario.util.JMath;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
@@ -137,5 +138,65 @@ public class DebugDraw
 	{
 		if (lines.size() >= MAX_LINES) return;
 		lines.add(new Line2D(from, to, color, lifetime));
+	}
+
+	// ============================
+	// Add box2d Methods
+	// ============================
+
+	public static void addBox(Vector2f center, Vector2f dimensions, float rotation)
+	{
+		addBox(center, dimensions, rotation, new Vector3f(0, 1, 0), 1);
+	}
+
+	// dimensions = (width, height)
+	public static void addBox(Vector2f center, Vector2f dimensions, float rotation, Vector3f color, int lifetime)
+	{
+		Vector2f min = new Vector2f(center).sub(new Vector2f(dimensions).mul(0.5f));
+		Vector2f max = new Vector2f(center).add(new Vector2f(dimensions).mul(0.5f));
+		Vector2f[] vertices = {
+			new Vector2f(min.x, min.y),
+			new Vector2f(min.x, max.y),
+			new Vector2f(max.x, max.y),
+			new Vector2f(max.x, min.y)
+		};
+
+		if (rotation != 0f)
+		{
+			for (Vector2f vertex : vertices)
+			{
+				JMath.rotate(vertex, rotation, center);
+			}
+		}
+
+		for (int i = 0; i < vertices.length; i++)
+		{
+			addLine2D(vertices[i], vertices[i + 1 == vertices.length ? 0 : i + 1], color, lifetime);
+		}
+	}
+
+	// ============================
+	// Add circle2d Methods
+	// ============================
+
+	public static void addCircle(Vector2f center, float radius, Vector3f color, int lifetime)
+	{
+		Vector2f[] points = new Vector2f[40];
+		int increment = 360 / points.length;
+		int currentAngle = 0;
+		for (int i = 0; i < points.length; i++)
+		{
+			Vector2f temp = new Vector2f(radius, 0);
+			JMath.rotate(temp, currentAngle, new Vector2f());
+			points[i] = new Vector2f(temp).add(center);
+
+			if (i > 0)
+			{
+				addLine2D(points[i], points[i - 1], color, lifetime);
+			}
+			currentAngle += increment;
+		}
+
+		addLine2D(points[0], points[points.length - 1], color, lifetime);
 	}
 }

@@ -10,8 +10,10 @@ import me.jho5245.mario.jade.Camera;
 import me.jho5245.mario.jade.GameObject;
 import me.jho5245.mario.jade.Prefabs;
 import me.jho5245.mario.jade.Transform;
+import me.jho5245.mario.renderer.DebugDraw;
 import me.jho5245.mario.util.AssetPool;
 import org.joml.Vector2f;
+import org.joml.Vector3f;
 
 public class LevelEditorScene extends Scene
 {
@@ -61,10 +63,16 @@ public class LevelEditorScene extends Scene
 		AssetPool.getTexture("assets/images/green.png");
 	}
 
+	float angle = 0f;
+
 	@Override
 	public void update(float dt)
 	{
 		levelEditorStuff.update(dt);
+		angle += dt * 40;
+
+		DebugDraw.addBox(new Vector2f(200, 200), new Vector2f(64, 32), angle, new Vector3f(0, 1, 0), 1);
+		DebugDraw.addCircle(new Vector2f(400, 400), (float) Math.sin(angle / 20) * 100 + 80, new Vector3f(1, 0, 0), 1);
 
 		this.gameObjects.forEach(gameObject -> gameObject.update(dt));
 		this.renderer.render();
