@@ -1,5 +1,7 @@
 package me.jho5245.mario.jade;
 
+import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector4f;
 
 import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
@@ -16,6 +18,8 @@ public class MouseListener
 	private final boolean[] mouseButtonPressed = new boolean[3];
 
 	private boolean isDragging;
+
+	private Vector2f gameViewportPos = new Vector2f(), gameViewportSize = new Vector2f();
 
 	private MouseListener()
 	{
@@ -80,22 +84,27 @@ public class MouseListener
 
 	public static float getOrthoX()
 	{
-		float currentX = getX();
-		currentX = (currentX / (float) Window.getWidth()) * 2f - 1f;
+		float currentX = getX() - get().gameViewportPos.x;
+		currentX = (currentX / get().gameViewportSize.x) * 2f - 1f;
 		Vector4f temp = new Vector4f(currentX, 0, 0, 1);
 		Camera camera = Window.getCurrentScene().getCamera();
-		temp.mul(camera.getInverseProjection()).mul(camera.getInverseView());
+		Matrix4f viewProjection = new Matrix4f();
+		camera.getInverseView().mul(camera.getInverseProjection(), viewProjection);
+		temp.mul(viewProjection);
 		currentX = temp.x;
 		return currentX;
 	}
 
 	public static float getOrthoY()
 	{
-		float currentY = Window.getHeight() - getY();
-		currentY = (currentY / (float) Window.getHeight()) * 2f - 1f;
+		float currentY = getY() - get().gameViewportPos.y;
+		// y값 반전 - ImGUI는 y축 증가가 위로 향함
+		currentY = -((currentY / get().gameViewportSize.y) * 2f - 1f);
 		Vector4f temp = new Vector4f(0, currentY, 0, 1);
 		Camera camera = Window.getCurrentScene().getCamera();
-		temp.mul(camera.getInverseProjection()).mul(camera.getInverseView());
+		Matrix4f viewProjection = new Matrix4f();
+		camera.getInverseView().mul(camera.getInverseProjection(), viewProjection);
+		temp.mul(viewProjection);
 		currentY = temp.y;
 		return currentY;
 	}
@@ -130,5 +139,25 @@ public class MouseListener
 		if (button < get().mouseButtonPressed.length)
 			return get().mouseButtonPressed[button];
 		return false;
+	}
+
+	public Vector2f getGameViewportPos()
+	{
+		return gameViewportPos;
+	}
+
+	public static void setGameViewportPos(Vector2f gameViewportPos)
+	{
+		get().gameViewportPos.set(gameViewportPos);
+	}
+
+	public Vector2f getGameViewportSize()
+	{
+		return gameViewportSize;
+	}
+
+	public static void setGameViewportSize(Vector2f gameViewportSize)
+	{
+		get().gameViewportSize.set(gameViewportSize);
 	}
 }

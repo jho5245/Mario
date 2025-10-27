@@ -140,7 +140,7 @@ public class ImGuiLayer
 			}
 
 			// 가끔 클릭이 안되면 아래 조건문 주석 처리
-			if (!io.getWantCaptureMouse())
+			if (!io.getWantCaptureMouse() || !GameViewWindow.getWantCaptureMouse())
 			{
 				MouseListener.mouseButtonCallback(w, button, action, mods);
 			}

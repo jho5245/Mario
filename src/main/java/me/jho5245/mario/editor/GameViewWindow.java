@@ -3,10 +3,14 @@ package me.jho5245.mario.editor;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.flag.ImGuiWindowFlags;
+import me.jho5245.mario.jade.MouseListener;
 import me.jho5245.mario.jade.Window;
+import org.joml.Vector2f;
 
 public class GameViewWindow
 {
+	private static float leftX, rightX, topY, bottomY;
+
 	public static void imgui()
 	{
 		ImGui.begin("Game Viewport", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
@@ -15,8 +19,21 @@ public class GameViewWindow
 		ImVec2 windowPos = getCenteredPositionForVieport(windowSize);
 
 		ImGui.setCursorPos(windowPos.x, windowPos.y);
+		ImVec2 topLeft = new ImVec2();
+		ImGui.getCursorScreenPos(topLeft);
+		topLeft.x -= ImGui.getScrollX();
+		topLeft.y -= ImGui.getScrollY();
+		leftX = topLeft.x;
+		bottomY = topLeft.y;
+		rightX = topLeft.x + windowSize.x;
+		topY = topLeft.y + windowSize.y;
+
 		int textureId = Window.getFrameBuffer().getTextureId();
 		ImGui.image(textureId, windowSize.x, windowSize.y, 0, 1, 1, 0);
+
+		// 마우스 위치를 게임 뷰포트 화면에 맞게 조정
+		MouseListener.setGameViewportPos(new Vector2f(topLeft.x, topLeft.y));
+		MouseListener.setGameViewportSize(new Vector2f(windowSize.x, windowSize.y));
 
 		ImGui.end();
 	}
@@ -51,5 +68,11 @@ public class GameViewWindow
 		float viewportY = (windowSize.y / 2f) - (aspectSize.y / 2f);
 
 		return new ImVec2(viewportX + ImGui.getCursorPosX(), viewportY + ImGui.getCursorPosY());
+	}
+
+	public static boolean getWantCaptureMouse()
+	{
+		return MouseListener.getX() >= leftX && MouseListener.getX() <= rightX &&
+				MouseListener.getY() <= topY && MouseListener.getY() >= bottomY;
 	}
 }
