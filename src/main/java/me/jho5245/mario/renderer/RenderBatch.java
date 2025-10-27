@@ -3,12 +3,15 @@ package me.jho5245.mario.renderer;
 import me.jho5245.mario.jade.Window;
 import me.jho5245.mario.components.SpriteRenderer;
 import me.jho5245.mario.util.AssetPool;
+import org.joml.Matrix4f;
 import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import java.lang.ProcessBuilder.Redirect;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
@@ -215,6 +218,18 @@ public class RenderBatch implements Comparable<RenderBatch>
 			}
 		}
 
+		float rotation = sprite.getGameObject().getTransform().getRotation();
+		boolean isRotated = rotation != 0f;
+		Matrix4f transformMatrfix = new Matrix4f().identity();
+		if (isRotated)
+		{
+			Vector2f position = sprite.getGameObject().getTransform().getPosition();
+			Vector2f scale = sprite.getGameObject().getTransform().getScale();
+			transformMatrfix.translate(position.x, position.y, 0);
+			transformMatrfix.rotate((float) Math.toRadians(rotation), 0, 0, 1);
+			transformMatrfix.scale(scale.x, scale.y, 0);
+		}
+
 		// add vertices with the appropriate properties
 		// *		*
 		// *		*
@@ -235,9 +250,19 @@ public class RenderBatch implements Comparable<RenderBatch>
 				yAdd = 1f;
 			}
 
+			// transform
+			Vector4f currentPosition = new Vector4f(
+					sprite.getGameObject().getTransform().getPosition().x + (xAdd * sprite.getGameObject().getTransform().getScale().x),
+					sprite.getGameObject().getTransform().getPosition().y + (yAdd * sprite.getGameObject().getTransform().getScale().y),
+					0, 1);
+			if (isRotated)
+			{
+				currentPosition = new Vector4f(xAdd, yAdd, 0, 1).mul(transformMatrfix);
+			}
+
 			// load position
-			vertices[offset] = sprite.getGameObject().getTransform().getPosition().x + (xAdd * sprite.getGameObject().getTransform().getScale().x);
-			vertices[offset + 1] = sprite.getGameObject().getTransform().getPosition().y + (yAdd * sprite.getGameObject().getTransform().getScale().y);
+			vertices[offset] = currentPosition.x;
+			vertices[offset + 1] = currentPosition.y;
 
 			// load color
 			vertices[offset + 2] = color.x;

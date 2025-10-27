@@ -3,10 +3,7 @@ package me.jho5245.mario.scenes;
 import imgui.ImGui;
 import imgui.ImVec2;
 import me.jho5245.mario.components.*;
-import me.jho5245.mario.jade.Camera;
-import me.jho5245.mario.jade.GameObject;
-import me.jho5245.mario.jade.Prefabs;
-import me.jho5245.mario.jade.Transform;
+import me.jho5245.mario.jade.*;
 import me.jho5245.mario.renderer.DebugDraw;
 import me.jho5245.mario.util.AssetPool;
 import org.joml.Vector2f;
@@ -25,20 +22,25 @@ public class LevelEditorScene extends Scene
 	@Override
 	public void init()
 	{
+		loadResources();
+		spriteSheet = AssetPool.getSpriteSheet("assets/images/spritesheets/decorationsAndBlocks.png");
+		SpriteSheet gizmos = AssetPool.getSpriteSheet("assets/images/gizmos.png");
+
 		this.camera = new Camera(new Vector2f(-250, 0));
 		levelEditorStuff.addComponent(new MouseControls());
 		levelEditorStuff.addComponent(new GridLines());
 		levelEditorStuff.addComponent(new EditorCamera(this.camera));
-
-		loadResources();
-		spriteSheet = AssetPool.getSpriteSheet("assets/images/spritesheets/decorationsAndBlocks.png");
+		levelEditorStuff.addComponent(new TranslateGizmo(gizmos.getSprite(1), Window.getImGuiLayer().getPropertiesWindow()));
+		levelEditorStuff.start();
 	}
 
 	private void loadResources()
 	{
 		AssetPool.getShader("assets/shaders/default.glsl");
-		AssetPool.addSpriteSheet("assets/images/spritesheets/decorationsAndBlocks.png",
-				new SpriteSheet(AssetPool.getTexture("assets/images/spritesheets/decorationsAndBlocks.png"), 16, 16, 81, 0));
+
+		AssetPool.addSpriteSheet("assets/images/spritesheets/decorationsAndBlocks.png", 16, 16, 81, 0);
+		AssetPool.addSpriteSheet("assets/images/gizmos.png", 24, 48, 3, 0);
+
 		AssetPool.getTexture("assets/images/green.png");
 
 		for (GameObject obj : this.gameObjects)
@@ -59,7 +61,6 @@ public class LevelEditorScene extends Scene
 	{
 		levelEditorStuff.update(dt);
 		this.camera.adjustProjection();
-
 		this.gameObjects.forEach(gameObject -> gameObject.update(dt));
 
 	}
@@ -73,6 +74,10 @@ public class LevelEditorScene extends Scene
 	@Override
 	public void imgui()
 	{
+		ImGui.begin("LevelEditorStuff");
+		levelEditorStuff.imgui();
+		ImGui.end();
+
 		ImGui.begin("test window");
 
 		ImVec2 windowPos = new ImVec2();

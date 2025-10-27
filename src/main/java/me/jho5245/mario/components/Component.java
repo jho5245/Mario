@@ -80,7 +80,7 @@ public abstract class Component
 				{
 					Vector2f v = (Vector2f) value;
 					float[] imVector2f = {v.x, v.y};
-					if (ImGui.dragFloat3(name + ": ", imVector2f))
+					if (ImGui.dragFloat2(name + ": ", imVector2f))
 					{
 						v.set(imVector2f[0], imVector2f[1]);
 					}

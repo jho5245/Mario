@@ -5,8 +5,8 @@ import org.joml.Vector2f;
 public class Transform
 {
 	protected Vector2f position;
-	protected Vector2f rotation;
 	protected Vector2f scale;
+	protected float rotation;
 
 	public Transform()
 	{
@@ -15,20 +15,20 @@ public class Transform
 
 	public Transform(Vector2f position)
 	{
-		this(position, new Vector2f());
+		this(position, 0f);
 	}
 
-	public Transform(Vector2f position, Vector2f rotation)
+	public Transform(Vector2f position, float rotation)
 	{
-		this(position, rotation, new Vector2f(1, 1));
+		this(position, new Vector2f(1, 1), rotation);
 	}
 
-	public Transform(Vector2f position, Vector2f rotation, Vector2f scale)
+	public Transform(Vector2f position, Vector2f scale, float rotation)
 	{
-		init(position, rotation, scale);
+		init(position, scale, rotation);
 	}
 
-	public void init(Vector2f position, Vector2f rotation, Vector2f scale)
+	public void init(Vector2f position, Vector2f scale, float rotation)
 	{
 		this.position = position;
 		this.rotation = rotation;
@@ -40,9 +40,14 @@ public class Transform
 		return this.position;
 	}
 
-	public Vector2f getRotation()
+	public float getRotation()
 	{
 		return this.rotation;
+	}
+
+	public void setRotation(float rotation)
+	{
+		this.rotation = rotation;
 	}
 
 	public Vector2f getScale()
@@ -52,14 +57,14 @@ public class Transform
 
 	public Transform copy()
 	{
-		return new Transform(new Vector2f(this.position), new Vector2f(this.rotation), new Vector2f(this.scale));
+		return new Transform(new Vector2f(this.position), new Vector2f(this.scale), this.rotation);
 	}
 
 	public void copy(Transform to)
 	{
 		to.position.set(this.position);
-		to.rotation.set(this.rotation);
 		to.scale.set(this.scale);
+		to.rotation = this.rotation;
 	}
 
 	@Override
@@ -69,7 +74,7 @@ public class Transform
 		if (o == null || getClass() != o.getClass()) return false;
 		Transform transform = (Transform) o;
 		if (!position.equals(transform.position)) return false;
-		if (!rotation.equals(transform.rotation)) return false;
+		if (rotation != transform.rotation) return false;
 		return scale.equals(transform.scale);
 	}
 }

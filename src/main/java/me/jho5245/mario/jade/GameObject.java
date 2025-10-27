@@ -18,6 +18,8 @@ public class GameObject
 
 	private int zIndex;
 
+	private boolean doSerialization = true;
+
 	public GameObject(String name, Transform transform, int zIndex)
 	{
 		this.name = name;
@@ -98,4 +100,15 @@ public class GameObject
 	{
 		ID_COUNTER = maxId;
 	}
+
+	public boolean doSerialization()
+	{
+		return this.doSerialization;
+	}
+
+	public void setNoSerialize()
+	{
+		this.doSerialization = false;
+	}
+
 }

@@ -60,6 +60,11 @@ public class AssetPool
 		}
 	}
 
+	public static void addSpriteSheet(String resourceName, int spriteWidth, int spriteHeight, int numSprites, int spacing)
+	{
+		addSpriteSheet(resourceName, new SpriteSheet(AssetPool.getTexture(resourceName), spriteWidth, spriteHeight, numSprites, spacing));
+	}
+
 	public static SpriteSheet getSpriteSheet(String resourceName)
 	{
 		File file = new File(resourceName);

@@ -89,7 +89,7 @@ public abstract class Scene
 		try
 		{
 			FileWriter writer = new FileWriter("level.json");
-			writer.write(gson.toJson(gameObjects));
+			writer.write(gson.toJson(gameObjects.stream().filter(GameObject::doSerialization).toList()));
 			writer.close();
 		}
 		catch (Exception e)

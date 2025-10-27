@@ -113,6 +113,11 @@ public class Window
 		return 16f / 9f;
 	}
 
+	public static ImGuiLayer getImGuiLayer()
+	{
+		return getInstance().imGuiLayer;
+	}
+
 	public void run()
 	{
 		System.out.printf("Hello LWJGL %s!%n", Version.getVersion());
