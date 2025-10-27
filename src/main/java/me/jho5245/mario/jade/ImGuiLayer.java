@@ -27,9 +27,12 @@ public class ImGuiLayer
 	private final ImGuiImplGl3 imGuiGl3 = new ImGuiImplGl3();
 	private final ImGuiImplGlfw imGuiGlfw = new ImGuiImplGlfw();
 
+	private GameViewWindow gameViewWindow;
+
 	public ImGuiLayer(long glfwWindow)
 	{
 		this.glfwWindow = glfwWindow;
+		this.gameViewWindow = new GameViewWindow();
 	}
 
 	// Initialize Dear ImGui.
@@ -140,7 +143,7 @@ public class ImGuiLayer
 			}
 
 			// 가끔 클릭이 안되면 아래 조건문 주석 처리
-			if (!io.getWantCaptureMouse() || !GameViewWindow.getWantCaptureMouse())
+			if (!io.getWantCaptureMouse() || !gameViewWindow.getWantCaptureMouse())
 			{
 				MouseListener.mouseButtonCallback(w, button, action, mods);
 			}
@@ -236,7 +239,7 @@ public class ImGuiLayer
 		setupDockspace();
 		currentScene.sceneImgui();
 		ImGui.showDemoWindow();
-		GameViewWindow.imgui();
+		gameViewWindow.imgui();
 		ImGui.end();
 		ImGui.render();
 
