@@ -26,7 +26,6 @@ public class PropertiesWindow
 			int x = (int) MouseListener.getScreenX();
 			int y = (int) MouseListener.getScreenY();
 			int gameObjectId = pickingTexture.readPixel(x, y);
-			System.out.println(gameObjectId);
 			activeGameObject = currentScene.getGameObject(gameObjectId);
 		}
 	}
