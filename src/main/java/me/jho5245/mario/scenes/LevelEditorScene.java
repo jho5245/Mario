@@ -75,16 +75,10 @@ public class LevelEditorScene extends Scene
 		}
 	}
 
-	float angle = 0f;
-
 	@Override
 	public void update(float dt)
 	{
 		levelEditorStuff.update(dt);
-		angle += dt * 40;
-
-		DebugDraw.addBox(new Vector2f(200, 200), new Vector2f(64, 32), angle, new Vector3f(0, 1, 0), 1);
-		DebugDraw.addCircle(new Vector2f(400, 400), (float) Math.sin(angle / 20) * 100 + 80, new Vector3f(1, 0, 0), 1);
 
 		this.gameObjects.forEach(gameObject -> gameObject.update(dt));
 		this.renderer.render();

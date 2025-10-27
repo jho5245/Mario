@@ -10,6 +10,7 @@ import imgui.flag.*;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;
 import imgui.type.ImBoolean;
+import me.jho5245.mario.editor.GameViewWindow;
 import me.jho5245.mario.scenes.Scene;
 import org.lwjgl.glfw.GLFW;
 
@@ -43,10 +44,10 @@ public class ImGuiLayer
 		final ImGuiIO io = ImGui.getIO();
 
 		io.setIniFilename("imgui.ini");
-		io.addConfigFlags(ImGuiConfigFlags.NavEnableKeyboard); // Navigation with keyboard
+		io.setConfigFlags(ImGuiConfigFlags.NavEnableKeyboard); // Navigation with keyboard
+		io.setConfigFlags(ImGuiConfigFlags.DockingEnable);
 		io.setBackendFlags(ImGuiBackendFlags.HasMouseCursors); // Mouse cursors to display while resizing windows etc.
 		io.setBackendPlatformName("imgui_java_impl_glfw");
-		io.setConfigFlags(ImGuiConfigFlags.DockingEnable);
 //		io.addConfigFlags(ImGuiConfigFlags.ViewportsEnable);
 
 		// ------------------------------------------------------------
@@ -230,10 +231,12 @@ public class ImGuiLayer
 
 		// Any Dear ImGui code SHOULD go between ImGui.newFrame()/ImGui.render() methods
 		imGuiGlfw.newFrame();
+
 		ImGui.newFrame();
 		setupDockspace();
-		ImGui.showDemoWindow();
 		currentScene.sceneImgui();
+		ImGui.showDemoWindow();
+		GameViewWindow.imgui();
 		ImGui.end();
 		ImGui.render();
 

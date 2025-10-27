@@ -44,7 +44,8 @@ public class AssetPool
 		}
 		else
 		{
-			Texture texture = new Texture(filePath);
+			Texture texture = new Texture();
+			texture.init(filePath);
 			textures.put(absolutePath, texture);
 			return texture;
 		}

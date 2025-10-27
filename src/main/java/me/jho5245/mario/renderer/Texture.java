@@ -17,9 +17,10 @@ public class Texture
 
 	private int width, height;
 
-	private Texture()
+	public Texture()
 	{
-
+		textureID = -1;
+		width = height = -1;
 	}
 
 	public Texture(int width, int height)
@@ -32,10 +33,13 @@ public class Texture
 		textureID = glGenTextures();
 		glBindTexture(GL_TEXTURE_2D, textureID);
 
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
 	}
 
-	public Texture(String filePath)
+	public void init(String filePath)
 	{
 		this.filePath = filePath;
 
@@ -115,12 +119,17 @@ public class Texture
 	@Override
 	public boolean equals(Object o)
 	{
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
 		Texture texture = (Texture) o;
-		if (width != texture.width) return false;
-		if (height != texture.height) return false;
-		if (textureID != texture.textureID) return false;
+		if (width != texture.width)
+			return false;
+		if (height != texture.height)
+			return false;
+		if (textureID != texture.textureID)
+			return false;
 		return Objects.equals(filePath, texture.filePath);
 	}
 }

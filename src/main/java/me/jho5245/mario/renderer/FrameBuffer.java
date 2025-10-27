@@ -12,6 +12,7 @@ public class FrameBuffer
 	{
 		// generate frame buffer
 		fboID = glGenFramebuffers();
+		glBindFramebuffer(GL_FRAMEBUFFER, fboID);
 
 		// create texture to render the data to & attach it to framebuffer
 		this.texture = new Texture(width, height);

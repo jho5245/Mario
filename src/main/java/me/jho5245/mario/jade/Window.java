@@ -100,6 +100,17 @@ public class Window
 		return getInstance().glslVersion;
 	}
 
+	public static FrameBuffer getFrameBuffer()
+	{
+		return getInstance().frameBuffer;
+	}
+
+	public static float getTargetAspectRatio()
+	{
+		// TODO: Do not hardcode
+		return 16f / 9f;
+	}
+
 	public void run()
 	{
 		System.out.printf("Hello LWJGL %s!%n", Version.getVersion());
@@ -132,7 +143,8 @@ public class Window
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
-//		this.frameBuffer = new FrameBuffer(width, height);
+		this.frameBuffer = new FrameBuffer(width, height);
+		glViewport(0, 0, width, height);
 
 		Window.changeScene(0);
 	}
@@ -216,10 +228,10 @@ public class Window
 			// Debug Draw
 			DebugDraw.beginFrame();
 
+			this.frameBuffer.bind();
+
 			glClearColor(r, g, b, a);
 			glClear(GL_COLOR_BUFFER_BIT);
-
-//			this.frameBuffer.bind();
 
 			if (dt >= 0)
 			{
@@ -227,7 +239,7 @@ public class Window
 				currentScene.update(dt);
 			}
 
-//			this.frameBuffer.unbind();
+			this.frameBuffer.unbind();
 
 			this.imGuiLayer.update(dt, currentScene);
 
