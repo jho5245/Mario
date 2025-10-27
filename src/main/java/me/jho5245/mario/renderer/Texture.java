@@ -13,7 +13,7 @@ public class Texture
 {
 	private String filePath;
 
-	private int textureID;
+	private transient int textureID;
 
 	private int width, height;
 

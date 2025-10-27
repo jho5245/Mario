@@ -2,10 +2,7 @@ package me.jho5245.mario.scenes;
 
 import imgui.ImGui;
 import imgui.ImVec2;
-import me.jho5245.mario.components.GridLines;
-import me.jho5245.mario.components.MouseControls;
-import me.jho5245.mario.components.Sprite;
-import me.jho5245.mario.components.SpriteSheet;
+import me.jho5245.mario.components.*;
 import me.jho5245.mario.jade.Camera;
 import me.jho5245.mario.jade.GameObject;
 import me.jho5245.mario.jade.Prefabs;
@@ -36,7 +33,10 @@ public class LevelEditorScene extends Scene
 		spriteSheet = AssetPool.getSpriteSheet("assets/images/spritesheets/decorationsAndBlocks.png");
 		if (levelLoaded)
 		{
-			this.activeGameObject = gameObjects.getFirst();
+			if (!this.gameObjects.isEmpty())
+			{
+				this.activeGameObject = gameObjects.getFirst();
+			}
 			return;
 		}
 
@@ -61,6 +61,18 @@ public class LevelEditorScene extends Scene
 		AssetPool.addSpriteSheet("assets/images/spritesheets/decorationsAndBlocks.png",
 				new SpriteSheet(AssetPool.getTexture("assets/images/spritesheets/decorationsAndBlocks.png"), 16, 16, 81, 0));
 		AssetPool.getTexture("assets/images/green.png");
+
+		for (GameObject obj : this.gameObjects)
+		{
+			if (obj.getComponent(SpriteRenderer.class) != null)
+			{
+				SpriteRenderer renderer = obj.getComponent(SpriteRenderer.class);
+				if (renderer.getTexture() != null)
+				{
+					renderer.setTexture(AssetPool.getTexture(renderer.getTexture().getFilePath()));
+				}
+			}
+		}
 	}
 
 	float angle = 0f;
