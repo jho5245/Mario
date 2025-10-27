@@ -1,10 +1,10 @@
 package me.jho5245.mario.jade;
 
-import me.jho5245.mario.renderer.DebugDraw;
-import me.jho5245.mario.renderer.FrameBuffer;
+import me.jho5245.mario.renderer.*;
 import me.jho5245.mario.scenes.LevelEditorScene;
 import me.jho5245.mario.scenes.LevelScene;
 import me.jho5245.mario.scenes.Scene;
+import me.jho5245.mario.util.AssetPool;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
@@ -32,6 +32,8 @@ public class Window
 	private static Scene currentScene;
 
 	private FrameBuffer frameBuffer;
+
+	private PickingTexture pickingTexture;
 
 	private Window()
 	{
@@ -143,6 +145,7 @@ public class Window
 		glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
 		this.frameBuffer = new FrameBuffer(width, height);
+		this.pickingTexture = new PickingTexture(width, height);
 		glViewport(0, 0, width, height);
 
 		Window.changeScene(0);
@@ -219,11 +222,38 @@ public class Window
 		float endTime;
 		float dt = -1f;
 
+		Shader defaultShader = AssetPool.getShader("assets/shaders/default.glsl");
+		Shader pickingShader = AssetPool.getShader("assets/shaders/pickingShader.glsl");
+
 		while (!glfwWindowShouldClose(glfwWindow))
 		{
 			// poll events
 			glfwPollEvents();
 
+			// Render pass 1. render to picking texture
+			glDisable(GL_BLEND);
+			pickingTexture.enableWriting();
+
+			glViewport(0, 0, width, height);
+			glClearColor(0f, 0f, 0f, 0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			Renderer.bindShader(pickingShader);
+			currentScene.render();
+
+			if (MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT))
+			{
+				int x = (int) MouseListener.getScreenX();
+				int y = (int) MouseListener.getScreenY();
+
+				System.out.println(pickingTexture.readPixel(x, y));
+			}
+
+			pickingTexture.disableWriting();
+			glEnable(GL_BLEND);
+
+
+
+			// render pass 2. render actual game
 			// Debug Draw
 			DebugDraw.beginFrame();
 
@@ -235,7 +265,9 @@ public class Window
 			if (dt >= 0)
 			{
 				DebugDraw.draw();
+				Renderer.bindShader(defaultShader);
 				currentScene.update(dt);
+				currentScene.render();
 			}
 
 			this.frameBuffer.unbind();

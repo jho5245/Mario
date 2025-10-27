@@ -29,6 +29,8 @@ public class FrameBuffer
 		{
 			assert false : "error: frame buffer is not complete.";
 		}
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
 	public void bind()

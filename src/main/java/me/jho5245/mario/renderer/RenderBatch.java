@@ -6,6 +6,7 @@ import me.jho5245.mario.util.AssetPool;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 
+import java.lang.ProcessBuilder.Redirect;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +29,8 @@ public class RenderBatch implements Comparable<RenderBatch>
 
 	private final int TEX_ID_SIZE = 1;
 
+	private final int ENTITY_ID_SIZE = 1;
+
 	private final int POS_OFFSET = 0;
 
 	private final int COLOR_OFFSET = POS_OFFSET + POS_SIZE * Float.BYTES;
@@ -36,7 +39,9 @@ public class RenderBatch implements Comparable<RenderBatch>
 
 	private final int TEX_ID_OFFSET = TEX_COORDS_OFFSET + TEX_COORDS_SIZE * Float.BYTES;
 
-	private final int VERTEX_SIZE = 9;
+	private final int ENTITY_ID_OFFSET = TEX_ID_OFFSET + TEX_ID_SIZE * Float.BYTES;
+
+	private final int VERTEX_SIZE = 10;
 
 	private final int VERTEX_SIZE_BYTES = VERTEX_SIZE * Float.BYTES;
 
@@ -65,14 +70,11 @@ public class RenderBatch implements Comparable<RenderBatch>
 
 	private int maxBatchSize;
 
-	private Shader shader;
-
 	private int zIndex;
 
 	public RenderBatch(int maxBatchSize, int zIndex)
 	{
 		this.zIndex = zIndex;
-		shader = AssetPool.getShader("assets/shaders/default.glsl");
 		this.sprites = new SpriteRenderer[maxBatchSize];
 		this.maxBatchSize = maxBatchSize;
 
@@ -110,6 +112,8 @@ public class RenderBatch implements Comparable<RenderBatch>
 		glEnableVertexAttribArray(2);
 		glVertexAttribPointer(3, TEX_ID_SIZE, GL_FLOAT, false, VERTEX_SIZE_BYTES, TEX_ID_OFFSET);
 		glEnableVertexAttribArray(3);
+		glVertexAttribPointer(4, ENTITY_ID_SIZE, GL_FLOAT, false, VERTEX_SIZE_BYTES, ENTITY_ID_OFFSET);
+		glEnableVertexAttribArray(4);
 
 	}
 
@@ -134,6 +138,7 @@ public class RenderBatch implements Comparable<RenderBatch>
 		}
 
 		// use shader
+		Shader shader = Renderer.getBoundSHader();
 		shader.use();
 		shader.uploadMat4f("uProjection", Window.getCurrentScene().getCamera().getProjectionMatrix());
 		shader.uploadMat4f("uView", Window.getCurrentScene().getCamera().getViewMatrix());
@@ -246,6 +251,9 @@ public class RenderBatch implements Comparable<RenderBatch>
 
 			// load texture id
 			vertices[offset + 8] = texId;
+
+			// load entity id
+			vertices[offset + 9] = sprite.getGameObject().getUid() + 1;
 
 			offset += VERTEX_SIZE;
 		}
