@@ -6,12 +6,10 @@ import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.callback.ImStrConsumer;
 import imgui.callback.ImStrSupplier;
-import imgui.flag.ImGuiBackendFlags;
-import imgui.flag.ImGuiConfigFlags;
-import imgui.flag.ImGuiKey;
-import imgui.flag.ImGuiMouseCursor;
+import imgui.flag.*;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;
+import imgui.type.ImBoolean;
 import me.jho5245.mario.scenes.Scene;
 import org.lwjgl.glfw.GLFW;
 
@@ -48,7 +46,8 @@ public class ImGuiLayer
 		io.addConfigFlags(ImGuiConfigFlags.NavEnableKeyboard); // Navigation with keyboard
 		io.setBackendFlags(ImGuiBackendFlags.HasMouseCursors); // Mouse cursors to display while resizing windows etc.
 		io.setBackendPlatformName("imgui_java_impl_glfw");
-		io.addConfigFlags(ImGuiConfigFlags.ViewportsEnable);
+		io.setConfigFlags(ImGuiConfigFlags.DockingEnable);
+//		io.addConfigFlags(ImGuiConfigFlags.ViewportsEnable);
 
 		// ------------------------------------------------------------
 		// Keyboard mapping. ImGui will use those indices to peek into the io.KeysDown[] array.
@@ -232,9 +231,10 @@ public class ImGuiLayer
 		// Any Dear ImGui code SHOULD go between ImGui.newFrame()/ImGui.render() methods
 		imGuiGlfw.newFrame();
 		ImGui.newFrame();
+		setupDockspace();
 		ImGui.showDemoWindow();
 		currentScene.sceneImgui();
-		//		imgui();
+		ImGui.end();
 		ImGui.render();
 
 		endFrame();
@@ -309,5 +309,27 @@ public class ImGuiLayer
 		}
 
 		ImGui.end();
+	}
+
+	private void setupDockspace()
+	{
+		int windowFlags = ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoDocking;
+
+		ImGui.setNextWindowPos(0f, 0f, ImGuiCond.Always);
+		ImGui.setNextWindowSize(Window.getWidth(), Window.getHeight());
+		// push 2 style variable
+		ImGui.pushStyleVar(ImGuiStyleVar.WindowRounding, 0f);
+		ImGui.pushStyleVar(ImGuiStyleVar.WindowBorderSize, 0f);
+
+		windowFlags |= ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse |
+				ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoBringToFrontOnFocus |
+				ImGuiWindowFlags.NoNavFocus;
+
+		ImGui.begin("Dockspace Demo", new ImBoolean(true), windowFlags);
+		// pop 2 style variable
+		ImGui.popStyleVar(2);
+
+		// Dockspace
+		ImGui.dockSpace(ImGui.getID("Dockspace"));
 	}
 }
