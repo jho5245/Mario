@@ -6,7 +6,6 @@ import me.jho5245.mario.scenes.LevelEditorScene;
 import me.jho5245.mario.scenes.LevelScene;
 import me.jho5245.mario.scenes.Scene;
 import org.lwjgl.Version;
-import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 
@@ -36,8 +35,8 @@ public class Window
 
 	private Window()
 	{
-		this.width = 1366;
-		this.height = 768;
+		this.width = 1920;
+		this.height = 1060;
 		this.title = "Mario";
 		r = 1;
 		g = 1;
