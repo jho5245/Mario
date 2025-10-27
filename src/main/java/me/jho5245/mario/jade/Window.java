@@ -23,6 +23,7 @@ public class Window
 	private long glfwWindow;
 
 	public float r, g, b, a;
+
 	private String glslVersion;
 
 	private ImGuiLayer imGuiLayer;
@@ -127,7 +128,8 @@ public class Window
 		GLFWErrorCallback.createPrint(System.err).set();
 
 		// Initialize GLFW
-		if (!glfwInit()) {
+		if (!glfwInit())
+		{
 			throw new IllegalStateException("Unable to initialize GLFW.");
 		}
 
@@ -139,7 +141,8 @@ public class Window
 
 		// Create the window
 		glfwWindow = glfwCreateWindow(this.width, this.height, this.title, NULL, NULL);
-		if (glfwWindow == NULL) {
+		if (glfwWindow == NULL)
+		{
 			throw new IllegalStateException("Failed to create the GLFW window.");
 		}
 
@@ -147,7 +150,8 @@ public class Window
 		glfwSetMouseButtonCallback(glfwWindow, MouseListener::mouseButtonCallback);
 		glfwSetScrollCallback(glfwWindow, MouseListener::mouseScrollCallback);
 		glfwSetKeyCallback(glfwWindow, KeyListener::keyCallback);
-		glfwSetWindowSizeCallback(glfwWindow, (w, newWidth, newHeight) -> {
+		glfwSetWindowSizeCallback(glfwWindow, (w, newWidth, newHeight) ->
+		{
 			Window.setWidth(newWidth);
 			Window.setHeight(newHeight);
 		});
@@ -219,8 +223,6 @@ public class Window
 
 			pickingTexture.disableWriting();
 			glEnable(GL_BLEND);
-
-
 
 			// render pass 2. render actual game
 			// Debug Draw
