@@ -291,29 +291,6 @@ public class ImGuiLayer
 		ImGui.destroyContext();
 	}
 
-	private boolean showText = false;
-
-	public void imgui()
-	{
-		ImGui.begin("ImGuiLayer Cool");
-
-		if (ImGui.button("I am a button"))
-		{
-			showText = true;
-		}
-
-		if (showText)
-		{
-			ImGui.text("you clicked a bu tton");
-			if (ImGui.button("stop shopwing text"))
-			{
-				showText = false;
-			}
-		}
-
-		ImGui.end();
-	}
-
 	private void setupDockspace()
 	{
 		int windowFlags = ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoDocking;
