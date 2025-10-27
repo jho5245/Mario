@@ -2,12 +2,11 @@ package me.jho5245.mario.scenes;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import imgui.ImGui;
+import me.jho5245.mario.components.Component;
+import me.jho5245.mario.components.ComponentDeserializer;
 import me.jho5245.mario.jade.Camera;
 import me.jho5245.mario.jade.GameObject;
 import me.jho5245.mario.jade.GameObjectDeserializer;
-import me.jho5245.mario.components.Component;
-import me.jho5245.mario.components.ComponentDeserializer;
 import me.jho5245.mario.renderer.Renderer;
 
 import java.io.FileWriter;
@@ -15,8 +14,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public abstract class Scene
 {
@@ -27,8 +26,6 @@ public abstract class Scene
 	protected boolean running = false;
 
 	protected final List<GameObject> gameObjects = new ArrayList<>();
-	protected GameObject activeGameObject;
-
 	protected boolean levelLoaded = false;
 
 	public Scene()
@@ -61,6 +58,12 @@ public abstract class Scene
 		}
 	}
 
+	public GameObject getGameObject(int id)
+	{
+		Optional<GameObject> result = this.gameObjects.stream().filter(gameObject -> gameObject.getUid() == id).findFirst();
+		return result.orElse(null);
+	}
+
 	public abstract void update(float dt);
 
 	public abstract void render();
@@ -68,18 +71,6 @@ public abstract class Scene
 	public Camera getCamera()
 	{
 		return camera;
-	}
-
-	public void sceneImgui()
-	{
-		if (activeGameObject != null)
-		{
-			ImGui.begin("Inspector");
-			activeGameObject.imgui();
-			ImGui.end();
-		}
-
-		imgui();
 	}
 
 	public void imgui()

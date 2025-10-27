@@ -123,67 +123,40 @@ public class Window
 
 	private void init()
 	{
-		initWindow();
-
-		initImGui();
-
-		// Mouse Listener
-		glfwSetCursorPosCallback(glfwWindow, MouseListener::mousePosCallback);
-		glfwSetMouseButtonCallback(glfwWindow, MouseListener::mouseButtonCallback);
-		glfwSetScrollCallback(glfwWindow, MouseListener::mouseScrollCallback);
-
-		// Keyboard Listener
-		glfwSetKeyCallback(glfwWindow, KeyListener::keyCallback);
-
-		glfwSetWindowSizeCallback(glfwWindow, (w,  newWidth, newHeight) -> {
-			Window.setWidth(newWidth);
-			Window.setHeight(newHeight);
-		});
-
-		// alpha blending
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-
-		this.frameBuffer = new FrameBuffer(width, height);
-		this.pickingTexture = new PickingTexture(width, height);
-		glViewport(0, 0, width, height);
-
-		Window.changeScene(0);
-	}
-
-	private void initWindow()
-	{
-		// Setup an error callback. The default implementation
-		// will print the error message in System.err.
+		// Setup an error callback
 		GLFWErrorCallback.createPrint(System.err).set();
 
-		// Initialize GLFW. Most GLFW functions will not work before doing this.
-		if (!glfwInit())
-		{
-			throw new IllegalStateException("Could not init GLFW!");
+		// Initialize GLFW
+		if (!glfwInit()) {
+			throw new IllegalStateException("Unable to initialize GLFW.");
 		}
-
-		glslVersion = "#version 330 core";
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
 		// Configure GLFW
 		glfwDefaultWindowHints();
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-		//		glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+		glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 
 		// Create the window
-		glfwWindow = glfwCreateWindow(width, height, title, NULL, NULL);
-		if (glfwWindow == NULL)
-		{
+		glfwWindow = glfwCreateWindow(this.width, this.height, this.title, NULL, NULL);
+		if (glfwWindow == NULL) {
 			throw new IllegalStateException("Failed to create the GLFW window.");
 		}
+
+		glfwSetCursorPosCallback(glfwWindow, MouseListener::mousePosCallback);
+		glfwSetMouseButtonCallback(glfwWindow, MouseListener::mouseButtonCallback);
+		glfwSetScrollCallback(glfwWindow, MouseListener::mouseScrollCallback);
+		glfwSetKeyCallback(glfwWindow, KeyListener::keyCallback);
+		glfwSetWindowSizeCallback(glfwWindow, (w, newWidth, newHeight) -> {
+			Window.setWidth(newWidth);
+			Window.setHeight(newHeight);
+		});
 
 		// Make the OpenGL context current
 		glfwMakeContextCurrent(glfwWindow);
 		// Enable v-sync
 		glfwSwapInterval(1);
+
 		// Make the window visible
 		glfwShowWindow(glfwWindow);
 
@@ -193,18 +166,22 @@ public class Window
 		// creates the GLCapabilities instance and makes the OpenGL
 		// bindings available for use.
 		GL.createCapabilities();
-	}
 
-	private void initImGui()
-	{
-		this.imGuiLayer = new ImGuiLayer(glfwWindow);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
+		this.frameBuffer = new FrameBuffer(width, height);
+		this.pickingTexture = new PickingTexture(width, height);
+		glViewport(0, 0, width, height);
+
+		this.imGuiLayer = new ImGuiLayer(glfwWindow, pickingTexture);
 		this.imGuiLayer.initImGui();
+
+		Window.changeScene(0);
 	}
 
 	private void destroy()
 	{
-		imGuiLayer.destroyImGui();
-
 		// Free the memory
 		glfwFreeCallbacks(glfwWindow);
 		glfwDestroyWindow(glfwWindow);
@@ -239,14 +216,6 @@ public class Window
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			Renderer.bindShader(pickingShader);
 			currentScene.render();
-
-			if (MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT))
-			{
-				int x = (int) MouseListener.getScreenX();
-				int y = (int) MouseListener.getScreenY();
-
-				System.out.println(pickingTexture.readPixel(x, y));
-			}
 
 			pickingTexture.disableWriting();
 			glEnable(GL_BLEND);

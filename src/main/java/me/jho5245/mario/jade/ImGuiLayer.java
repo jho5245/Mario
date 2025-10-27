@@ -11,13 +11,15 @@ import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;
 import imgui.type.ImBoolean;
 import me.jho5245.mario.editor.GameViewWindow;
+import me.jho5245.mario.editor.PropertiesWindow;
+import me.jho5245.mario.renderer.PickingTexture;
 import me.jho5245.mario.scenes.Scene;
 import org.lwjgl.glfw.GLFW;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-public class ImGuiLayer
-{
+public class ImGuiLayer {
+
 	private long glfwWindow;
 
 	// Mouse cursors provided by GLFW
@@ -25,19 +27,18 @@ public class ImGuiLayer
 
 	// LWJGL3 renderer (SHOULD be initialized)
 	private final ImGuiImplGl3 imGuiGl3 = new ImGuiImplGl3();
-	private final ImGuiImplGlfw imGuiGlfw = new ImGuiImplGlfw();
 
 	private GameViewWindow gameViewWindow;
+	private PropertiesWindow propertiesWindow;
 
-	public ImGuiLayer(long glfwWindow)
-	{
+	public ImGuiLayer(long glfwWindow, PickingTexture pickingTexture) {
 		this.glfwWindow = glfwWindow;
 		this.gameViewWindow = new GameViewWindow();
+		this.propertiesWindow = new PropertiesWindow(pickingTexture);
 	}
 
 	// Initialize Dear ImGui.
-	public void initImGui()
-	{
+	public void initImGui() {
 		// IMPORTANT!!
 		// This line is critical for Dear ImGui to work.
 		ImGui.createContext();
@@ -46,12 +47,11 @@ public class ImGuiLayer
 		// Initialize ImGuiIO config
 		final ImGuiIO io = ImGui.getIO();
 
-		io.setIniFilename("imgui.ini");
+		io.setIniFilename("imgui.ini"); // We don't want to save .ini file
 		io.setConfigFlags(ImGuiConfigFlags.NavEnableKeyboard); // Navigation with keyboard
 		io.setConfigFlags(ImGuiConfigFlags.DockingEnable);
 		io.setBackendFlags(ImGuiBackendFlags.HasMouseCursors); // Mouse cursors to display while resizing windows etc.
 		io.setBackendPlatformName("imgui_java_impl_glfw");
-//		io.addConfigFlags(ImGuiConfigFlags.ViewportsEnable);
 
 		// ------------------------------------------------------------
 		// Keyboard mapping. ImGui will use those indices to peek into the io.KeysDown[] array.
@@ -95,14 +95,10 @@ public class ImGuiLayer
 		// ------------------------------------------------------------
 		// GLFW callbacks to handle user input
 
-		glfwSetKeyCallback(glfwWindow, (w, key, scancode, action, mods) ->
-		{
-			if (action == GLFW_PRESS)
-			{
+		glfwSetKeyCallback(glfwWindow, (w, key, scancode, action, mods) -> {
+			if (action == GLFW_PRESS) {
 				io.setKeysDown(key, true);
-			}
-			else if (action == GLFW_RELEASE)
-			{
+			} else if (action == GLFW_RELEASE) {
 				io.setKeysDown(key, false);
 			}
 
@@ -111,22 +107,18 @@ public class ImGuiLayer
 			io.setKeyAlt(io.getKeysDown(GLFW_KEY_LEFT_ALT) || io.getKeysDown(GLFW_KEY_RIGHT_ALT));
 			io.setKeySuper(io.getKeysDown(GLFW_KEY_LEFT_SUPER) || io.getKeysDown(GLFW_KEY_RIGHT_SUPER));
 
-			if (!io.getWantCaptureKeyboard())
-			{
+			if (!io.getWantCaptureKeyboard()) {
 				KeyListener.keyCallback(w, key, scancode, action, mods);
 			}
 		});
 
-		glfwSetCharCallback(glfwWindow, (w, c) ->
-		{
-			if (c != GLFW_KEY_DELETE)
-			{
+		glfwSetCharCallback(glfwWindow, (w, c) -> {
+			if (c != GLFW_KEY_DELETE) {
 				io.addInputCharacter(c);
 			}
 		});
 
-		glfwSetMouseButtonCallback(glfwWindow, (w, button, action, mods) ->
-		{
+		glfwSetMouseButtonCallback(glfwWindow, (w, button, action, mods) -> {
 			final boolean[] mouseDown = new boolean[5];
 
 			mouseDown[0] = button == GLFW_MOUSE_BUTTON_1 && action != GLFW_RELEASE;
@@ -137,45 +129,34 @@ public class ImGuiLayer
 
 			io.setMouseDown(mouseDown);
 
-			if (!io.getWantCaptureMouse() && mouseDown[1])
-			{
+			if (!io.getWantCaptureMouse() && mouseDown[1]) {
 				ImGui.setWindowFocus(null);
 			}
 
-			// 가끔 클릭이 안되면 아래 조건문 주석 처리
-			if (!io.getWantCaptureMouse() || !gameViewWindow.getWantCaptureMouse())
-			{
+			if (!io.getWantCaptureMouse() || gameViewWindow.getWantCaptureMouse()) {
 				MouseListener.mouseButtonCallback(w, button, action, mods);
 			}
 		});
 
-		glfwSetScrollCallback(glfwWindow, (w, xOffset, yOffset) ->
-		{
+		glfwSetScrollCallback(glfwWindow, (w, xOffset, yOffset) -> {
 			io.setMouseWheelH(io.getMouseWheelH() + (float) xOffset);
 			io.setMouseWheel(io.getMouseWheel() + (float) yOffset);
 		});
 
-		io.setSetClipboardTextFn(new ImStrConsumer()
-		{
+		io.setSetClipboardTextFn(new ImStrConsumer() {
 			@Override
-			public void accept(final String s)
-			{
+			public void accept(final String s) {
 				glfwSetClipboardString(glfwWindow, s);
 			}
 		});
 
-		io.setGetClipboardTextFn(new ImStrSupplier()
-		{
+		io.setGetClipboardTextFn(new ImStrSupplier() {
 			@Override
-			public String get()
-			{
+			public String get() {
 				final String clipboardString = glfwGetClipboardString(glfwWindow);
-				if (clipboardString != null)
-				{
+				if (clipboardString != null) {
 					return clipboardString;
-				}
-				else
-				{
+				} else {
 					return "";
 				}
 			}
@@ -189,31 +170,11 @@ public class ImGuiLayer
 		final ImFontConfig fontConfig = new ImFontConfig(); // Natively allocated object, should be explicitly destroyed
 
 		// Glyphs could be added per-font as well as per config used globally like here
-		fontConfig.setGlyphRanges(fontAtlas.getGlyphRangesKorean());
-
-//		// Add a default font, which is 'ProggyClean.ttf, 13px'
-//		fontAtlas.addFontDefault();
+		fontConfig.setGlyphRanges(fontAtlas.getGlyphRangesDefault());
 
 		// Fonts merge example
-//		fontConfig.setMergeMode(true); // When enabled, all fonts added with this config would be merged with the previously added font
 		fontConfig.setPixelSnapH(true);
-		fontAtlas.addFontFromFileTTF("assets/fonts/consola.ttf", 12, fontConfig);
-
-//		fontAtlas.addFontFromMemoryTTF(loadFromResources("basis33.ttf"), 16, fontConfig);
-
-//		fontConfig.setMergeMode(false);
-//		fontConfig.setPixelSnapH(false);
-
-		// Fonts from file/memory example
-		// We can add new fonts from the file system
-//		fontAtlas.addFontFromFileTTF("src/test/resources/Righteous-Regular.ttf", 14, fontConfig);
-//		fontAtlas.addFontFromFileTTF("src/test/resources/Righteous-Regular.ttf", 16, fontConfig);
-
-		// Or directly from the memory
-//		fontConfig.setName("Roboto-Regular.ttf, 14px"); // This name will be displayed in Style Editor
-//		fontAtlas.addFontFromMemoryTTF(loadFromResources("Roboto-Regular.ttf"), 14, fontConfig);
-//		fontConfig.setName("Roboto-Regular.ttf, 16px"); // We can apply a new config value every time we add a new font
-//		fontAtlas.addFontFromMemoryTTF(loadFromResources("Roboto-Regular.ttf"), 16, fontConfig);
+		fontAtlas.addFontFromFileTTF("assets/fonts/consola.ttf", 11, fontConfig);
 
 		fontConfig.destroy(); // After all fonts were added we don't need this config more
 
@@ -224,46 +185,32 @@ public class ImGuiLayer
 		// Method initializes LWJGL3 renderer.
 		// This method SHOULD be called after you've initialized your ImGui configuration (fonts and so on).
 		// ImGui context should be created as well.
-		imGuiGl3.init(Window.getGLSLVersion());
-		imGuiGlfw.init(glfwWindow, true);
+		imGuiGl3.init("#version 330 core");
 	}
 
-	public void update(float dt, Scene currentScene)
-	{
+	public void update(float dt, Scene currentScene) {
 		startFrame(dt);
 
 		// Any Dear ImGui code SHOULD go between ImGui.newFrame()/ImGui.render() methods
-		imGuiGlfw.newFrame();
-
 		ImGui.newFrame();
 		setupDockspace();
-		currentScene.sceneImgui();
+		currentScene.imgui();
 		ImGui.showDemoWindow();
 		gameViewWindow.imgui();
+		propertiesWindow.update(dt, currentScene);
+		propertiesWindow.imgui();
 		ImGui.end();
 		ImGui.render();
 
 		endFrame();
-
-		// Update and Render additional Platform Windows
-		// (Platform functions may change the current OpenGL context, so we save/restore it to make it easier to paste this code elsewhere.
-		//  For this specific demo app we could also call glfwMakeContextCurrent(window) directly)
-		if (ImGui.getIO().hasConfigFlags(ImGuiConfigFlags.ViewportsEnable))
-		{
-			final long backupCurrentContext = org.lwjgl.glfw.GLFW.glfwGetCurrentContext();
-			ImGui.updatePlatformWindows();
-			ImGui.renderPlatformWindowsDefault();
-			GLFW.glfwMakeContextCurrent(backupCurrentContext);
-		}
 	}
 
-	private void startFrame(final float deltaTime)
-	{
+	private void startFrame(final float deltaTime) {
 		// Get window properties and mouse position
-		float[] winWidth = { Window.getWidth() };
-		float[] winHeight = { Window.getHeight() };
-		double[] mousePosX = { 0 };
-		double[] mousePosY = { 0 };
+		float[] winWidth = {Window.getWidth()};
+		float[] winHeight = {Window.getHeight()};
+		double[] mousePosX = {0};
+		double[] mousePosY = {0};
 		glfwGetCursorPos(glfwWindow, mousePosX, mousePosY);
 
 		// We SHOULD call those methods to update Dear ImGui state for the current frame
@@ -279,37 +226,30 @@ public class ImGuiLayer
 		glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	}
 
-	private void endFrame()
-	{
+	private void endFrame() {
 		// After Dear ImGui prepared a draw data, we use it in the LWJGL3 renderer.
 		// At that moment ImGui will be rendered to the current OpenGL context.
 		imGuiGl3.renderDrawData(ImGui.getDrawData());
 	}
 
 	// If you want to clean a room after yourself - do it by yourself
-	public void destroyImGui()
-	{
-		imGuiGlfw.dispose();
+	private void destroyImGui() {
 		imGuiGl3.dispose();
 		ImGui.destroyContext();
 	}
 
-	private void setupDockspace()
-	{
+	private void setupDockspace() {
 		int windowFlags = ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoDocking;
 
-		ImGui.setNextWindowPos(0f, 0f, ImGuiCond.Always);
+		ImGui.setNextWindowPos(0.0f, 0.0f, ImGuiCond.Always);
 		ImGui.setNextWindowSize(Window.getWidth(), Window.getHeight());
-		// push 2 style variable
-		ImGui.pushStyleVar(ImGuiStyleVar.WindowRounding, 0f);
-		ImGui.pushStyleVar(ImGuiStyleVar.WindowBorderSize, 0f);
-
+		ImGui.pushStyleVar(ImGuiStyleVar.WindowRounding, 0.0f);
+		ImGui.pushStyleVar(ImGuiStyleVar.WindowBorderSize, 0.0f);
 		windowFlags |= ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse |
-				ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoBringToFrontOnFocus |
-				ImGuiWindowFlags.NoNavFocus;
+				ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove |
+				ImGuiWindowFlags.NoBringToFrontOnFocus | ImGuiWindowFlags.NoNavFocus;
 
 		ImGui.begin("Dockspace Demo", new ImBoolean(true), windowFlags);
-		// pop 2 style variable
 		ImGui.popStyleVar(2);
 
 		// Dockspace
