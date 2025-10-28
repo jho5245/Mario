@@ -43,8 +43,8 @@ public class Transform extends Component
 	{
 		JImGui.drawVec2Control("Position", position);
 		JImGui.drawVec2Control("Scale", scale, Settings.GRID_HEIGHT);
-		JImGui.dragFloat("Rotation", rotation);
-		JImGui.dragInt("zIndex", zIndex);
+		this.rotation = JImGui.dragFloat("Rotation", rotation);
+		this.zIndex = JImGui.dragInt("zIndex", zIndex);
 	}
 
 	public Vector2f getPosition()
@@ -66,6 +66,7 @@ public class Transform extends Component
 	{
 		return this.scale;
 	}
+
 
 	public Transform copy()
 	{

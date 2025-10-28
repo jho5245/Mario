@@ -5,13 +5,10 @@ import me.jho5245.mario.physics2d.enums.BodyType;
 import org.jbox2d.dynamics.Body;
 import org.joml.Vector2f;
 
-/**
- * Adapter from jbox2d to mario
- */
 public class Rigidbody2D extends Component
 {
 	private Vector2f velocity = new Vector2f();
-	private float angularVelocity = 0.8f;
+	private float angularDamping = 0.8f;
 	private float linearDamping = 0.9f;
 	private float mass = 0;
 	private BodyType bodyType = BodyType.DYNAMIC;
@@ -19,15 +16,22 @@ public class Rigidbody2D extends Component
 	private boolean fixedRotation = false;
 	private boolean continuousCollision = true;
 
-	private Body rawBody = null;
+	private transient Body rawBody = null;
+	private transient boolean isPlaying = false;
+
+	public Rigidbody2D()
+	{
+
+	}
 
 	@Override
 	public void update(float dt)
 	{
-		if (rawBody != null)
+		Collider collider = gameObject.getComponent(Collider.class);
+		if (rawBody != null && isPlaying && collider != null)
 		{
-			this.gameObject.transform.position.set(rawBody.getPosition().x, rawBody.getPosition().y);
-			this.gameObject.transform.rotation = (float) Math.toDegrees(rawBody.getAngle());
+			this.gameObject.transform.position.set(this.rawBody.getPosition().x - collider.getOffset().x, this.rawBody.getPosition().y - collider.getOffset().y);
+			this.gameObject.transform.rotation = (float) Math.toDegrees(this.rawBody.getAngle());
 		}
 	}
 
@@ -41,14 +45,14 @@ public class Rigidbody2D extends Component
 		this.velocity = velocity;
 	}
 
-	public float getAngularVelocity()
+	public float getAngularDamping()
 	{
-		return angularVelocity;
+		return angularDamping;
 	}
 
-	public void setAngularVelocity(float angularVelocity)
+	public void setAngularDamping(float angularDamping)
 	{
-		this.angularVelocity = angularVelocity;
+		this.angularDamping = angularDamping;
 	}
 
 	public float getLinearDamping()
@@ -109,5 +113,10 @@ public class Rigidbody2D extends Component
 	public void setRawBody(Body rawBody)
 	{
 		this.rawBody = rawBody;
+	}
+
+	public void setIsPlaying(boolean val)
+	{
+		this.isPlaying = val;
 	}
 }

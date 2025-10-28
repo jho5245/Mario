@@ -70,8 +70,15 @@ public class AssetPool
 		File file = new File(resourceName);
 		if (!spritesheets.containsKey(file.getAbsolutePath()))
 		{
-			assert false: "No SpriteSheet %s to access".formatted(resourceName);
+			assert false : "No SpriteSheet %s to access".formatted(resourceName);
 		}
 		return spritesheets.getOrDefault(file.getAbsolutePath(), null);
+	}
+
+	public static void reset()
+	{
+		AssetPool.spritesheets.clear();
+		AssetPool.textures.clear();
+		AssetPool.shaders.clear();
 	}
 }

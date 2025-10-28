@@ -5,15 +5,32 @@ import imgui.ImVec2;
 import imgui.flag.ImGuiWindowFlags;
 import me.jho5245.mario.jade.MouseListener;
 import me.jho5245.mario.jade.Window;
+import me.jho5245.mario.observers.ObserverHandler;
+import me.jho5245.mario.observers.events.Event;
+import me.jho5245.mario.observers.events.EventType;
 import org.joml.Vector2f;
 
 public class GameViewWindow
 {
 	private float leftX, rightX, topY, bottomY;
+	private boolean isPlaying;
 
 	public void imgui()
 	{
-		ImGui.begin("Game Viewport", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+		ImGui.begin("Game Viewport", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.MenuBar);
+
+		ImGui.beginMenuBar();
+		if (ImGui.menuItem("Play", "", isPlaying, !isPlaying))
+		{
+			isPlaying = true;
+			ObserverHandler.notify(null, new Event(EventType.GAME_ENGINE_START_PLAY));
+		}
+		if (ImGui.menuItem("Stop", "", !isPlaying, isPlaying))
+		{
+			isPlaying = false;
+			ObserverHandler.notify(null, new Event(EventType.GAME_ENGINE_STOP_PLAY));
+		}
+		ImGui.endMenuBar();
 
 		ImVec2 windowSize = getLargestSizeForViewport();
 		ImVec2 windowPos = getCenteredPositionForVieport(windowSize);

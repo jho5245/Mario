@@ -1,6 +1,7 @@
 package me.jho5245.mario.components;
 
 import imgui.ImGui;
+import imgui.type.ImInt;
 import me.jho5245.mario.editor.JImGui;
 import me.jho5245.mario.jade.GameObject;
 import org.joml.Vector2f;
@@ -41,7 +42,8 @@ public abstract class Component
 			for (Field field : fields)
 			{
 				boolean isTransient = Modifier.isTransient(field.getModifiers());
-				if (isTransient) continue;
+				if (isTransient)
+					continue;
 				boolean isPrivate = Modifier.isPrivate(field.getModifiers());
 
 				if (isPrivate)
@@ -77,7 +79,11 @@ public abstract class Component
 				else if (type == Vector3f.class)
 				{
 					Vector3f v = (Vector3f) value;
-					float[] imVector3f = {v.x, v.y, v.z};
+					float[] imVector3f = {
+							v.x,
+							v.y,
+							v.z
+					};
 					if (ImGui.dragFloat3(name + ": ", imVector3f))
 					{
 						v.set(imVector3f[0], imVector3f[1], imVector3f[2]);
@@ -86,10 +92,25 @@ public abstract class Component
 				else if (type == Vector4f.class)
 				{
 					Vector4f v = (Vector4f) value;
-					float[] imVector4f = {v.x, v.y, v.z, v.w};
+					float[] imVector4f = {
+							v.x,
+							v.y,
+							v.z,
+							v.w
+					};
 					if (ImGui.dragFloat4(name + ": ", imVector4f))
 					{
 						v.set(imVector4f[0], imVector4f[1], imVector4f[2], imVector4f[3]);
+					}
+				}
+				else if (type.isEnum())
+				{
+					String[] enumValues = getEnumValues(type);
+					String enumType = ((Enum<?>) value).name();
+					ImInt index = new ImInt(indexOf(enumType, enumValues));
+					if (ImGui.combo("Enum", index, enumValues, enumValues.length))
+					{
+						field.set(this, type.getEnumConstants()[index.get()]);
 					}
 				}
 
@@ -111,6 +132,37 @@ public abstract class Component
 	public int getUid()
 	{
 		return this.uid;
+	}
+
+	@SuppressWarnings("unchecked")
+	private <T extends Enum<T>> String[] getEnumValues(Class<?> enumType)
+	{
+		String[] enumValues = new String[enumType.getEnumConstants().length];
+		int i = 0;
+		for (T c : (T[]) enumType.getEnumConstants())
+		{
+			enumValues[i] = c.name();
+			i++;
+		}
+		return enumValues;
+	}
+
+	public void destroy()
+	{
+
+	}
+
+	private int indexOf(String obj, String[] arr)
+	{
+		for (int i = 0; i < arr.length; i++)
+		{
+			if (obj.equals(arr[i]))
+			{
+				return i;
+			}
+		}
+
+		return -1;
 	}
 
 	public static void init(int maxId)

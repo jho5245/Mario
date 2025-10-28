@@ -10,7 +10,7 @@ public class Camera
 
 	protected Vector2f position;
 
-	private Vector2f projectionSize;
+	private Vector2f projectionSize = new Vector2f(6f, 3f);
 
 	private float zoom = 1f;
 
@@ -21,7 +21,6 @@ public class Camera
 		this.inverseProjection = new Matrix4f();
 		this.inverseView = new Matrix4f();
 		this.position = position;
-		this.projectionSize = new Vector2f(32f * 40f, 32f * 21f);
 		adjustProjection();
 	}
 
@@ -37,7 +36,7 @@ public class Camera
 		Vector3f cameraFront = new Vector3f(0f, 0f, -1f);
 		Vector3f cameraUp = new Vector3f(0f, 1f, 0f);
 		this.viewMatrix.identity();
-		this.viewMatrix = viewMatrix.lookAt(new Vector3f(position.x, position.y, 20f), cameraFront.add(position.x, position.y, 0f), cameraUp);
+		this.viewMatrix = viewMatrix.lookAt(new Vector3f(position.x, position.y, 7f), cameraFront.add(position.x, position.y, 0f), cameraUp);
 		this.viewMatrix.invert(inverseView);
 		return this.viewMatrix;
 	}

@@ -4,6 +4,9 @@ import imgui.ImGui;
 import me.jho5245.mario.components.NonPickable;
 import me.jho5245.mario.jade.GameObject;
 import me.jho5245.mario.jade.MouseListener;
+import me.jho5245.mario.physics2d.components.Box2DCollider;
+import me.jho5245.mario.physics2d.components.CircleCollider;
+import me.jho5245.mario.physics2d.components.Rigidbody2D;
 import me.jho5245.mario.renderer.PickingTexture;
 import me.jho5245.mario.scenes.Scene;
 
@@ -20,6 +23,7 @@ public class PropertiesWindow
 	public PropertiesWindow(PickingTexture pickingTexture)
 	{
 		this.pickingTexture = pickingTexture;
+		this.activeGameObject = null;
 	}
 
 	public void update(float dt, Scene currentScene)
@@ -49,6 +53,34 @@ public class PropertiesWindow
 		if (activeGameObject != null)
 		{
 			ImGui.begin("Properties");
+			if (ImGui.beginPopupContextWindow("ComponentAdder"))
+			{
+				if (ImGui.menuItem("Add Rigidbody"))
+				{
+					if (activeGameObject.getComponent(Rigidbody2D.class) == null)
+					{
+						activeGameObject.addComponent(new Rigidbody2D());
+					}
+				}
+
+				if (ImGui.menuItem("Add Box Collider"))
+				{
+					if (activeGameObject.getComponent(Box2DCollider.class) == null && activeGameObject.getComponent(CircleCollider.class) == null)
+					{
+						activeGameObject.addComponent(new Box2DCollider());
+					}
+				}
+
+				if (ImGui.menuItem("Add Circle Collider"))
+				{
+					if (activeGameObject.getComponent(Box2DCollider.class) == null && activeGameObject.getComponent(CircleCollider.class) == null)
+					{
+						activeGameObject.addComponent(new CircleCollider());
+					}
+				}
+
+				ImGui.endPopup();
+			}
 			activeGameObject.imgui();
 			ImGui.end();
 		}
@@ -57,5 +89,10 @@ public class PropertiesWindow
 	public GameObject getActiveGameObject()
 	{
 		return activeGameObject;
+	}
+
+	public void setActiveGameObject(GameObject gameObject)
+	{
+		this.activeGameObject = gameObject;
 	}
 }

@@ -8,7 +8,12 @@ import me.jho5245.mario.components.Transform;
 import me.jho5245.mario.jade.Camera;
 import me.jho5245.mario.jade.GameObject;
 import me.jho5245.mario.jade.GameObjectDeserializer;
+import me.jho5245.mario.jade.MouseListener;
+import me.jho5245.mario.physics2d.Physics2D;
+import me.jho5245.mario.renderer.DebugDraw;
 import me.jho5245.mario.renderer.Renderer;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -18,41 +23,56 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public abstract class Scene
+public class Scene
 {
-	protected Renderer renderer = new Renderer();
-
+	protected Renderer renderer;
+	private Physics2D physics2D;
 	protected Camera camera;
+	protected boolean isRunning = false;
+	protected final List<GameObject> gameObjects;
 
-	protected boolean running = false;
+	private SceneInitializer sceneInitializer;
 
-	protected final List<GameObject> gameObjects = new ArrayList<>();
-	protected boolean levelLoaded = false;
-
-	public Scene()
+	public Scene(SceneInitializer sceneInitializer, boolean playPhysics)
 	{
-
+		this.sceneInitializer = sceneInitializer;
+		this.physics2D = new Physics2D(playPhysics);
+		this.renderer = new Renderer();
+		this.gameObjects = new ArrayList<>();
+		this.isRunning = false;
 	}
 
 	public void init()
 	{
-
+		this.camera = new Camera(new Vector2f(0, 0));
+		this.sceneInitializer.loadResources(this);
+		this.sceneInitializer.init(this);
 	}
 
 	public void start()
 	{
-		gameObjects.forEach(gameObject ->
+		for (int i = 0; i < this.gameObjects.size(); i++)
 		{
+			GameObject gameObject = this.gameObjects.get(i);
 			gameObject.start();
 			renderer.add(gameObject);
-		});
-		running = true;
+			this.physics2D.addGameObject(gameObject);
+		}
+		isRunning = true;
+	}
+
+	public void destroy()
+	{
+		for (GameObject gameObject : gameObjects)
+		{
+			gameObject.destroy();
+		}
 	}
 
 	public void addGameObject(GameObject gameObject)
 	{
 		gameObjects.add(gameObject);
-		if (running)
+		if (isRunning)
 		{
 			gameObject.start();
 			renderer.add(gameObject);
@@ -65,9 +85,32 @@ public abstract class Scene
 		return result.orElse(null);
 	}
 
-	public abstract void update(float dt);
+	public void update(float dt)
+	{
+		this.camera.adjustProjection();
+		this.physics2D.update(dt);
 
-	public abstract void render();
+		DebugDraw.addLine2D(new Vector2f(0, 0), new Vector2f(1, 1), new Vector3f(1, 1, 1), 1);
+
+		for (int i = 0; i < gameObjects.size(); i++)
+		{
+			GameObject gameObject = gameObjects.get(i);
+			gameObject.update(dt);
+
+			if (gameObject.isDead())
+			{
+				gameObjects.remove(i);
+				this.renderer.destroyGameObject(gameObject);
+				this.physics2D.destroyGameObject(gameObject);
+				i--;
+			}
+		}
+	}
+
+	public void render()
+	{
+		this.renderer.render();
+	}
 
 	public Camera getCamera()
 	{
@@ -76,7 +119,12 @@ public abstract class Scene
 
 	public void imgui()
 	{
+		this.sceneInitializer.imgui();
+	}
 
+	public void debugDrawPhysics()
+	{
+		this.physics2D.debugDraw();
 	}
 
 	public GameObject createGameObject(String name)
@@ -87,13 +135,10 @@ public abstract class Scene
 		return gameObject;
 	}
 
-	public void saveExit()
+	public void save()
 	{
-		Gson gson = new GsonBuilder()
-				.setPrettyPrinting()
-				.registerTypeAdapter(Component.class, new ComponentDeserializer())
-				.registerTypeAdapter(GameObject.class, new GameObjectDeserializer())
-				.create();
+		Gson gson = new GsonBuilder().setPrettyPrinting().registerTypeAdapter(Component.class, new ComponentDeserializer())
+				.registerTypeAdapter(GameObject.class, new GameObjectDeserializer()).create();
 
 		try
 		{
@@ -109,11 +154,8 @@ public abstract class Scene
 
 	public void load()
 	{
-		Gson gson = new GsonBuilder()
-				.setPrettyPrinting()
-				.registerTypeAdapter(Component.class, new ComponentDeserializer())
-				.registerTypeAdapter(GameObject.class, new GameObjectDeserializer())
-				.create();
+		Gson gson = new GsonBuilder().setPrettyPrinting().registerTypeAdapter(Component.class, new ComponentDeserializer())
+				.registerTypeAdapter(GameObject.class, new GameObjectDeserializer()).create();
 
 		String inFile;
 		try
@@ -131,7 +173,8 @@ public abstract class Scene
 			int maxGameObjectId = -1;
 			int maxComponentId = -1;
 			GameObject[] gameObjects = gson.fromJson(inFile, GameObject[].class);
-			for (GameObject gameObject : gameObjects) {
+			for (GameObject gameObject : gameObjects)
+			{
 				addGameObject(gameObject);
 				for (Component component : gameObject.getAllComponents())
 				{
@@ -150,7 +193,11 @@ public abstract class Scene
 			maxComponentId++;
 			GameObject.init(maxGameObjectId);
 			Component.init(maxComponentId);
-			this.levelLoaded = true;
 		}
+	}
+
+	public List<GameObject> getGameObjects()
+	{
+		return this.gameObjects;
 	}
 }

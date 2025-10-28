@@ -73,7 +73,8 @@ public class DebugDraw
 
 	public static void draw()
 	{
-		if (lines.isEmpty()) return;
+		if (lines.isEmpty())
+			return;
 		int index = 0;
 		for (Line2D line : lines)
 		{
@@ -110,7 +111,7 @@ public class DebugDraw
 		glEnableVertexAttribArray(1);
 
 		// draw the batch
-		glDrawArrays(GL_LINES, 0, lines.size() * 6 * 2);
+		glDrawArrays(GL_LINES, 0, lines.size() * 2);
 
 		// disable location
 		glDisableVertexAttribArray(0);
@@ -136,7 +137,8 @@ public class DebugDraw
 
 	public static void addLine2D(Vector2f from, Vector2f to, Vector3f color, int lifetime)
 	{
-		if (lines.size() >= MAX_LINES) return;
+		if (lines.size() >= MAX_LINES)
+			return;
 		lines.add(new Line2D(from, to, color, lifetime));
 	}
 
@@ -155,10 +157,10 @@ public class DebugDraw
 		Vector2f min = new Vector2f(center).sub(new Vector2f(dimensions).mul(0.5f));
 		Vector2f max = new Vector2f(center).add(new Vector2f(dimensions).mul(0.5f));
 		Vector2f[] vertices = {
-			new Vector2f(min.x, min.y),
-			new Vector2f(min.x, max.y),
-			new Vector2f(max.x, max.y),
-			new Vector2f(max.x, min.y)
+				new Vector2f(min.x, min.y),
+				new Vector2f(min.x, max.y),
+				new Vector2f(max.x, max.y),
+				new Vector2f(max.x, min.y)
 		};
 
 		if (rotation != 0f)

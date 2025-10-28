@@ -1,9 +1,13 @@
 package me.jho5245.mario.jade;
 
+import me.jho5245.mario.observers.Observer;
+import me.jho5245.mario.observers.ObserverHandler;
+import me.jho5245.mario.observers.events.Event;
+import me.jho5245.mario.observers.events.EventType;
 import me.jho5245.mario.renderer.*;
-import me.jho5245.mario.scenes.LevelEditorScene;
-import me.jho5245.mario.scenes.LevelScene;
+import me.jho5245.mario.scenes.LevelEditorInitializer;
 import me.jho5245.mario.scenes.Scene;
+import me.jho5245.mario.scenes.SceneInitializer;
 import me.jho5245.mario.util.AssetPool;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -14,37 +18,25 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
-public class Window
+public class Window implements Observer
 {
 	private int width, height;
-
 	private final String title;
-
 	private long glfwWindow;
 
-	public float r, g, b, a;
-
-	private String glslVersion;
-
 	private ImGuiLayer imGuiLayer;
-
 	private static Window window = null;
-
 	private static Scene currentScene;
-
 	private FrameBuffer frameBuffer;
-
 	private PickingTexture pickingTexture;
+	private boolean debugDrawPhysics = false;
 
 	private Window()
 	{
 		this.width = 1920;
 		this.height = 1060;
 		this.title = "Mario";
-		r = 1;
-		g = 1;
-		b = 1;
-		a = 1;
+		ObserverHandler.addObserver(this);
 	}
 
 	public static Window getInstance()
@@ -56,17 +48,14 @@ public class Window
 		return window;
 	}
 
-	public static void changeScene(int newScene)
+	public static void changeScene(SceneInitializer sceneInitializer, boolean playPhysics)
 	{
-		switch (newScene)
+		if (currentScene != null)
 		{
-			case 0 -> currentScene = new LevelEditorScene();
-			case 1 -> currentScene = new LevelScene();
-			default ->
-			{
-				assert false : "Unknown scene '%s'".formatted(newScene);
-			}
+			currentScene.destroy();
 		}
+		getImGuiLayer().getPropertiesWindow().setActiveGameObject(null);
+		currentScene = new Scene(sceneInitializer, playPhysics);
 		currentScene.load();
 		currentScene.init();
 		currentScene.start();
@@ -97,11 +86,6 @@ public class Window
 		getInstance().height = height;
 	}
 
-	public static String getGLSLVersion()
-	{
-		return getInstance().glslVersion;
-	}
-
 	public static FrameBuffer getFrameBuffer()
 	{
 		return getInstance().frameBuffer;
@@ -116,6 +100,32 @@ public class Window
 	public static ImGuiLayer getImGuiLayer()
 	{
 		return getInstance().imGuiLayer;
+	}
+
+	@Override
+	public void onNotify(GameObject obj, Event event)
+	{
+		if (event.type == EventType.GAME_ENGINE_START_PLAY)
+		{
+			currentScene.save();
+			Window.changeScene(new LevelEditorInitializer(), true);
+		}
+		else if (event.type == EventType.GAME_ENGINE_STOP_PLAY)
+		{
+			Window.changeScene(new LevelEditorInitializer(), false);
+		}
+		else if (event.type == EventType.TOGGLE_PHYSICS_DEBUG_DRAW)
+		{
+			this.debugDrawPhysics = !this.debugDrawPhysics;
+		}
+		else if (event.type == EventType.SAVE_LEVEL)
+		{
+			currentScene.save();
+		}
+		else if (event.type == EventType.LOAD_LEVEL)
+		{
+			Window.changeScene(new LevelEditorInitializer(), true);
+		}
 	}
 
 	public void run()
@@ -186,7 +196,7 @@ public class Window
 		this.imGuiLayer = new ImGuiLayer(glfwWindow, pickingTexture);
 		this.imGuiLayer.initImGui();
 
-		Window.changeScene(0);
+		Window.changeScene(new LevelEditorInitializer(), false);
 	}
 
 	private void destroy()
@@ -221,10 +231,15 @@ public class Window
 			pickingTexture.enableWriting();
 
 			glViewport(0, 0, width, height);
-			glClearColor(0f, 0f, 0f, 0f);
+			glClearColor(0, 0,0, 0);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			Renderer.bindShader(pickingShader);
 			currentScene.render();
+
+			if (debugDrawPhysics)
+			{
+				currentScene.debugDrawPhysics();
+			}
 
 			pickingTexture.disableWriting();
 			glEnable(GL_BLEND);
@@ -235,7 +250,7 @@ public class Window
 
 			this.frameBuffer.bind();
 
-			glClearColor(r, g, b, a);
+			glClearColor(1, 1, 1, 1);
 			glClear(GL_COLOR_BUFFER_BIT);
 
 			if (dt >= 0)
@@ -257,6 +272,6 @@ public class Window
 			dt = endTime - beginTime;
 			beginTime = endTime;
 		}
-		currentScene.saveExit();
+		currentScene.save();
 	}
 }

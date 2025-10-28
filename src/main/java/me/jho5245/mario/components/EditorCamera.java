@@ -86,7 +86,7 @@ public class EditorCamera extends Component
 			camera.getPosition().lerp(new Vector2f(), lerpTime);
 			camera.setZoom(camera.getZoom() + ((1f - camera.getZoom()) * lerpTime));
 			lerpTime += dt * resetSpeed / 100f;
-			if (Math.abs(camera.getPosition().x) <= 1f && Math.abs(camera.getPosition().y) <= 1f)
+			if (Math.abs(camera.getPosition().x) <= 0.01f && Math.abs(camera.getPosition().y) <= 0.01f)
 			{
 				lerpTime = 0f;
 				camera.getPosition().set(0f, 0f);

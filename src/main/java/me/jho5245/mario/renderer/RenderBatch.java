@@ -1,5 +1,6 @@
 package me.jho5245.mario.renderer;
 
+import me.jho5245.mario.jade.GameObject;
 import me.jho5245.mario.jade.Window;
 import me.jho5245.mario.components.SpriteRenderer;
 import me.jho5245.mario.util.AssetPool;
@@ -120,6 +121,25 @@ public class RenderBatch implements Comparable<RenderBatch>
 
 	}
 
+	public boolean destroyIfExists(GameObject gameObject)
+	{
+		SpriteRenderer sprite = gameObject.getComponent(SpriteRenderer.class);
+		for (int i = 0; i < numSprites; i++)
+		{
+			if (sprites[i] == sprite)
+			{
+				for (int j = i; j < numSprites - 1; j++)
+				{
+					sprites[j] = sprites[j + 1];
+					sprites[j].setDirty();
+				}
+				numSprites--;
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public void render()
 	{
 		boolean rebufferData = false;
@@ -175,6 +195,7 @@ public class RenderBatch implements Comparable<RenderBatch>
 		int index = this.numSprites;
 		this.sprites[index] = sprite;
 		this.numSprites++;
+		sprite.setDirty();
 
 		if (sprite.getTexture() != null)
 		{
@@ -233,28 +254,27 @@ public class RenderBatch implements Comparable<RenderBatch>
 		// add vertices with the appropriate properties
 		// *		*
 		// *		*
-		float xAdd = 1f;
-		float yAdd = 1f;
+		float xAdd = 0.5f;
+		float yAdd = 0.5f;
 		for (int i = 0; i < 4; i++)
 		{
 			if (i == 1)
 			{
-				yAdd = 0f;
+				yAdd = -0.5f;
 			}
 			else if (i == 2)
 			{
-				xAdd = 0f;
+				xAdd = -0.5f;
 			}
 			else if (i == 3)
 			{
-				yAdd = 1f;
+				yAdd = 0.5f;
 			}
 
 			// transform
 			Vector4f currentPosition = new Vector4f(
 					sprite.getGameObject().getTransform().getPosition().x + (xAdd * sprite.getGameObject().getTransform().getScale().x),
-					sprite.getGameObject().getTransform().getPosition().y + (yAdd * sprite.getGameObject().getTransform().getScale().y),
-					0, 1);
+					sprite.getGameObject().getTransform().getPosition().y + (yAdd * sprite.getGameObject().getTransform().getScale().y), 0, 1);
 			if (isRotated)
 			{
 				currentPosition = new Vector4f(xAdd, yAdd, 0, 1).mul(transformMatrfix);
