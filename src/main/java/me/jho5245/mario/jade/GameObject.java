@@ -1,6 +1,7 @@
 package me.jho5245.mario.jade;
 
 import me.jho5245.mario.components.Component;
+import me.jho5245.mario.components.Transform;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,18 +15,14 @@ public class GameObject
 
 	private List<Component> components;
 
-	private Transform transform;
-
-	private int zIndex;
+	public transient Transform transform;
 
 	private boolean doSerialization = true;
 
-	public GameObject(String name, Transform transform, int zIndex)
+	public GameObject(String name)
 	{
 		this.name = name;
 		this.components = new ArrayList<>();
-		this.transform = transform;
-		this.zIndex = zIndex;
 		this.uid = GameObject.ID_COUNTER++;
 	}
 
@@ -77,11 +74,6 @@ public class GameObject
 	public Transform getTransform()
 	{
 		return this.transform;
-	}
-
-	public int zIndex()
-	{
-		return this.zIndex;
 	}
 
 	public void imgui()

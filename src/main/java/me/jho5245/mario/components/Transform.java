@@ -1,12 +1,13 @@
-package me.jho5245.mario.jade;
+package me.jho5245.mario.components;
 
 import org.joml.Vector2f;
 
-public class Transform
+public class Transform extends Component
 {
-	protected Vector2f position;
-	protected Vector2f scale;
-	protected float rotation;
+	public Vector2f position;
+	public Vector2f scale;
+	public float rotation;
+	public int zIndex;
 
 	public Transform()
 	{
@@ -70,11 +71,17 @@ public class Transform
 	@Override
 	public boolean equals(Object o)
 	{
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
 		Transform transform = (Transform) o;
-		if (!position.equals(transform.position)) return false;
-		if (rotation != transform.rotation) return false;
+		if (!position.equals(transform.position))
+			return false;
+		if (rotation != transform.rotation)
+			return false;
+		if (zIndex != transform.zIndex)
+			return false;
 		return scale.equals(transform.scale);
 	}
 }

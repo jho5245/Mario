@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import me.jho5245.mario.components.Component;
 import me.jho5245.mario.components.ComponentDeserializer;
+import me.jho5245.mario.components.Transform;
 import me.jho5245.mario.jade.Camera;
 import me.jho5245.mario.jade.GameObject;
 import me.jho5245.mario.jade.GameObjectDeserializer;
@@ -76,6 +77,14 @@ public abstract class Scene
 	public void imgui()
 	{
 
+	}
+
+	public GameObject createGameObject(String name)
+	{
+		GameObject gameObject = new GameObject(name);
+		gameObject.addComponent(new Transform());
+		gameObject.transform = gameObject.getComponent(Transform.class);
+		return gameObject;
 	}
 
 	public void saveExit()

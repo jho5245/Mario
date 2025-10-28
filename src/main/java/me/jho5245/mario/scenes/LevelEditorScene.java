@@ -4,8 +4,6 @@ import imgui.ImGui;
 import imgui.ImVec2;
 import me.jho5245.mario.components.*;
 import me.jho5245.mario.components.gizmo.GizmoSystem;
-import me.jho5245.mario.components.gizmo.ScaleGizmo;
-import me.jho5245.mario.components.gizmo.TranslateGizmo;
 import me.jho5245.mario.jade.*;
 import me.jho5245.mario.util.AssetPool;
 import org.joml.Vector2f;
@@ -14,7 +12,7 @@ public class LevelEditorScene extends Scene
 {
 	private SpriteSheet spriteSheet;
 
-	GameObject levelEditorStuff = new GameObject("LevelEditor", new Transform(new Vector2f()), 0);
+	GameObject levelEditorStuff = this.createGameObject("LevelEditor");
 
 	public LevelEditorScene()
 	{
