@@ -3,11 +3,12 @@ package me.jho5245.mario.scenes;
 import imgui.ImGui;
 import imgui.ImVec2;
 import me.jho5245.mario.components.*;
+import me.jho5245.mario.components.gizmo.GizmoSystem;
+import me.jho5245.mario.components.gizmo.ScaleGizmo;
+import me.jho5245.mario.components.gizmo.TranslateGizmo;
 import me.jho5245.mario.jade.*;
-import me.jho5245.mario.renderer.DebugDraw;
 import me.jho5245.mario.util.AssetPool;
 import org.joml.Vector2f;
-import org.joml.Vector3f;
 
 public class LevelEditorScene extends Scene
 {
@@ -26,11 +27,11 @@ public class LevelEditorScene extends Scene
 		spriteSheet = AssetPool.getSpriteSheet("assets/images/spritesheets/decorationsAndBlocks.png");
 		SpriteSheet gizmos = AssetPool.getSpriteSheet("assets/images/gizmos.png");
 
-		this.camera = new Camera(new Vector2f(-250, 0));
+		this.camera = new Camera(new Vector2f(0, 0));
 		levelEditorStuff.addComponent(new MouseControls());
 		levelEditorStuff.addComponent(new GridLines());
 		levelEditorStuff.addComponent(new EditorCamera(this.camera));
-		levelEditorStuff.addComponent(new TranslateGizmo(gizmos.getSprite(1), Window.getImGuiLayer().getPropertiesWindow()));
+		levelEditorStuff.addComponent(new GizmoSystem(gizmos));
 		levelEditorStuff.start();
 	}
 

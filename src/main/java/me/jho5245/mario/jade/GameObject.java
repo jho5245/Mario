@@ -68,7 +68,10 @@ public class GameObject
 
 	public void start()
 	{
-		components.forEach(Component::start);
+		for (int i=0; i<components.size(); i++)
+		{
+			components.get(i).start();
+		}
 	}
 
 	public Transform getTransform()

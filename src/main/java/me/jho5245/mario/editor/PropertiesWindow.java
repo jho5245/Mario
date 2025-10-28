@@ -1,6 +1,7 @@
 package me.jho5245.mario.editor;
 
 import imgui.ImGui;
+import me.jho5245.mario.components.NonPickable;
 import me.jho5245.mario.jade.GameObject;
 import me.jho5245.mario.jade.MouseListener;
 import me.jho5245.mario.renderer.PickingTexture;
@@ -30,7 +31,15 @@ public class PropertiesWindow
 			int x = (int) MouseListener.getScreenX();
 			int y = (int) MouseListener.getScreenY();
 			int gameObjectId = pickingTexture.readPixel(x, y);
-			activeGameObject = currentScene.getGameObject(gameObjectId);
+			GameObject pickedObject = currentScene.getGameObject(gameObjectId);
+			if (pickedObject != null && pickedObject.getComponent(NonPickable.class) == null)
+			{
+				activeGameObject = pickedObject;
+			}
+			else if (pickedObject == null && !MouseListener.isDragging())
+			{
+				activeGameObject = null;
+			}
 			this.debounceTime = 0.2f;
 		}
 	}

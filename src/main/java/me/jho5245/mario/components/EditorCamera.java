@@ -61,7 +61,6 @@ public class EditorCamera extends Component
 		if (MouseListener.getScrollY() != 0f)
 		{
 			float scrollSensivity = this.scrollSensivity * (isCtrlPressed ? 3 : 1);
-			System.out.println(scrollSensivity);
 			float addValue = (float) Math.pow(Math.abs(MouseListener.getScrollY() * scrollSensivity), 1 / camera.getZoom());
 			addValue *= -Math.signum(MouseListener.getScrollY());
 			camera.addZoom(addValue);
