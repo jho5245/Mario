@@ -13,6 +13,7 @@ import imgui.type.ImBoolean;
 import me.jho5245.mario.editor.GameViewWindow;
 import me.jho5245.mario.editor.MenuBar;
 import me.jho5245.mario.editor.PropertiesWindow;
+import me.jho5245.mario.editor.SceneHeirarchyWindow;
 import me.jho5245.mario.renderer.PickingTexture;
 import me.jho5245.mario.scenes.Scene;
 
@@ -34,6 +35,7 @@ public class ImGuiLayer
 	private GameViewWindow gameViewWindow;
 	private PropertiesWindow propertiesWindow;
 	private MenuBar menuBar;
+	private SceneHeirarchyWindow sceneHeirarchyWindow;
 
 	public ImGuiLayer(long glfwWindow, PickingTexture pickingTexture)
 	{
@@ -41,6 +43,7 @@ public class ImGuiLayer
 		this.gameViewWindow = new GameViewWindow();
 		this.propertiesWindow = new PropertiesWindow(pickingTexture);
 		this.menuBar = new MenuBar();
+		this.sceneHeirarchyWindow = new SceneHeirarchyWindow();
 	}
 
 	// Initialize Dear ImGui.
@@ -187,6 +190,7 @@ public class ImGuiLayer
 		gameViewWindow.imgui();
 		propertiesWindow.update(dt, currentScene);
 		propertiesWindow.imgui();
+		sceneHeirarchyWindow.imgui();
 
 		endFrame();
 	}
