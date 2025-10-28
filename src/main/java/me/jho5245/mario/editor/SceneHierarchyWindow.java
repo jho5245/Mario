@@ -7,7 +7,7 @@ import me.jho5245.mario.jade.Window;
 
 import java.util.List;
 
-public class SceneHeirarchyWindow
+public class SceneHierarchyWindow
 {
 	public void imgui()
 	{
