@@ -17,7 +17,7 @@ dependencies {
     // Gson
     implementation("com.google.code.gson:gson:2.13.2")
 
-    // Imgui files
+    // Imgui, jbox2d files
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
     var lwjglVersion = "3.2.3"
