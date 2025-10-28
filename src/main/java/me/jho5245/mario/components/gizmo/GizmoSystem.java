@@ -4,7 +4,6 @@ import me.jho5245.mario.components.Component;
 import me.jho5245.mario.components.SpriteSheet;
 import me.jho5245.mario.jade.KeyListener;
 import me.jho5245.mario.jade.Window;
-import org.lwjgl.glfw.GLFW;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_E;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_R;
