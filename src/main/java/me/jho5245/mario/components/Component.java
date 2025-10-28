@@ -1,6 +1,7 @@
 package me.jho5245.mario.components;
 
 import imgui.ImGui;
+import me.jho5245.mario.editor.JImGui;
 import me.jho5245.mario.jade.GameObject;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -53,20 +54,12 @@ public abstract class Component
 				if (type == int.class)
 				{
 					int v = (int) value;
-					int[] imInt = { v };
-					if (ImGui.dragInt(name + ": ", imInt))
-					{
-						field.set(this, imInt[0]);
-					}
+					field.set(this, JImGui.dragInt(name, v));
 				}
 				else if (type == float.class)
 				{
 					float v = (float) value;
-					float[] imFloat = { v };
-					if (ImGui.dragFloat(name + ": ", imFloat))
-					{
-						field.set(this, imFloat[0]);
-					}
+					field.set(this, JImGui.dragFloat(name, v));
 				}
 				else if (type == boolean.class)
 				{
@@ -79,11 +72,7 @@ public abstract class Component
 				else if (type == Vector2f.class)
 				{
 					Vector2f v = (Vector2f) value;
-					float[] imVector2f = {v.x, v.y};
-					if (ImGui.dragFloat2(name + ": ", imVector2f))
-					{
-						v.set(imVector2f[0], imVector2f[1]);
-					}
+					JImGui.drawVec2Control(name, v);
 				}
 				else if (type == Vector3f.class)
 				{

@@ -1,5 +1,6 @@
 package me.jho5245.mario.jade;
 
+import imgui.ImGui;
 import me.jho5245.mario.components.Component;
 import me.jho5245.mario.components.Transform;
 
@@ -78,7 +79,13 @@ public class GameObject
 
 	public void imgui()
 	{
-		components.forEach(Component::imgui);
+		for (Component component : components)
+		{
+			if (ImGui.collapsingHeader(component.getClass().getSimpleName()))
+			{
+				component.imgui();
+			}
+		}
 	}
 
 	public int getUid()

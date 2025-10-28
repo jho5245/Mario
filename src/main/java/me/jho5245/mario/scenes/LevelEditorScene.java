@@ -73,11 +73,7 @@ public class LevelEditorScene extends Scene
 	@Override
 	public void imgui()
 	{
-		ImGui.begin("LevelEditorStuff");
-		levelEditorStuff.imgui();
-		ImGui.end();
-
-		ImGui.begin("test window");
+		ImGui.begin("Tiles");
 
 		ImVec2 windowPos = new ImVec2();
 		ImGui.getWindowPos(windowPos);

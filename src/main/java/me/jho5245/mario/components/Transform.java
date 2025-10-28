@@ -1,5 +1,7 @@
 package me.jho5245.mario.components;
 
+import me.jho5245.mario.editor.JImGui;
+import me.jho5245.mario.util.Settings;
 import org.joml.Vector2f;
 
 public class Transform extends Component
@@ -34,6 +36,15 @@ public class Transform extends Component
 		this.position = position;
 		this.rotation = rotation;
 		this.scale = scale;
+	}
+
+	@Override
+	public void imgui()
+	{
+		JImGui.drawVec2Control("Position", position);
+		JImGui.drawVec2Control("Scale", scale, Settings.GRID_HEIGHT);
+		JImGui.dragFloat("Rotation", rotation);
+		JImGui.dragInt("zIndex", zIndex);
 	}
 
 	public Vector2f getPosition()
