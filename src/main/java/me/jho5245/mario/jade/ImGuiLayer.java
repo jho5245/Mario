@@ -221,7 +221,6 @@ public class ImGuiLayer
 		ImGui.newFrame();
 		setupDockspace();
 		currentScene.imgui();
-		ImGui.showDemoWindow();
 		gameViewWindow.imgui();
 		propertiesWindow.update(dt, currentScene);
 		propertiesWindow.imgui();
