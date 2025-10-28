@@ -9,9 +9,11 @@ import java.util.List;
 
 public class SceneHierarchyWindow
 {
+	private static String payloadDragDropType = "SceneHierarchy";
+
 	public void imgui()
 	{
-		ImGui.begin("Scene Heirarchy");
+		ImGui.begin("Scene Hierarchy");
 		List<GameObject> gameObjects = Window.getCurrentScene().getGameObjects();
 		int index = 0;
 		for (GameObject gameObject : gameObjects)
@@ -19,11 +21,7 @@ public class SceneHierarchyWindow
 			if (!gameObject.doSerialization())
 				continue;
 
-			ImGui.pushID(index);
-			boolean treeNodeOpen = ImGui.treeNodeEx(gameObject.name,
-					ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.FramePadding | ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.SpanAvailWidth,
-					gameObject.name);
-			ImGui.popID();
+			boolean treeNodeOpen = doTreeNode(gameObject, index);
 
 			if (treeNodeOpen)
 			{
@@ -32,5 +30,37 @@ public class SceneHierarchyWindow
 			index++;
 		}
 		ImGui.end();
+	}
+
+	private boolean doTreeNode(GameObject gameObject, int index)
+	{
+		ImGui.pushID(index);
+		boolean treeNodeOpen = ImGui.treeNodeEx(gameObject.name,
+				ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.FramePadding | ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.SpanAvailWidth,
+				gameObject.name);
+		ImGui.popID();
+
+		if (ImGui.beginDragDropSource())
+		{
+			ImGui.setDragDropPayloadObject(payloadDragDropType, gameObject);
+			ImGui.text("Move " + gameObject.name + " to..");
+//			ImGui.button("Cancel");
+			ImGui.endDragDropSource();
+		}
+
+		if (ImGui.beginDragDropTarget())
+		{
+			Object payloadObject = ImGui.acceptDragDropPayloadObject(payloadDragDropType);
+			if (payloadObject != null)
+			{
+				if (payloadObject instanceof GameObject object)
+				{
+					System.out.println(object.name + " acc");
+				}
+			}
+			ImGui.endDragDropTarget();
+		}
+
+		return treeNodeOpen;
 	}
 }

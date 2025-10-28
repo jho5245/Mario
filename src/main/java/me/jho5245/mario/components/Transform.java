@@ -41,6 +41,7 @@ public class Transform extends Component
 	@Override
 	public void imgui()
 	{
+		gameObject.name = JImGui.inputText("Name:", gameObject.name);
 		JImGui.drawVec2Control("Position", position);
 		JImGui.drawVec2Control("Scale", scale, Settings.GRID_HEIGHT);
 		this.rotation = JImGui.dragFloat("Rotation", rotation);

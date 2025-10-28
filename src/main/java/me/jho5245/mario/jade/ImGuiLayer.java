@@ -58,8 +58,8 @@ public class ImGuiLayer
 
 		io.setIniFilename("imgui.ini"); // We don't want to save .ini file
 //		io.setConfigFlags(ImGuiConfigFlags.NavEnableKeyboard); // Navigation with keyboard
-		io.setConfigFlags(ImGuiConfigFlags.DockingEnable);
-//		io.setConfigFlags(ImGuiConfigFlags.ViewportsEnable);
+		io.addConfigFlags(ImGuiConfigFlags.DockingEnable);
+//		io.addConfigFlags(ImGuiConfigFlags.ViewportsEnable);
 //		io.setBackendFlags(ImGuiBackendFlags.HasMouseCursors); // Mouse cursors to display while resizing windows etc.
 		io.setBackendPlatformName("imgui_java_impl_glfw");
 
