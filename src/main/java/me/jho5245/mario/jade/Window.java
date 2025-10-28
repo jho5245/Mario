@@ -3,7 +3,6 @@ package me.jho5245.mario.jade;
 import me.jho5245.mario.observers.Observer;
 import me.jho5245.mario.observers.ObserverHandler;
 import me.jho5245.mario.observers.events.Event;
-import me.jho5245.mario.observers.events.EventType;
 import me.jho5245.mario.renderer.*;
 import me.jho5245.mario.scenes.LevelEditorInitializer;
 import me.jho5245.mario.scenes.Scene;
@@ -30,6 +29,7 @@ public class Window implements Observer
 	private FrameBuffer frameBuffer;
 	private PickingTexture pickingTexture;
 	private boolean debugDrawPhysics = false;
+	private boolean runtimePlaying;
 
 	private Window()
 	{
@@ -105,26 +105,31 @@ public class Window implements Observer
 	@Override
 	public void onNotify(GameObject obj, Event event)
 	{
-		if (event.type == EventType.GAME_ENGINE_START_PLAY)
+		switch (event.type)
 		{
-			currentScene.save();
-			Window.changeScene(new LevelEditorInitializer(), true);
-		}
-		else if (event.type == EventType.GAME_ENGINE_STOP_PLAY)
-		{
-			Window.changeScene(new LevelEditorInitializer(), false);
-		}
-		else if (event.type == EventType.TOGGLE_PHYSICS_DEBUG_DRAW)
-		{
-			this.debugDrawPhysics = !this.debugDrawPhysics;
-		}
-		else if (event.type == EventType.SAVE_LEVEL)
-		{
-			currentScene.save();
-		}
-		else if (event.type == EventType.LOAD_LEVEL)
-		{
-			Window.changeScene(new LevelEditorInitializer(), true);
+			case GAME_ENGINE_START_PLAY ->
+			{
+				currentScene.save();
+				Window.changeScene(new LevelEditorInitializer(), true);
+				this.runtimePlaying = true;
+			}
+			case GAME_ENGINE_STOP_PLAY ->
+			{
+				Window.changeScene(new LevelEditorInitializer(), false);
+				this.runtimePlaying = false;
+			}
+			case TOGGLE_PHYSICS_DEBUG_DRAW ->
+			{
+				this.debugDrawPhysics = !this.debugDrawPhysics;
+			}
+			case SAVE_LEVEL ->
+			{
+				currentScene.save();
+			}
+			case LOAD_LEVEL ->
+			{
+				Window.changeScene(new LevelEditorInitializer(), true);
+			}
 		}
 	}
 
@@ -231,7 +236,7 @@ public class Window implements Observer
 			pickingTexture.enableWriting();
 
 			glViewport(0, 0, width, height);
-			glClearColor(0, 0,0, 0);
+			glClearColor(0, 0, 0, 0);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			Renderer.bindShader(pickingShader);
 			currentScene.render();
@@ -257,7 +262,14 @@ public class Window implements Observer
 			{
 				DebugDraw.draw();
 				Renderer.bindShader(defaultShader);
-				currentScene.update(dt);
+				if (runtimePlaying)
+				{
+					currentScene.update(dt);
+				}
+				else
+				{
+					currentScene.editorUpdate(dt);
+				}
 				currentScene.render();
 			}
 
@@ -272,6 +284,5 @@ public class Window implements Observer
 			dt = endTime - beginTime;
 			beginTime = endTime;
 		}
-		currentScene.save();
 	}
 }

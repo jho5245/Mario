@@ -20,9 +20,9 @@ public class Box2DCollider extends Collider
 	}
 
 	@Override
-	public void update(float dt)
+	public void editorUpdate(float dt)
 	{
-		Vector2f center = new Vector2f(this.gameObject.transform.position).add(offset.x, offset.y);
+		Vector2f center = new Vector2f(this.gameObject.transform.position).add(offset);
 		DebugDraw.addBox(center, this.halfSize, this.gameObject.transform.rotation);
 	}
 

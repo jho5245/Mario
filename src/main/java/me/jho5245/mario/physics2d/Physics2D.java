@@ -25,7 +25,7 @@ public class Physics2D
 	public Physics2D(boolean isPlaying)
 	{
 		this.isPlaying = isPlaying;
-		this.gravity = new Vec2(0, -3f);
+		this.gravity = new Vec2(0, -20f);
 		this.world = new World(gravity);
 		world.setDebugDraw(new DebugDrawJ2D());
 	}
@@ -35,7 +35,7 @@ public class Physics2D
 		Rigidbody2D rb = go.getComponent(Rigidbody2D.class);
 		if (rb != null && rb.getRawBody() == null)
 		{
-			Transform transform = go.getComponent(Transform.class);
+			Transform transform = go.transform;
 
 			BodyDef bodyDef = new BodyDef();
 			bodyDef.position.set(transform.position.x, transform.position.y);
@@ -53,8 +53,8 @@ public class Physics2D
 			}
 
 			PolygonShape shape = new PolygonShape();
-			CircleCollider circleCollider = null;
-			Box2DCollider box2DCollider = null;
+			CircleCollider circleCollider;
+			Box2DCollider box2DCollider;
 			if ((circleCollider = go.getComponent(CircleCollider.class)) != null)
 			{
 				shape.setRadius(circleCollider.getRadius());
@@ -103,7 +103,7 @@ public class Physics2D
 			return;
 
 		physicsTime += dt;
-		if (physicsTime >= 0.0f)
+		if (physicsTime >= 0f)
 		{
 			physicsTime -= Settings.PHYSICS_TIMESTEP;
 			world.step(Settings.PHYSICS_TIMESTEP, Settings.PHYSICS_VELOCITY_ITERATIONS, Settings.PHYSICS_POSITION_ITERATIONS);

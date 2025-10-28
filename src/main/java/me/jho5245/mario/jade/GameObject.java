@@ -62,6 +62,11 @@ public class GameObject
 		component.gameObject = this;
 	}
 
+	public void editorUpdate(float dt)
+	{
+		components.forEach(component -> component.editorUpdate(dt));
+	}
+
 	public void update(float dt)
 	{
 		components.forEach(component -> component.update(dt));

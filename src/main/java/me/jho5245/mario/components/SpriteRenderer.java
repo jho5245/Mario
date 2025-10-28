@@ -41,6 +41,16 @@ public class SpriteRenderer extends Component
 	}
 
 	@Override
+	public void editorUpdate(float dt)
+	{
+		if (!this.lastTransform.equals(this.gameObject.getTransform()))
+		{
+			this.getGameObject().getTransform().copy(this.lastTransform);
+			isDirty = true;
+		}
+	}
+
+	@Override
 	public void update(float dt)
 	{
 		if (!this.lastTransform.equals(this.gameObject.getTransform()))

@@ -24,9 +24,17 @@ public abstract class Component
 
 	}
 
+	public void editorUpdate(float dt)
+	{
+	}
+
 	public void update(float dt)
 	{
 
+	}
+
+	public void render()
+	{
 	}
 
 	public GameObject getGameObject()
@@ -108,7 +116,7 @@ public abstract class Component
 					String[] enumValues = getEnumValues(type);
 					String enumType = ((Enum<?>) value).name();
 					ImInt index = new ImInt(indexOf(enumType, enumValues));
-					if (ImGui.combo("Enum", index, enumValues, enumValues.length))
+					if (ImGui.combo(field.getName(), index, enumValues, enumValues.length))
 					{
 						field.set(this, type.getEnumConstants()[index.get()]);
 					}

@@ -6,6 +6,7 @@ import me.jho5245.mario.components.*;
 import me.jho5245.mario.components.gizmo.GizmoSystem;
 import me.jho5245.mario.jade.*;
 import me.jho5245.mario.util.AssetPool;
+import me.jho5245.mario.util.Settings;
 import org.joml.Vector2f;
 
 import me.jho5245.mario.components.*;
@@ -28,10 +29,10 @@ public class LevelEditorInitializer extends SceneInitializer
 		sprites = AssetPool.getSpriteSheet("assets/images/spritesheets/decorationsAndBlocks.png");
 		SpriteSheet gizmos = AssetPool.getSpriteSheet("assets/images/gizmos.png");
 
-		levelEditorStuff = new GameObject("Level Editor Stuff");
+		levelEditorStuff = scene.createGameObject("Level Editor Stuff");
 		levelEditorStuff.setNoSerialize();
 		levelEditorStuff.addComponent(new MouseControls());
-		//levelEditorStuff.addComponent(new GridLines());
+		levelEditorStuff.addComponent(new GridLines());
 		levelEditorStuff.addComponent(new EditorCamera(scene.getCamera()));
 		levelEditorStuff.addComponent(new GizmoSystem(gizmos));
 		scene.addGameObject(levelEditorStuff);
@@ -80,15 +81,15 @@ public class LevelEditorInitializer extends SceneInitializer
 		for (int i = 0; i < sprites.size(); i++)
 		{
 			Sprite sprite = sprites.getSprite(i);
-			float spriteWidth = sprite.getWidth() * 4;
-			float spriteHeight = sprite.getHeight() * 4;
+			float spriteWidth = sprite.getWidth() * 2;
+			float spriteHeight = sprite.getHeight() * 2;
 			int id = sprite.getTexId();
 			Vector2f[] texCoords = sprite.getTexCoords();
 
 			ImGui.pushID(i);
 			if (ImGui.imageButton(id, spriteWidth, spriteHeight, texCoords[2].x, texCoords[0].y, texCoords[0].x, texCoords[2].y))
 			{
-				GameObject object = Prefabs.generateSpriteObject(sprite, 0.25f, 0.25f);
+				GameObject object = Prefabs.generateSpriteObject(sprite, Settings.GRID_WIDTH, Settings.GRID_HEIGHT);
 				levelEditorStuff.getComponent(MouseControls.class).pickUpObject(object);
 			}
 			ImGui.popID();

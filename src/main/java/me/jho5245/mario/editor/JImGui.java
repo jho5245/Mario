@@ -8,7 +8,7 @@ import org.joml.Vector4f;
 
 public class JImGui
 {
-	private static float defaultColumnWidth = 80f;
+	private static float defaultColumnWidth = 120f;
 
 	public static void drawVec2Control(String label, Vector2f values)
 	{

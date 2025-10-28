@@ -76,8 +76,11 @@ public class RenderBatch implements Comparable<RenderBatch>
 
 	private int zIndex;
 
-	public RenderBatch(int maxBatchSize, int zIndex)
+	private Renderer renderer;
+
+	public RenderBatch(int maxBatchSize, int zIndex, Renderer renderer)
 	{
+		this.renderer = renderer;
 		this.zIndex = zIndex;
 		this.sprites = new SpriteRenderer[maxBatchSize];
 		this.maxBatchSize = maxBatchSize;
@@ -128,6 +131,7 @@ public class RenderBatch implements Comparable<RenderBatch>
 		{
 			if (sprites[i] == sprite)
 			{
+				// 스프라이트 제거 후 정렬
 				for (int j = i; j < numSprites - 1; j++)
 				{
 					sprites[j] = sprites[j + 1];
@@ -151,6 +155,13 @@ public class RenderBatch implements Comparable<RenderBatch>
 				loadVertexProperties(i);
 				sprite.setClean();
 				rebufferData = true;
+			}
+
+			if (sprite.gameObject.transform.zIndex != this.zIndex)
+			{
+				destroyIfExists(sprite.gameObject);
+				renderer.add(sprite.gameObject);
+				i--;
 			}
 		}
 		// rebuffer data every frame

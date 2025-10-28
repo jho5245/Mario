@@ -6,8 +6,11 @@ import me.jho5245.mario.components.Sprite;
 import me.jho5245.mario.components.SpriteRenderer;
 import me.jho5245.mario.editor.PropertiesWindow;
 import me.jho5245.mario.jade.*;
+import me.jho5245.mario.util.Settings;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
+
+import java.util.Set;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -24,11 +27,11 @@ public class Gizmo extends Component
 	private SpriteRenderer yAxisSprite;
 	protected GameObject activeGameObject;
 
-	private Vector2f xAxisOffset = new Vector2f(24f / 80f, -6f / 80f);
-	private Vector2f yAxisOffset = new Vector2f(-7f / 80f, 21f / 80f);
+	private Vector2f xAxisOffset = new Vector2f(24f / 40f, -6f / 20f);
+	private Vector2f yAxisOffset = new Vector2f(-7f / 20f, 21f / 40f);
 
-	private float gizmoWidth = 16f / 80f;
-	private float gizmoHeight = 48f / 80f;
+	private float gizmoWidth = 16f / 40f;
+	private float gizmoHeight = 48f / 40f;
 
 	protected boolean xAxisActive, yAxisActive;
 
@@ -38,8 +41,8 @@ public class Gizmo extends Component
 
 	public Gizmo(Sprite arrowSprite, PropertiesWindow propertiesWindow)
 	{
-		this.xAxisObject = Prefabs.generateSpriteObject(arrowSprite, 0.2f, 0.6f);
-		this.yAxisObject = Prefabs.generateSpriteObject(arrowSprite, 0.2f, 0.6f);
+		this.xAxisObject = Prefabs.generateSpriteObject(arrowSprite, gizmoWidth, gizmoHeight);
+		this.yAxisObject = Prefabs.generateSpriteObject(arrowSprite, gizmoWidth, gizmoHeight);
 		this.xAxisSprite = this.xAxisObject.getComponent(SpriteRenderer.class);
 		this.yAxisSprite = this.yAxisObject.getComponent(SpriteRenderer.class);
 		this.propertiesWindow = propertiesWindow;
@@ -65,6 +68,15 @@ public class Gizmo extends Component
 	@Override
 	public void update(float dt)
 	{
+		if (using)
+		{
+			this.setInactive();
+		}
+	}
+
+	@Override
+	public void editorUpdate(float dt)
+	{
 		if (!using)
 			return;
 		this.activeGameObject = this.propertiesWindow.getActiveGameObject();
@@ -75,7 +87,7 @@ public class Gizmo extends Component
 			{
 				GameObject newObj = this.activeGameObject.copy();
 				Window.getCurrentScene().addGameObject(newObj);
-				newObj.transform.position.add(new Vector2f(0.25f, 0f));
+				newObj.transform.position.add(new Vector2f(Settings.GRID_WIDTH, 0f));
 				this.propertiesWindow.setActiveGameObject(newObj);
 				return;
 			}

@@ -25,11 +25,11 @@ import java.util.Optional;
 
 public class Scene
 {
-	protected Renderer renderer;
+	private Renderer renderer;
 	private Physics2D physics2D;
-	protected Camera camera;
-	protected boolean isRunning = false;
-	protected final List<GameObject> gameObjects;
+	private Camera camera;
+	private boolean isRunning;
+	private final List<GameObject> gameObjects;
 
 	private SceneInitializer sceneInitializer;
 
@@ -56,7 +56,7 @@ public class Scene
 			GameObject gameObject = this.gameObjects.get(i);
 			gameObject.start();
 			renderer.add(gameObject);
-			this.physics2D.addGameObject(gameObject);
+			physics2D.addGameObject(gameObject);
 		}
 		isRunning = true;
 	}
@@ -76,6 +76,7 @@ public class Scene
 		{
 			gameObject.start();
 			renderer.add(gameObject);
+			physics2D.addGameObject(gameObject);
 		}
 	}
 
@@ -85,12 +86,29 @@ public class Scene
 		return result.orElse(null);
 	}
 
+	public void editorUpdate(float dt)
+	{
+		this.camera.adjustProjection();
+
+		for (int i = 0; i < gameObjects.size(); i++)
+		{
+			GameObject gameObject = gameObjects.get(i);
+			gameObject.editorUpdate(dt);
+
+			if (gameObject.isDead())
+			{
+				gameObjects.remove(i);
+				this.renderer.destroyGameObject(gameObject);
+				this.physics2D.destroyGameObject(gameObject);
+				i--;
+			}
+		}
+	}
+
 	public void update(float dt)
 	{
 		this.camera.adjustProjection();
 		this.physics2D.update(dt);
-
-		DebugDraw.addLine2D(new Vector2f(0, 0), new Vector2f(1, 1), new Vector3f(1, 1, 1), 1);
 
 		for (int i = 0; i < gameObjects.size(); i++)
 		{

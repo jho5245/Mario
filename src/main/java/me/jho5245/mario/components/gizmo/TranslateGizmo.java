@@ -7,7 +7,6 @@ import me.jho5245.mario.jade.MouseListener;
 import me.jho5245.mario.util.Settings;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_ALT;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_CONTROL;
 
 public class TranslateGizmo extends Gizmo
 {
@@ -17,7 +16,7 @@ public class TranslateGizmo extends Gizmo
 	}
 
 	@Override
-	public void update(float dt)
+	public void editorUpdate(float dt)
 	{
 
 		if (activeGameObject != null)
@@ -46,6 +45,6 @@ public class TranslateGizmo extends Gizmo
 			}
 		}
 
-		super.update(dt);
+		super.editorUpdate(dt);
 	}
 }
