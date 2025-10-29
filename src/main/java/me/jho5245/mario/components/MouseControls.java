@@ -1,11 +1,14 @@
 package me.jho5245.mario.components;
 
+import me.jho5245.mario.animations.StateMachine;
 import me.jho5245.mario.jade.GameObject;
 import me.jho5245.mario.jade.KeyListener;
 import me.jho5245.mario.jade.MouseListener;
 import me.jho5245.mario.jade.Window;
 import me.jho5245.mario.util.Settings;
 import org.joml.Vector4f;
+
+import java.util.Optional;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -31,6 +34,7 @@ public class MouseControls extends Component
 	public void place()
 	{
 		GameObject copy = holdingObject.copy();
+		Optional.ofNullable(copy.getComponent(StateMachine.class)).ifPresent(StateMachine::refreshTextures);
 		copy.getComponent(SpriteRenderer.class).setColor(new Vector4f(1));
 		copy.removeComponent(NonPickable.class);
 		Window.getCurrentScene().addGameObject(copy);

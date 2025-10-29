@@ -11,6 +11,11 @@ public class Sprite
 
 	private Vector2f[] texCoords;
 
+	public Sprite()
+	{
+		this(null);
+	}
+
 	public Sprite(Texture texture)
 	{
 		this.texture = texture;

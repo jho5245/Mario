@@ -70,6 +70,7 @@ public class Gizmo extends Component
 		{
 			this.setInactive();
 		}
+		// 플레이 도중에는 Gizmo 투명화 처리
 		xAxisSprite.setColor(new Vector4f(0));
 		yAxisSprite.setColor(new Vector4f(0));
 	}
