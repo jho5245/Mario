@@ -4,10 +4,12 @@ import imgui.ImGui;
 import imgui.type.ImInt;
 import me.jho5245.mario.editor.JImGui;
 import me.jho5245.mario.jade.GameObject;
+import org.jbox2d.dynamics.contacts.Contact;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
+import java.lang.module.Configuration;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
@@ -26,6 +28,7 @@ public abstract class Component
 
 	public void editorUpdate(float dt)
 	{
+
 	}
 
 	public void update(float dt)
@@ -40,6 +43,26 @@ public abstract class Component
 	public GameObject getGameObject()
 	{
 		return this.gameObject;
+	}
+
+	public void beginCollision(GameObject collidingObject, Contact contact, Vector2f hitNormal)
+	{
+
+	}
+
+	public void endCollision(GameObject collidingObject, Contact contact, Vector2f hitNormal)
+	{
+
+	}
+
+	public void preSolve(GameObject collidingObject, Contact contact, Vector2f hitNormal)
+	{
+
+	}
+
+	public void postSolve(GameObject collidingObject, Contact contact, Vector2f hitNormal)
+	{
+
 	}
 
 	public void imgui()

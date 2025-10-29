@@ -36,7 +36,12 @@ public class StateMachine extends Component
 		this.states.add(state);
 	}
 
-	public void setDefaultStateTitle(String defaultStateTitle)
+	public void addState(String from, String to, String onTrigger)
+	{
+		this.stateTransfers.put(new StateTrigger(from, onTrigger), to);
+	}
+
+	public void setDefaultState(String defaultStateTitle)
 	{
 		for (AnimationState state : this.states)
 		{

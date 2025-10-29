@@ -5,6 +5,9 @@ import imgui.ImVec2;
 import me.jho5245.mario.animations.StateMachine;
 import me.jho5245.mario.components.*;
 import me.jho5245.mario.components.gizmo.GizmoSystem;
+import me.jho5245.mario.physics2d.components.Box2DCollider;
+import me.jho5245.mario.physics2d.components.Rigidbody2D;
+import me.jho5245.mario.physics2d.enums.BodyType;
 import me.jho5245.mario.sounds.Sound;
 import me.jho5245.mario.util.AssetPool;
 import me.jho5245.mario.util.Settings;
@@ -15,6 +18,7 @@ import me.jho5245.mario.jade.Prefabs;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Set;
 
 public class LevelEditorInitializer extends SceneInitializer
 {
@@ -46,6 +50,9 @@ public class LevelEditorInitializer extends SceneInitializer
 
 		AssetPool.addSpriteSheet("assets/images/spritesheets/decorationsAndBlocks.png", 16, 16, 81, 0);
 		AssetPool.addSpriteSheet("assets/images/spritesheet.png", 16, 16, 26, 0);
+		AssetPool.addSpriteSheet("assets/images/turtle.png", 16, 24, 4, 0);
+		AssetPool.addSpriteSheet("assets/images/bigSpritesheet.png", 16, 32, 42, 0);
+		AssetPool.addSpriteSheet("assets/images/pipes.png", 32, 32, 4, 0);
 		AssetPool.addSpriteSheet("assets/images/items.png", 16, 16, 43, 0);
 		AssetPool.addSpriteSheet("assets/images/gizmos.png", 24, 48, 3, 0);
 
@@ -108,6 +115,9 @@ public class LevelEditorInitializer extends SceneInitializer
 				float windowX2 = windowPos.x + windowSize.x;
 				for (int i = 0; i < sprites.size(); i++)
 				{
+					// skip for non box collider tiles
+					if (i == 34 || i >= 38 && i < 61) continue;
+
 					Sprite sprite = sprites.getSprite(i);
 					float spriteWidth = sprite.getWidth() * 2;
 					float spriteHeight = sprite.getHeight() * 2;
@@ -118,6 +128,20 @@ public class LevelEditorInitializer extends SceneInitializer
 					if (ImGui.imageButton(id, spriteWidth, spriteHeight, texCoords[2].x, texCoords[0].y, texCoords[0].x, texCoords[2].y))
 					{
 						GameObject object = Prefabs.generateSpriteObject(sprite, Settings.GRID_WIDTH, Settings.GRID_HEIGHT);
+
+						Rigidbody2D rigidbody2D = new Rigidbody2D();
+						rigidbody2D.setBodyType(BodyType.STATIC);
+						Box2DCollider box2DCollider = new Box2DCollider();
+						box2DCollider.setHalfSize(new Vector2f(Settings.GRID_WIDTH, Settings.GRID_HEIGHT));
+						object.addComponent(rigidbody2D);
+						object.addComponent(box2DCollider);
+						object.addComponent(new Ground());
+						// breakable bricks
+						if (i == 12)
+						{
+//							object.addComponent(new BreakableBrick());
+						}
+
 						levelEditorStuff.getComponent(MouseControls.class).pickUpObject(object);
 					}
 					ImGui.popID();
@@ -181,7 +205,9 @@ public class LevelEditorInitializer extends SceneInitializer
 						if (!sound.isPlaying())
 						{
 							sound.play();
-						} else sound.stop();
+						}
+						else
+							sound.stop();
 					}
 
 					if (ImGui.getContentRegionAvailX() > 100)
@@ -191,7 +217,6 @@ public class LevelEditorInitializer extends SceneInitializer
 				}
 				ImGui.endTabItem();
 			}
-
 
 			ImGui.endTabBar();
 		}

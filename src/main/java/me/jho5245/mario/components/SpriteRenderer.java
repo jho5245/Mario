@@ -1,6 +1,5 @@
 package me.jho5245.mario.components;
 
-import imgui.ImGui;
 import me.jho5245.mario.editor.JImGui;
 import me.jho5245.mario.renderer.Texture;
 import org.joml.Vector2f;

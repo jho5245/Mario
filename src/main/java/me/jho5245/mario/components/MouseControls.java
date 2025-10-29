@@ -42,6 +42,7 @@ public class MouseControls extends Component
 		this.holdingObject = object;
 		this.holdingObject.getComponent(SpriteRenderer.class).setColor(new Vector4f(1, 1, 1, 0.5f));
 		this.holdingObject.addComponent(new NonPickable());
+		this.holdingObject.setNoSerialize();
 		Window.getCurrentScene().addGameObject(object);
 	}
 

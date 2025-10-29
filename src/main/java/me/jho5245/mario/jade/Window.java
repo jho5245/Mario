@@ -3,6 +3,7 @@ package me.jho5245.mario.jade;
 import me.jho5245.mario.observers.Observer;
 import me.jho5245.mario.observers.ObserverHandler;
 import me.jho5245.mario.observers.events.Event;
+import me.jho5245.mario.physics2d.Physics2D;
 import me.jho5245.mario.renderer.*;
 import me.jho5245.mario.scenes.LevelEditorInitializer;
 import me.jho5245.mario.scenes.Scene;
@@ -70,6 +71,11 @@ public class Window implements Observer
 		currentScene.load();
 		currentScene.init(originCameraPosition);
 		currentScene.start();
+	}
+
+	public static Physics2D getPhysics()
+	{
+		return currentScene.getPhysics();
 	}
 
 	public static Scene getCurrentScene()

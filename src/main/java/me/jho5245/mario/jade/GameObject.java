@@ -133,7 +133,7 @@ public class GameObject
 	public GameObject copy()
 	{
 		Gson gson = new GsonBuilder().setPrettyPrinting().registerTypeAdapter(Component.class, new ComponentDeserializer())
-				.registerTypeAdapter(GameObject.class, new GameObjectDeserializer()).create();
+				.registerTypeAdapter(GameObject.class, new GameObjectDeserializer()).enableComplexMapKeySerialization().create();
 		String objAsJson = gson.toJson(this);
 		GameObject obj = gson.fromJson(objAsJson, GameObject.class);
 		obj.generateUid();

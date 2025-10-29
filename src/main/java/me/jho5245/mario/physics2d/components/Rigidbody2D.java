@@ -1,7 +1,9 @@
 package me.jho5245.mario.physics2d.components;
 
 import me.jho5245.mario.components.Component;
+import me.jho5245.mario.jade.Window;
 import me.jho5245.mario.physics2d.enums.BodyType;
+import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.joml.Vector2f;
 
@@ -12,6 +14,11 @@ public class Rigidbody2D extends Component
 	private float linearDamping = 0.9f;
 	private float mass = 0;
 	private BodyType bodyType = BodyType.DYNAMIC;
+	private float friction = 0.1f;
+	public float angularVelocity;
+	public float gravityScale = 1f;
+	// 충돌 감지는 하나, 길막을 하지 않는다.
+	private boolean isSensor;
 
 	private boolean fixedRotation = false;
 	private boolean continuousCollision = true;
@@ -27,11 +34,27 @@ public class Rigidbody2D extends Component
 	@Override
 	public void update(float dt)
 	{
-		Collider collider = gameObject.getComponent(Collider.class);
-		if (rawBody != null && isPlaying && collider != null)
+		if (rawBody != null)
 		{
-			this.gameObject.transform.position.set(this.rawBody.getPosition().x - collider.getOffset().x, this.rawBody.getPosition().y - collider.getOffset().y);
-			this.gameObject.transform.rotation = (float) Math.toDegrees(this.rawBody.getAngle());
+			this.gameObject.transform.position.set(rawBody.getPosition().x, rawBody.getPosition().y);
+			this.gameObject.transform.rotation = (float) Math.toDegrees(rawBody.getAngle());
+		}
+	}
+
+	public void addVelocity(Vector2f forceToAdd)
+	{
+		if (rawBody != null)
+		{
+			rawBody.applyForceToCenter(new Vec2(velocity.x, velocity.y));
+		}
+	}
+
+	public void addImpulse(Vector2f impulse)
+	{
+		if (rawBody != null)
+		{
+			// TODO: should we wake it?
+			rawBody.applyLinearImpulse(new Vec2(velocity.x, velocity.y), rawBody.getWorldCenter(), false);
 		}
 	}
 
@@ -42,7 +65,57 @@ public class Rigidbody2D extends Component
 
 	public void setVelocity(Vector2f velocity)
 	{
-		this.velocity = velocity;
+		this.velocity.set(velocity);
+		if (rawBody != null)
+		{
+			this.rawBody.setLinearVelocity(new Vec2(velocity.x, velocity.y));
+		}
+	}
+
+	public void setAngularVelocity(float angularVelocity)
+	{
+		this.angularVelocity = angularVelocity;
+		if (rawBody != null)
+		{
+			this.rawBody.setAngularVelocity(angularVelocity);
+		}
+	}
+
+	public void setGravityScale(float gravityScale)
+	{
+		this.gravityScale = gravityScale;
+		if (rawBody != null)
+		{
+			this.rawBody.setGravityScale(gravityScale);
+		}
+	}
+
+	public void setIsSensor()
+	{
+		this.isSensor = true;
+		if (rawBody != null)
+		{
+			Window.getPhysics().setIsSensor(this);
+		}
+	}
+
+	public float getFriction()
+	{
+		return this.friction;
+	}
+
+	public boolean isSensor()
+	{
+		return this.isSensor;
+	}
+
+	public void setNotSensor()
+	{
+		this.isSensor = false;
+		if (rawBody != null)
+		{
+			Window.getPhysics().setNotSensor(this);
+		}
 	}
 
 	public float getAngularDamping()
