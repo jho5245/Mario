@@ -45,6 +45,11 @@ public class ImGuiLayer
 		this.sceneHierarchyWindow = new SceneHierarchyWindow();
 	}
 
+	public GameViewWindow getGameViewWindow()
+	{
+		return gameViewWindow;
+	}
+
 	// Initialize Dear ImGui.
 	public void initImGui()
 	{
@@ -128,6 +133,10 @@ public class ImGuiLayer
 			{
 				MouseListener.mouseScrollCallback(w, xOffset, yOffset);
 			}
+			else
+			{
+				MouseListener.clear();
+			}
 		});
 
 		io.setSetClipboardTextFn(new ImStrConsumer()
@@ -191,7 +200,6 @@ public class ImGuiLayer
 		setupDockspace();
 		currentScene.imgui();
 		gameViewWindow.imgui();
-		propertiesWindow.update(dt, currentScene);
 		propertiesWindow.imgui();
 		sceneHierarchyWindow.imgui();
 

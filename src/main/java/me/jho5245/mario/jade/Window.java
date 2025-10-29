@@ -108,11 +108,6 @@ public class Window implements Observer
 		return 16f / 9f;
 	}
 
-	public static PickingTexture getPickingTexture()
-	{
-		return getInstance().pickingTexture;
-	}
-
 	public static ImGuiLayer getImGuiLayer()
 	{
 		return getInstance().imGuiLayer;
@@ -296,7 +291,6 @@ public class Window implements Observer
 
 			if (dt >= 0)
 			{
-				DebugDraw.draw();
 				Renderer.bindShader(defaultShader);
 				if (runtimePlaying)
 				{
@@ -307,6 +301,7 @@ public class Window implements Observer
 					currentScene.editorUpdate(dt);
 				}
 				currentScene.render();
+				DebugDraw.draw();
 			}
 
 			this.frameBuffer.unbind();

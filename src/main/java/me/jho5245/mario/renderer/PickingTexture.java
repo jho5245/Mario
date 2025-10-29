@@ -1,5 +1,10 @@
 package me.jho5245.mario.renderer;
 
+import org.joml.Vector2f;
+import org.joml.Vector2i;
+
+import java.awt.print.PrinterIOException;
+
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL14.GL_DEPTH_COMPONENT32;
 import static org.lwjgl.opengl.GL30.*;
@@ -17,7 +22,7 @@ public class PickingTexture
 	{
 		if (!init(width, height))
 		{
-			assert false: "error init picking texture";
+			assert false : "error init picking texture";
 		}
 	}
 
@@ -74,10 +79,24 @@ public class PickingTexture
 	{
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, fboID);
 		glReadBuffer(GL_COLOR_ATTACHMENT0);
-
 		float[] pixels = new float[3];
 		glReadPixels(x, y, 1, 1, GL_RGB, GL_FLOAT, pixels);
-
 		return (int) (pixels[0]) - 1;
+	}
+
+	public float[] readPixels(Vector2i start, Vector2i end)
+	{
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, fboID);
+		glReadBuffer(GL_COLOR_ATTACHMENT0);
+
+		Vector2i size = new Vector2i(end).sub(start).absolute();
+		int numPixels = size.x * size.y;
+		float[] pixels = new float[3 * numPixels];
+		glReadPixels(start.x, start.y, size.x, size.y, GL_RGB, GL_FLOAT, pixels);
+		for (int i = 0; i < pixels.length; i++)
+		{
+			pixels[i] -= 1;
+		}
+		return pixels;
 	}
 }
