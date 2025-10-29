@@ -79,7 +79,7 @@ public class Camera
 
 	public void setZoom(float zoom)
 	{
-		this.zoom = Math.min(4f, Math.max(zoom, 0.2f));
+		this.zoom = Math.min(8f, Math.max(zoom, 0.2f));
 	}
 
 	public void addZoom(float zoom)
