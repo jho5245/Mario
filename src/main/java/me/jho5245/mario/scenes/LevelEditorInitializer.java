@@ -5,19 +5,16 @@ import imgui.ImVec2;
 import me.jho5245.mario.animations.StateMachine;
 import me.jho5245.mario.components.*;
 import me.jho5245.mario.components.gizmo.GizmoSystem;
-import me.jho5245.mario.jade.*;
+import me.jho5245.mario.sounds.Sound;
 import me.jho5245.mario.util.AssetPool;
 import me.jho5245.mario.util.Settings;
 import org.joml.Vector2f;
 
-import me.jho5245.mario.components.*;
-import imgui.ImGui;
-import imgui.ImVec2;
-import me.jho5245.mario.components.gizmo.GizmoSystem;
 import me.jho5245.mario.jade.GameObject;
 import me.jho5245.mario.jade.Prefabs;
-import org.joml.Vector2f;
-import me.jho5245.mario.util.AssetPool;
+
+import java.io.File;
+import java.util.Collection;
 
 public class LevelEditorInitializer extends SceneInitializer
 {
@@ -50,6 +47,22 @@ public class LevelEditorInitializer extends SceneInitializer
 		AssetPool.addSpriteSheet("assets/images/spritesheet.png", 16, 16, 26, 0);
 		AssetPool.addSpriteSheet("assets/images/items.png", 16, 16, 43, 0);
 		AssetPool.addSpriteSheet("assets/images/gizmos.png", 24, 48, 3, 0);
+
+		AssetPool.addSound("assets/sounds/main-theme-overworld.ogg", true);
+		AssetPool.addSound("assets/sounds/flagpole.ogg", false);
+		AssetPool.addSound("assets/sounds/break_block.ogg", false);
+		AssetPool.addSound("assets/sounds/bump.ogg", false);
+		AssetPool.addSound("assets/sounds/coin.ogg", false);
+		AssetPool.addSound("assets/sounds/gameover.ogg", false);
+		AssetPool.addSound("assets/sounds/jump-small.ogg", false);
+		AssetPool.addSound("assets/sounds/mario_die.ogg", false);
+		AssetPool.addSound("assets/sounds/pipe.ogg", false);
+		AssetPool.addSound("assets/sounds/powerup.ogg", false);
+		AssetPool.addSound("assets/sounds/powerup_appears.ogg", false);
+		AssetPool.addSound("assets/sounds/stage_clear.ogg", false);
+		AssetPool.addSound("assets/sounds/stomp.ogg", false);
+		AssetPool.addSound("assets/sounds/kick.ogg", false);
+		AssetPool.addSound("assets/sounds/invincible.ogg", false);
 
 		for (GameObject g : scene.getGameObjects())
 		{
@@ -153,6 +166,28 @@ public class LevelEditorInitializer extends SceneInitializer
 					ImGui.sameLine();
 				}
 
+				ImGui.endTabItem();
+			}
+
+			if (ImGui.beginTabItem("Sounds"))
+			{
+				Collection<Sound> sounds = AssetPool.getAllSounds();
+				for (Sound sound : sounds)
+				{
+					File temp = new File(sound.getFilePath());
+					if (ImGui.button(temp.getName()))
+					{
+						if (!sound.isPlaying())
+						{
+							sound.play();
+						} else sound.stop();
+					}
+
+					if (ImGui.getContentRegionAvailX() > 100)
+					{
+						ImGui.sameLine();
+					}
+				}
 				ImGui.endTabItem();
 			}
 

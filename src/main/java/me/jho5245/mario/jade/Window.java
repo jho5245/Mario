@@ -11,10 +11,15 @@ import me.jho5245.mario.util.AssetPool;
 import org.joml.Vector2f;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.openal.AL;
+import org.lwjgl.openal.ALC;
+import org.lwjgl.openal.ALCCapabilities;
+import org.lwjgl.openal.ALCapabilities;
 import org.lwjgl.opengl.GL;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.openal.ALC10.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
@@ -31,6 +36,9 @@ public class Window implements Observer
 	private PickingTexture pickingTexture;
 	private boolean debugDrawPhysics = false;
 	private boolean runtimePlaying;
+
+	private long audioContext;
+	private long audioDevice;
 
 	private Window()
 	{
@@ -192,6 +200,22 @@ public class Window implements Observer
 		// Make the window visible
 		glfwShowWindow(glfwWindow);
 
+		// Init audio device
+		String defaultDeviceName = alcGetString(0, ALC_DEFAULT_DEVICE_SPECIFIER);
+		assert defaultDeviceName != null: "defaultDeviceName is null";
+		audioDevice = alcOpenDevice(defaultDeviceName);
+
+		int[] attributes = {0};
+		audioContext = alcCreateContext(audioDevice, attributes);
+		alcMakeContextCurrent(audioContext);
+
+		ALCCapabilities alcCapabilities = ALC.createCapabilities(audioDevice);
+		ALCapabilities alCapabilities = AL.createCapabilities(alcCapabilities);
+		if (!alCapabilities.OpenAL10)
+		{
+			assert false : "OpenAL10 is not supported";
+		}
+
 		// This line is critical for LWJGL's interoperation with GLFW's
 		// OpenGL context, or any context that is managed externally.
 		// LWJGL detects the context that is current in the current thread,
@@ -214,6 +238,10 @@ public class Window implements Observer
 
 	private void destroy()
 	{
+		// Destroy audio context
+		alcDestroyContext(audioContext);
+		alcCloseDevice(audioDevice);
+
 		// Free the memory
 		glfwFreeCallbacks(glfwWindow);
 		glfwDestroyWindow(glfwWindow);
