@@ -24,7 +24,7 @@ public class Physics2D
 	public Physics2D(boolean isPlaying)
 	{
 		this.isPlaying = isPlaying;
-		this.gravity = new Vec2(0, -10f);
+		this.gravity = new Vec2(0, -20f);
 		this.world = new World(gravity);
 		world.setContactListener(new JadeContactListener());
 		world.setDebugDraw(new DebugDrawJ2D());

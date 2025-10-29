@@ -14,7 +14,7 @@ public class AnimationState
 	private static final Sprite defaultSprite = new Sprite();
 	private transient float timeTracker;
 	private transient int currentSprite;
-
+	private transient float speed = 1f;
 
 	public boolean doesLoop;
 
@@ -40,7 +40,7 @@ public class AnimationState
 	{
 		if (currentSprite < animationFrames.size())
 		{
-			timeTracker -= dt;
+			timeTracker -= dt * speed;
 			if (timeTracker <= 0)
 			{
 				if (currentSprite != animationFrames.size() - 1 || doesLoop)
@@ -69,5 +69,15 @@ public class AnimationState
 	public void setDoesLoop(boolean doesLoop)
 	{
 		this.doesLoop = doesLoop;
+	}
+
+	public float getSpeed()
+	{
+		return speed;
+	}
+
+	public void setSpeed(float speed)
+	{
+		this.speed = speed;
 	}
 }

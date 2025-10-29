@@ -85,7 +85,6 @@ public class StateMachine extends Component
 				return;
 			}
 		}
-		System.out.println("unable to find trigger: " + trigger);
 	}
 
 	@Override
@@ -180,5 +179,37 @@ public class StateMachine extends Component
 		{
 			return Objects.hash(state, trigger);
 		}
+	}
+
+	public void setSpeed(float speed)
+	{
+		for (AnimationState state : this.states)
+		{
+			state.setSpeed(speed);
+		}
+	}
+
+	public float getSpeed()
+	{
+		for (AnimationState state : this.states)
+		{
+			return state.getSpeed();
+		}
+		return 1f;
+	}
+
+	public AnimationState getCurrentState()
+	{
+		return currentState;
+	}
+
+	public String getDefaultTitle()
+	{
+		return defaultStateTitle;
+	}
+
+	public String getCurrentTitle()
+	{
+		return currentState.title;
 	}
 }

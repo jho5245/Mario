@@ -65,11 +65,21 @@ public class PillboxCollider extends Component
 		}
 	}
 
+	public float getWidth()
+	{
+		return width;
+	}
+
 	public void setWidth(float width)
 	{
 		this.width = width;
 		recalculateColliders();
 		resetFixture();
+	}
+
+	public float getHeight()
+	{
+		return height;
 	}
 
 	public void setHeight(float height)
