@@ -5,6 +5,7 @@ import me.jho5245.mario.jade.KeyListener;
 import me.jho5245.mario.jade.MouseListener;
 import me.jho5245.mario.jade.Window;
 import me.jho5245.mario.util.Settings;
+import org.joml.Vector4f;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -12,33 +13,55 @@ public class MouseControls extends Component
 {
 	GameObject holdingObject;
 
+	private float debounceTime = 0.05f;
+	private float debounce = debounceTime;
+
 	public void pickUpObject(GameObject object)
 	{
+		if (this.holdingObject != null)
+		{
+			this.holdingObject.destroy();
+		}
 		this.holdingObject = object;
+		this.holdingObject.getComponent(SpriteRenderer.class).setColor(new Vector4f(1, 1, 1, 0.5f));
+		this.holdingObject.addComponent(new NonPickable());
 		Window.getCurrentScene().addGameObject(object);
 	}
 
 	public void place()
 	{
-		this.holdingObject = null;
+		GameObject copy = holdingObject.copy();
+		copy.getComponent(SpriteRenderer.class).setColor(new Vector4f(1));
+		copy.removeComponent(NonPickable.class);
+		Window.getCurrentScene().addGameObject(copy);
 	}
 
 	@Override
 	public void editorUpdate(float dt)
 	{
-		if (holdingObject != null)
+		debounce -= dt;
+		if (holdingObject != null && debounce <= 0)
 		{
-			holdingObject.getTransform().getPosition().x = MouseListener.getOrthoX();
-			holdingObject.getTransform().getPosition().y = MouseListener.getOrthoY();
+			float x = MouseListener.getWorldX();
+			float y = MouseListener.getWorldY();
 			if (!KeyListener.isKeyPressed(GLFW_KEY_LEFT_ALT))
 			{
-				holdingObject.getTransform().getPosition().x = (int) (holdingObject.getTransform().getPosition().x / Settings.GRID_WIDTH) * Settings.GRID_WIDTH;
-				holdingObject.getTransform().getPosition().y = (int) (holdingObject.getTransform().getPosition().y / Settings.GRID_HEIGHT) * Settings.GRID_HEIGHT;
+				x = Math.round(x / Settings.GRID_WIDTH) * Settings.GRID_WIDTH;
+				y = Math.round(y / Settings.GRID_HEIGHT) * Settings.GRID_HEIGHT;
 			}
+			holdingObject.getTransform().getPosition().x = x;
+			holdingObject.getTransform().getPosition().y = y;
 
 			if (MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT))
 			{
 				place();
+				debounce = debounceTime;
+			}
+
+			if (KeyListener.isKeyPressed(GLFW_KEY_ESCAPE))
+			{
+				holdingObject.destroy();
+				holdingObject = null;
 			}
 		}
 	}

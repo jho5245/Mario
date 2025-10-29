@@ -8,6 +8,7 @@ import me.jho5245.mario.scenes.LevelEditorInitializer;
 import me.jho5245.mario.scenes.Scene;
 import me.jho5245.mario.scenes.SceneInitializer;
 import me.jho5245.mario.util.AssetPool;
+import org.joml.Vector2f;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
@@ -50,14 +51,16 @@ public class Window implements Observer
 
 	public static void changeScene(SceneInitializer sceneInitializer, boolean playPhysics)
 	{
+		Vector2f originCameraPosition = null;
 		if (currentScene != null)
 		{
+			originCameraPosition = currentScene.getCamera().getPosition();
 			currentScene.destroy();
 		}
 		getImGuiLayer().getPropertiesWindow().setActiveGameObject(null);
 		currentScene = new Scene(sceneInitializer, playPhysics);
 		currentScene.load();
-		currentScene.init();
+		currentScene.init(originCameraPosition);
 		currentScene.start();
 	}
 
@@ -95,6 +98,11 @@ public class Window implements Observer
 	{
 		// TODO: Do not hardcode
 		return 16f / 9f;
+	}
+
+	public static PickingTexture getPickingTexture()
+	{
+		return getInstance().pickingTexture;
 	}
 
 	public static ImGuiLayer getImGuiLayer()

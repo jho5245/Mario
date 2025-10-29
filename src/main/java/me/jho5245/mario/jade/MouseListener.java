@@ -12,7 +12,7 @@ public class MouseListener
 	private static MouseListener instance;
 
 	private double scrollX, scrollY;
-	private double xPos, yPos, lastX, lastY, worldX, worldY, lastWorldX, lastWorldY;
+	private double xPos, yPos, worldX, worldY;
 	private final boolean[] mouseButtonPressed = new boolean[3];
 	private boolean isDragging;
 	private int mouseButtonDown = 0;
@@ -37,14 +37,8 @@ public class MouseListener
 		{
 			get().isDragging = true;
 		}
-		get().lastX = get().xPos;
-		get().lastY = get().yPos;
-		get().lastWorldX = get().worldX;
-		get().lastWorldY = get().worldY;
 		get().xPos = xPos;
 		get().yPos = yPos;
-		calcOrthoX();
-		calcOrthoY();
 	}
 
 	public static void mouseButtonCallback(long window, int button, int action, int mods)
@@ -75,10 +69,6 @@ public class MouseListener
 	{
 		get().scrollY = 0;
 		get().scrollY = 0;
-		get().lastX = get().xPos;
-		get().lastY = get().yPos;
-		get().lastWorldX = get().worldX;
-		get().lastWorldY = get().worldY;
 	}
 
 	public static float getX()
@@ -93,73 +83,49 @@ public class MouseListener
 
 	public static float getScreenX()
 	{
-		float currentX = getX() - get().gameViewportPos.x;
-		currentX = (currentX / get().gameViewportSize.x) * Window.getWidth();
-		return currentX;
+		return getScreen().x;
 	}
 
 	public static float getScreenY()
 	{
+		return getScreen().y;
+	}
+
+	public static Vector2f getScreen()
+	{
+		float currentX = getX() - get().gameViewportPos.x;
+		currentX = (currentX / get().gameViewportSize.x) * Window.getWidth();
 		float currentY = getY() - get().gameViewportPos.y;
 		currentY = Window.getHeight() - ((currentY / get().gameViewportSize.y) * Window.getHeight());
-		return currentY;
+		return new Vector2f(currentX, currentY);
 	}
 
-	public static float getOrthoX()
+	public static float getWorldX()
 	{
-		return (float) get().worldX;
+		return getWorld().x;
 	}
 
-	private static void calcOrthoX()
+	public static float getWorldY()
+	{
+		return getWorld().y;
+	}
+
+	public static Vector2f getWorld()
 	{
 		float currentX = getX() - get().gameViewportPos.x;
 		currentX = (currentX / get().gameViewportSize.x) * 2f - 1f;
-		Vector4f temp = new Vector4f(currentX, 0, 0, 1);
-		Camera camera = Window.getCurrentScene().getCamera();
-		Matrix4f viewProjection = new Matrix4f();
-		camera.getInverseView().mul(camera.getInverseProjection(), viewProjection);
-		temp.mul(viewProjection);
-
-		get().worldX = temp.x;
-	}
-
-	public static float getOrthoY()
-	{
-		return (float) get().worldY;
-	}
-
-	private static void calcOrthoY()
-	{
 		float currentY = getY() - get().gameViewportPos.y;
 		// y값 반전 - ImGUI는 y축 증가가 위로 향함
 		currentY = -((currentY / get().gameViewportSize.y) * 2f - 1f);
-		Vector4f temp = new Vector4f(0, currentY, 0, 1);
+
+		Vector4f temp = new Vector4f(currentX, currentY, 0, 1);
+
 		Camera camera = Window.getCurrentScene().getCamera();
-		Matrix4f viewProjection = new Matrix4f();
-		camera.getInverseView().mul(camera.getInverseProjection(), viewProjection);
-		temp.mul(viewProjection);
+		Matrix4f inverseView = new Matrix4f(camera.getInverseView());
+		Matrix4f inverseProjection = new Matrix4f(camera.getInverseProjection());
+		temp.mul(inverseView.mul(inverseProjection));
 
-		get().worldY = temp.y;
-	}
-
-	public static float getDx()
-	{
-		return (float) (get().lastX - get().xPos);
-	}
-
-	public static float getDy()
-	{
-		return (float) (get().lastY - get().yPos);
-	}
-
-	public static float getWorldDx()
-	{
-		return (float) (get().lastWorldX - get().worldX);
-	}
-
-	public static float getWorldDy()
-	{
-		return (float) (get().lastWorldY - get().worldY);
+		return new Vector2f(temp.x, temp.y);
 	}
 
 	public static float getScrollX()

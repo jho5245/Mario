@@ -1,5 +1,6 @@
 package me.jho5245.mario.jade;
 
+import me.jho5245.mario.util.Settings;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -13,6 +14,11 @@ public class Camera
 	private Vector2f projectionSize = new Vector2f(projectionWidth, projectionHeight);
 
 	private float zoom = 1f;
+
+	public Camera()
+	{
+		this(new Vector2f(-Settings.GRID_WIDTH / 2, -Settings.GRID_HEIGHT / 2));
+	}
 
 	public Camera(Vector2f position)
 	{

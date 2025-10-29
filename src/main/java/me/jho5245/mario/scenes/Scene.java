@@ -42,9 +42,16 @@ public class Scene
 		this.isRunning = false;
 	}
 
-	public void init()
+	public void init(Vector2f startCameraPosition)
 	{
-		this.camera = new Camera(new Vector2f(0, 0));
+		if (startCameraPosition != null)
+		{
+			this.camera = new Camera(new Vector2f(startCameraPosition));
+		}
+		else
+		{
+			this.camera = new Camera();
+		}
 		this.sceneInitializer.loadResources(this);
 		this.sceneInitializer.init(this);
 	}

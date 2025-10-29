@@ -3,9 +3,8 @@ package me.jho5245.mario.components;
 import me.jho5245.mario.jade.Camera;
 import me.jho5245.mario.jade.KeyListener;
 import me.jho5245.mario.jade.MouseListener;
+import me.jho5245.mario.util.Settings;
 import org.joml.Vector2f;
-
-import java.security.Key;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -40,13 +39,13 @@ public class EditorCamera extends Component
 	{
 		if (MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_MIDDLE) && dragDebounce > 0)
 		{
-			this.clickOrigin = new Vector2f(MouseListener.getOrthoX(), MouseListener.getOrthoY());
+			this.clickOrigin = MouseListener.getWorld();
 			dragDebounce -= dt;
 			return;
 		}
 		else if (MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_MIDDLE))
 		{
-			Vector2f mousePos = new Vector2f(MouseListener.getOrthoX(), MouseListener.getOrthoY());
+			Vector2f mousePos = MouseListener.getWorld();
 			Vector2f delta = new Vector2f(mousePos).sub(clickOrigin);
 			camera.getPosition().sub(delta.mul(dt).mul(dragSensivity));
 			clickOrigin.lerp(mousePos, dt);
@@ -64,6 +63,7 @@ public class EditorCamera extends Component
 			float addValue = (float) Math.pow(Math.abs(MouseListener.getScrollY() * scrollSensivity), 1 / camera.getZoom());
 			addValue *= -Math.signum(MouseListener.getScrollY());
 			camera.addZoom(addValue);
+			reset = false;
 		}
 
 		if (KeyListener.isKeyPressed(GLFW_KEY_KP_DECIMAL))
@@ -80,16 +80,15 @@ public class EditorCamera extends Component
 		}
 
 		isCtrlPressed = KeyListener.isKeyPressed(GLFW_KEY_LEFT_CONTROL);
-
 		if (reset)
 		{
-			camera.getPosition().lerp(new Vector2f(), lerpTime);
+			camera.getPosition().lerp(new Vector2f(-Settings.GRID_WIDTH / 2, -Settings.GRID_HEIGHT / 2), lerpTime);
 			camera.setZoom(camera.getZoom() + ((1f - camera.getZoom()) * lerpTime));
 			lerpTime += dt * resetSpeed / 100f;
-			if (Math.abs(camera.getPosition().x) <= 0.01f && Math.abs(camera.getPosition().y) <= 0.01f)
+			if (Math.abs(camera.getZoom() - 1f) <= 0.001f && Math.abs(camera.getPosition().x + Settings.GRID_WIDTH / 2) <= 0.01f && Math.abs(camera.getPosition().y + Settings.GRID_HEIGHT / 2) <= 0.01f)
 			{
 				lerpTime = 0f;
-				camera.getPosition().set(0f, 0f);
+				camera.getPosition().set(new Vector2f(-Settings.GRID_WIDTH / 2, -Settings.GRID_HEIGHT / 2));
 				camera.setZoom(1f);
 				reset = false;
 			}

@@ -3,12 +3,16 @@ package me.jho5245.mario.editor;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.flag.ImGuiWindowFlags;
+import me.jho5245.mario.jade.KeyListener;
 import me.jho5245.mario.jade.MouseListener;
 import me.jho5245.mario.jade.Window;
 import me.jho5245.mario.observers.ObserverHandler;
 import me.jho5245.mario.observers.events.Event;
 import me.jho5245.mario.observers.events.EventType;
 import org.joml.Vector2f;
+import org.lwjgl.glfw.GLFW;
+
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 
 public class GameViewWindow
 {
@@ -31,6 +35,12 @@ public class GameViewWindow
 			ObserverHandler.notify(null, new Event(EventType.GAME_ENGINE_STOP_PLAY));
 		}
 		ImGui.endMenuBar();
+
+		if (KeyListener.keyBeginPress(GLFW_KEY_SPACE))
+		{
+			ObserverHandler.notify(null, new Event(isPlaying ? EventType.GAME_ENGINE_STOP_PLAY : EventType.GAME_ENGINE_START_PLAY));
+			isPlaying = !isPlaying;
+		}
 
 		ImVec2 windowSize = getLargestSizeForViewport();
 		ImVec2 windowPos = getCenteredPositionForVieport(windowSize);

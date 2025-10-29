@@ -10,15 +10,13 @@ import me.jho5245.mario.util.Settings;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 
-import java.util.Set;
-
 import static org.lwjgl.glfw.GLFW.*;
 
 public class Gizmo extends Component
 {
-	private Vector4f xAxisColor = new Vector4f(1, 0.3f, 0.3f, 1);
+	private Vector4f xAxisColor = new Vector4f(1, 0.5f, 0.5f, 0.8f);
 	private Vector4f xAxisColorHover = new Vector4f(1, 0, 0, 1);
-	private Vector4f yAxisColor = new Vector4f(0.3f, 1, 0.3f, 1);
+	private Vector4f yAxisColor = new Vector4f(0.5f, 1, 0.5f, 0.8f);
 	private Vector4f yAxisColorHover = new Vector4f(0, 1, 0, 1);
 
 	private GameObject xAxisObject;
@@ -72,6 +70,8 @@ public class Gizmo extends Component
 		{
 			this.setInactive();
 		}
+		xAxisSprite.setColor(new Vector4f(0));
+		yAxisSprite.setColor(new Vector4f(0));
 	}
 
 	@Override
@@ -147,7 +147,7 @@ public class Gizmo extends Component
 
 	private boolean checkXHoverState()
 	{
-		Vector2f mousePos = new Vector2f(MouseListener.getOrthoX(), MouseListener.getOrthoY());
+		Vector2f mousePos = MouseListener.getWorld();
 		if (mousePos.x <= xAxisObject.transform.position.x + (gizmoHeight / 2.0f) && mousePos.x >= xAxisObject.transform.position.x - (gizmoHeight / 2.0f)
 				&& mousePos.y >= xAxisObject.transform.position.y - (gizmoWidth / 2.0f) && mousePos.y <= xAxisObject.transform.position.y + (gizmoWidth / 2.0f))
 		{
@@ -160,7 +160,7 @@ public class Gizmo extends Component
 
 	private boolean checkYHoverState()
 	{
-		Vector2f mousePos = new Vector2f(MouseListener.getOrthoX(), MouseListener.getOrthoY());
+		Vector2f mousePos = MouseListener.getWorld();
 		if (mousePos.x <= yAxisObject.transform.position.x + (gizmoWidth / 2.0f) && mousePos.x >= yAxisObject.transform.position.x - (gizmoWidth / 2.0f)
 				&& mousePos.y <= yAxisObject.transform.position.y + (gizmoHeight / 2.0f) && mousePos.y >= yAxisObject.transform.position.y - (gizmoHeight / 2.0f))
 		{
