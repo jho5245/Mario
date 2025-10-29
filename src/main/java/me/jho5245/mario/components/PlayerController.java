@@ -5,7 +5,6 @@ import me.jho5245.mario.jade.KeyListener;
 import me.jho5245.mario.jade.Window;
 import me.jho5245.mario.physics2d.RaycastInfo;
 import me.jho5245.mario.physics2d.components.Rigidbody2D;
-import me.jho5245.mario.renderer.DebugDraw;
 import me.jho5245.mario.util.AssetPool;
 import org.joml.Vector2f;
 
