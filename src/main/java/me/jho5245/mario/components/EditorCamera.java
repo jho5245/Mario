@@ -10,7 +10,11 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class EditorCamera extends Component
 {
-	private float dragDebounce = 0.032f;
+	private final float dragDebounceOrigin = 0.032f;
+	private float dragDebounce = dragDebounceOrigin;
+
+	private final float keyDelayOrigin = 0.1f;
+	private float keyDelay = keyDelayOrigin;
 
 	private final Camera camera;
 
@@ -37,24 +41,95 @@ public class EditorCamera extends Component
 	@Override
 	public void editorUpdate(float dt)
 	{
-		if (MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_MIDDLE) && dragDebounce > 0)
+		final boolean MOUSE_MIDDLE = MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_MIDDLE);
+		final boolean KEY_LEFT_ALT = KeyListener.isKeyPressed(GLFW_KEY_LEFT_ALT);
+
+		if (MOUSE_MIDDLE && dragDebounce > 0)
 		{
 			this.clickOrigin = MouseListener.getWorld();
 			dragDebounce -= dt;
 			return;
 		}
-		else if (MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_MIDDLE))
+		else if (MOUSE_MIDDLE)
 		{
 			Vector2f mousePos = MouseListener.getWorld();
 			Vector2f delta = new Vector2f(mousePos).sub(clickOrigin);
 			camera.getPosition().sub(delta.mul(dt).mul(dragSensivity));
 			clickOrigin.lerp(mousePos, dt);
+			if (!KEY_LEFT_ALT)
+			{
+				float x = camera.getPosition().x;
+				float y = camera.getPosition().y;
+				camera.getPosition().x = (int) (x / Settings.GRID_WIDTH) * Settings.GRID_WIDTH - Settings.GRID_WIDTH / 2;
+				camera.getPosition().y = (int) (y / Settings.GRID_HEIGHT) * Settings.GRID_HEIGHT -  Settings.GRID_HEIGHT / 2;
+			}
 			reset = false;
+		}
+
+		// mouse camera by keyboard
+		{
+			boolean moving = false;
+			float dx = 0;
+			float dy = 0;
+			if (KeyListener.isKeyPressed(GLFW_KEY_LEFT))
+			{
+				moving = true;
+				if (keyDelay < 0)
+				{
+					dx = -Settings.GRID_WIDTH;
+					keyDelay = keyDelayOrigin;
+				}
+			}
+			else if (KeyListener.isKeyPressed(GLFW_KEY_RIGHT))
+			{
+				moving = true;
+				if (keyDelay < 0)
+				{
+					dx = Settings.GRID_WIDTH;
+					keyDelay = keyDelayOrigin;
+				}
+			}
+			if (KeyListener.isKeyPressed(GLFW_KEY_UP))
+			{
+				moving = true;
+				if (keyDelay < 0)
+				{
+					dy = Settings.GRID_HEIGHT;
+					keyDelay = keyDelayOrigin;
+				}
+			}
+			else if (KeyListener.isKeyPressed(GLFW_KEY_DOWN))
+			{
+				moving = true;
+				if (keyDelay < 0)
+				{
+					dy = -Settings.GRID_HEIGHT;
+					keyDelay = keyDelayOrigin;
+				}
+			}
+
+			if (moving)
+			{
+				keyDelay -= dt;
+				// double speed when shift is pressed
+				if (KeyListener.isKeyPressed(GLFW_KEY_LEFT_SHIFT))
+				{
+					dx *= 2;
+					dy *= 2;
+				}
+				else if (KEY_LEFT_ALT)
+				{
+					dx /= 2;
+					dy /= 2;
+				}
+				camera.getPosition().x += dx;
+				camera.getPosition().y += dy;
+			}
 		}
 
 		if (dragDebounce <= 0f && !MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_MIDDLE))
 		{
-			dragDebounce = 0.1f;
+			dragDebounce = dragDebounceOrigin;
 		}
 
 		if (MouseListener.getScrollY() != 0f)
