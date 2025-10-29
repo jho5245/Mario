@@ -22,17 +22,17 @@ public class KeyListener
 		return instance;
 	}
 
-	public static void keyCallback(long window, int key, int scanCode, int action, int mods)
+	public static void keyCallback(long window, int keyCode, int scanCode, int action, int mods)
 	{
 		if (action == GLFW_PRESS)
 		{
-			get().keyBeginPress[key] = true;
-			get().keyPressed[key] = true;
+			get().keyBeginPress[keyCode] = true;
+			get().keyPressed[keyCode] = true;
 		}
 		else if (action == GLFW_RELEASE)
 		{
-			get().keyBeginPress[key] = false;
-			get().keyPressed[key] = false;
+			get().keyBeginPress[keyCode] = false;
+			get().keyPressed[keyCode] = false;
 		}
 	}
 
