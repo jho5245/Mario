@@ -46,5 +46,9 @@ public class KeyControls extends Component
 			}
 			propertiesWindow.clearSelected();
 		}
+		else if (KeyListener.keyBeginPress(GLFW_KEY_ESCAPE))
+		{
+			propertiesWindow.clearSelected();
+		}
 	}
 }

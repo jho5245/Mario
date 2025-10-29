@@ -197,10 +197,10 @@ public class Window implements Observer
 
 		// Init audio device
 		String defaultDeviceName = alcGetString(0, ALC_DEFAULT_DEVICE_SPECIFIER);
-		assert defaultDeviceName != null: "defaultDeviceName is null";
+		assert defaultDeviceName != null : "defaultDeviceName is null";
 		audioDevice = alcOpenDevice(defaultDeviceName);
 
-		int[] attributes = {0};
+		int[] attributes = { 0 };
 		audioContext = alcCreateContext(audioDevice, attributes);
 		alcMakeContextCurrent(audioContext);
 
@@ -308,8 +308,9 @@ public class Window implements Observer
 
 			this.imGuiLayer.update(dt, currentScene);
 
-			glfwSwapBuffers(glfwWindow);
 			MouseListener.endFrame();
+			KeyListener.endFrame();
+			glfwSwapBuffers(glfwWindow);
 
 			endTime = (float) glfwGetTime();
 			dt = endTime - beginTime;

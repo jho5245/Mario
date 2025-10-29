@@ -1,11 +1,13 @@
 package me.jho5245.mario.editor;
 
 import imgui.ImGui;
+import me.jho5245.mario.components.SpriteRenderer;
 import me.jho5245.mario.jade.GameObject;
 import me.jho5245.mario.physics2d.components.Box2DCollider;
 import me.jho5245.mario.physics2d.components.CircleCollider;
 import me.jho5245.mario.physics2d.components.Rigidbody2D;
 import me.jho5245.mario.renderer.PickingTexture;
+import org.joml.Vector4f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +15,8 @@ import java.util.List;
 public class PropertiesWindow
 {
 	private List<GameObject> activeGameObjects;
-
+	// 선택한 게임오브젝트 원래 색상
+	private List<Vector4f> activeGameObjectsOriginColor;
 	private GameObject activeGameObject;
 
 	private PickingTexture pickingTexture;
@@ -21,8 +24,8 @@ public class PropertiesWindow
 	public PropertiesWindow(PickingTexture pickingTexture)
 	{
 		this.activeGameObjects = new ArrayList<>();
+		this.activeGameObjectsOriginColor = new ArrayList<>();
 		this.pickingTexture = pickingTexture;
-		this.activeGameObject = null;
 	}
 
 	public void imgui()
@@ -71,7 +74,21 @@ public class PropertiesWindow
 
 	public void clearSelected()
 	{
+		if (!activeGameObjectsOriginColor.isEmpty())
+		{
+			int i = 0;
+			for (GameObject gameObject : activeGameObjects)
+			{
+				SpriteRenderer renderer = gameObject.getComponent(SpriteRenderer.class);
+				if (renderer != null)
+				{
+					renderer.setColor(activeGameObjectsOriginColor.get(i));
+				}
+				i++;
+			}
+		}
 		this.activeGameObjects.clear();
+		this.activeGameObjectsOriginColor.clear();
 	}
 
 	public GameObject getActiveGameObject()
@@ -90,7 +107,19 @@ public class PropertiesWindow
 
 	public void addActiveGameObject(GameObject gameObject)
 	{
+		SpriteRenderer renderer = gameObject.getComponent(SpriteRenderer.class);
+		if (renderer != null)
+		{
+			this.activeGameObjectsOriginColor.add(new Vector4f(renderer.getColor()));
+			renderer.setColor(new Vector4f(1, 1, 1, 0.5f));
+		}
+		// 색깔이 없어도 빈 색상 추가
+		else
+		{
+			this.activeGameObjectsOriginColor.add(new Vector4f());
+		}
 		this.activeGameObjects.add(gameObject);
+
 	}
 
 	public PickingTexture getPickingTexture()
