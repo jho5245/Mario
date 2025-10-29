@@ -11,7 +11,7 @@ public class AnimationState
 	public String title;
 	public List<Frame> animationFrames = new ArrayList<>();
 
-	private static Sprite defaultSprite = new Sprite();
+	private static final Sprite defaultSprite = new Sprite();
 	private transient float timeTracker;
 	private transient int currentSprite;
 
