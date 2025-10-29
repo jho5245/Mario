@@ -8,16 +8,14 @@ import me.jho5245.mario.components.Transform;
 import me.jho5245.mario.jade.Camera;
 import me.jho5245.mario.jade.GameObject;
 import me.jho5245.mario.jade.GameObjectDeserializer;
-import me.jho5245.mario.jade.MouseListener;
 import me.jho5245.mario.physics2d.Physics2D;
-import me.jho5245.mario.renderer.DebugDraw;
 import me.jho5245.mario.renderer.Renderer;
 import org.joml.Vector2f;
-import org.joml.Vector3f;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -186,6 +184,11 @@ public class Scene
 		try
 		{
 			inFile = new String(Files.readAllBytes(Paths.get("level.json")));
+		}
+		catch (NoSuchFileException e)
+		{
+			System.out.println("No file found! Making a new one..");
+			return;
 		}
 		catch (IOException e)
 		{

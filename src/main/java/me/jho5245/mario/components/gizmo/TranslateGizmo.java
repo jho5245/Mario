@@ -23,25 +23,37 @@ public class TranslateGizmo extends Gizmo
 		{
 			if (xAxisActive && !yAxisActive)
 			{
+				float x;
 				if (KeyListener.isKeyPressed(GLFW_KEY_LEFT_ALT))
 				{
-					activeGameObject.getTransform().getPosition().x = MouseListener.getWorldX();
+					x = MouseListener.getWorldX();
 				}
 				else
 				{
-					activeGameObject.getTransform().getPosition().x = (int) (MouseListener.getWorldX() / Settings.GRID_WIDTH) * Settings.GRID_WIDTH;
+					x = (int) (MouseListener.getWorldX() / Settings.GRID_WIDTH) * Settings.GRID_WIDTH;
+					if ((int) activeGameObject.transform.scale.x % 2 == 0)
+					{
+						x -= Settings.GRID_WIDTH / 2;
+					}
 				}
+				activeGameObject.getTransform().getPosition().x = x;
 			}
 			else if (yAxisActive && !xAxisActive)
 			{
+				float y;
 				if (KeyListener.isKeyPressed(GLFW_KEY_LEFT_ALT))
 				{
-					activeGameObject.getTransform().getPosition().y = MouseListener.getWorldY();
+					y = MouseListener.getWorldY();
 				}
 				else
 				{
-					activeGameObject.getTransform().getPosition().y = (int) (MouseListener.getWorldY() / Settings.GRID_HEIGHT) * Settings.GRID_HEIGHT;
+					y = (int) (MouseListener.getWorldY() / Settings.GRID_HEIGHT) * Settings.GRID_HEIGHT;
+					if ((int) activeGameObject.transform.scale.y % 2 == 0)
+					{
+						y -= Settings.GRID_WIDTH / 2;
+					}
 				}
+				activeGameObject.getTransform().getPosition().y = y;
 			}
 		}
 

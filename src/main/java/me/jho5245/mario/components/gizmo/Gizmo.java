@@ -148,7 +148,7 @@ public class Gizmo extends Component
 	private boolean checkXHoverState()
 	{
 		Vector2f mousePos = MouseListener.getWorld();
-		if (mousePos.x <= xAxisObject.transform.position.x + (gizmoHeight / 2.0f) && mousePos.x >= xAxisObject.transform.position.x - (gizmoHeight / 2.0f)
+		if (xAxisActive || mousePos.x <= xAxisObject.transform.position.x + (gizmoHeight / 2.0f) && mousePos.x >= xAxisObject.transform.position.x - (gizmoHeight / 2.0f)
 				&& mousePos.y >= xAxisObject.transform.position.y - (gizmoWidth / 2.0f) && mousePos.y <= xAxisObject.transform.position.y + (gizmoWidth / 2.0f))
 		{
 			xAxisSprite.setColor(xAxisColorHover);
@@ -161,7 +161,7 @@ public class Gizmo extends Component
 	private boolean checkYHoverState()
 	{
 		Vector2f mousePos = MouseListener.getWorld();
-		if (mousePos.x <= yAxisObject.transform.position.x + (gizmoWidth / 2.0f) && mousePos.x >= yAxisObject.transform.position.x - (gizmoWidth / 2.0f)
+		if (yAxisActive || mousePos.x <= yAxisObject.transform.position.x + (gizmoWidth / 2.0f) && mousePos.x >= yAxisObject.transform.position.x - (gizmoWidth / 2.0f)
 				&& mousePos.y <= yAxisObject.transform.position.y + (gizmoHeight / 2.0f) && mousePos.y >= yAxisObject.transform.position.y - (gizmoHeight / 2.0f))
 		{
 			yAxisSprite.setColor(yAxisColorHover);

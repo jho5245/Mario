@@ -7,7 +7,7 @@ import me.jho5245.mario.observers.events.Event;
 import me.jho5245.mario.observers.events.EventType;
 import org.lwjgl.glfw.GLFW;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_F3;
+import static org.lwjgl.glfw.GLFW.*;
 
 public class MenuBar
 {
@@ -42,6 +42,11 @@ public class MenuBar
 		if (KeyListener.keyBeginPress(GLFW_KEY_F3))
 		{
 			ObserverHandler.notify(null, new Event(EventType.TOGGLE_PHYSICS_DEBUG_DRAW));
+		}
+
+		if (KeyListener.keyBeginPress(GLFW_KEY_S) && KeyListener.isKeyPressed(GLFW_KEY_LEFT_CONTROL))
+		{
+			ObserverHandler.notify(null, new Event(EventType.SAVE_LEVEL));
 		}
 
 		ImGui.endMenuBar();

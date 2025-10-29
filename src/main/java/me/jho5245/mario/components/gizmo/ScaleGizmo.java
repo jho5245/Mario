@@ -24,7 +24,7 @@ public class ScaleGizmo extends Gizmo
 			{
 				if (KeyListener.isKeyPressed(GLFW_KEY_LEFT_ALT))
 				{
-					activeGameObject.getTransform().getScale().x -= MouseListener.getWorldX();
+					activeGameObject.getTransform().getScale().x = MouseListener.getWorldX() - activeGameObject.getTransform().getPosition().x;
 					if (activeGameObject.getTransform().getScale().x < 0)
 						activeGameObject.getTransform().getScale().x = 0;
 				}
@@ -37,7 +37,7 @@ public class ScaleGizmo extends Gizmo
 			{
 				if (KeyListener.isKeyPressed(GLFW_KEY_LEFT_ALT))
 				{
-					activeGameObject.getTransform().getScale().y -= MouseListener.getWorldY();
+					activeGameObject.getTransform().getScale().y = MouseListener.getWorldY() - activeGameObject.getTransform().getPosition().y;
 					if (activeGameObject.getTransform().getScale().y < 0)
 						activeGameObject.getTransform().getScale().y = 0;
 				}
