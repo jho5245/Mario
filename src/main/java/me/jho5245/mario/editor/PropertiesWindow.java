@@ -101,7 +101,7 @@ public class PropertiesWindow
 		if (gameObject != null)
 		{
 			clearSelected();
-			this.activeGameObjects.add(gameObject);
+			addActiveGameObject(gameObject);
 		}
 	}
 

@@ -152,9 +152,17 @@ public class RenderBatch implements Comparable<RenderBatch>
 			SpriteRenderer sprite = sprites[i];
 			if (sprite.isDirty())
 			{
-				loadVertexProperties(i);
-				sprite.setClean();
-				rebufferData = true;
+				if (!hasTexture(sprite.getTexture()))
+				{
+					this.renderer.destroyGameObject(sprite.getGameObject());
+					this.renderer.add(sprite.getGameObject());
+				}
+				else
+				{
+					loadVertexProperties(i);
+					sprite.setClean();
+					rebufferData = true;
+				}
 			}
 
 			if (sprite.gameObject.transform.zIndex != this.zIndex)

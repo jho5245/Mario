@@ -1,5 +1,6 @@
 package me.jho5245.mario.components;
 
+import me.jho5245.mario.animations.StateMachine;
 import me.jho5245.mario.editor.PropertiesWindow;
 import me.jho5245.mario.jade.GameObject;
 import me.jho5245.mario.jade.KeyListener;
@@ -9,6 +10,7 @@ import org.joml.Vector2f;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -22,10 +24,12 @@ public class KeyControls extends Component
 		List<GameObject> activeGameObjects = propertiesWindow.getActiveGameObjects();
 		if (KeyListener.isKeyPressed(GLFW_KEY_LEFT_CONTROL) && KeyListener.keyBeginPress(GLFW_KEY_D) && activeGameObject != null)
 		{
-			GameObject newObj = activeGameObject.copy();
-			Window.getCurrentScene().addGameObject(newObj);
-			newObj.transform.position.add(new Vector2f(Settings.GRID_WIDTH, 0f));
-			propertiesWindow.setActiveGameObject(newObj);
+			propertiesWindow.clearSelected();
+			GameObject copy = activeGameObject.copy();
+			Window.getCurrentScene().addGameObject(copy);
+			copy.transform.position.add(new Vector2f(Settings.GRID_WIDTH, 0f));
+			propertiesWindow.setActiveGameObject(copy);
+			Optional.ofNullable(copy.getComponent(StateMachine.class)).ifPresent(StateMachine::refreshTextures);
 		}
 		else if (KeyListener.isKeyPressed(GLFW_KEY_LEFT_CONTROL) && KeyListener.keyBeginPress(GLFW_KEY_D) && activeGameObjects.size() > 1)
 		{
@@ -36,6 +40,7 @@ public class KeyControls extends Component
 				GameObject copy =  gameObject.copy();
 				Window.getCurrentScene().addGameObject(copy);
 				propertiesWindow.addActiveGameObject(copy);
+				Optional.ofNullable(copy.getComponent(StateMachine.class)).ifPresent(StateMachine::refreshTextures);
 			}
 		}
 		else if (KeyListener.keyBeginPress(GLFW_KEY_DELETE))
