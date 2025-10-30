@@ -1,6 +1,7 @@
 package me.jho5245.mario.physics2d.components;
 
 import me.jho5245.mario.components.Component;
+import me.jho5245.mario.components.ai.MushroomAI;
 import me.jho5245.mario.jade.Window;
 import me.jho5245.mario.physics2d.enums.BodyType;
 import org.jbox2d.common.Vec2;
@@ -54,7 +55,7 @@ public class Rigidbody2D extends Component
 	{
 		if (rawBody != null)
 		{
-			rawBody.applyForceToCenter(new Vec2(velocity.x, velocity.y));
+			rawBody.applyForceToCenter(new Vec2(forceToAdd.x, forceToAdd.y));
 		}
 	}
 
@@ -63,7 +64,7 @@ public class Rigidbody2D extends Component
 		if (rawBody != null)
 		{
 			// TODO: should we wake it?
-			rawBody.applyLinearImpulse(new Vec2(velocity.x, velocity.y), rawBody.getWorldCenter(), false);
+			rawBody.applyLinearImpulse(new Vec2(impulse.x, impulse.y), rawBody.getWorldCenter(), false);
 		}
 	}
 

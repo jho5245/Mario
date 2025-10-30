@@ -3,9 +3,11 @@ package me.jho5245.mario.jade;
 import me.jho5245.mario.animations.AnimationState;
 import me.jho5245.mario.animations.StateMachine;
 import me.jho5245.mario.components.*;
+import me.jho5245.mario.components.ai.MushroomAI;
 import me.jho5245.mario.components.block.BlockCoin;
 import me.jho5245.mario.components.block.QuestionBlock;
 import me.jho5245.mario.physics2d.components.Box2DCollider;
+import me.jho5245.mario.physics2d.components.CircleCollider;
 import me.jho5245.mario.physics2d.components.PillboxCollider;
 import me.jho5245.mario.physics2d.components.Rigidbody2D;
 import me.jho5245.mario.physics2d.enums.BodyType;
@@ -269,5 +271,24 @@ public class Prefabs
 		coin.addComponent(new BlockCoin());
 
 		return coin;
+	}
+
+	public static GameObject generateMushroom()
+	{
+		SpriteSheet items = AssetPool.getSpriteSheet("assets/images/items.png");
+		GameObject mushroom = generateSpriteObject(items.getSprite(10), Settings.GRID_WIDTH, Settings.GRID_HEIGHT);
+
+		Rigidbody2D rb = new Rigidbody2D();
+		rb.setBodyType(BodyType.DYNAMIC);
+		rb.setFixedRotation(true);
+		rb.setContinuousCollision(false);
+		mushroom.addComponent(rb);
+
+		CircleCollider circleCollider = new CircleCollider();
+		circleCollider.setRadius(0.49f);
+		mushroom.addComponent(circleCollider);
+		mushroom.addComponent(new MushroomAI());
+
+		return mushroom;
 	}
 }

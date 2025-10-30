@@ -28,6 +28,7 @@ public class Scene
 	private Camera camera;
 	private boolean isRunning;
 	private final List<GameObject> gameObjects;
+	private List<GameObject> pendingObjects;
 
 	private SceneInitializer sceneInitializer;
 
@@ -37,6 +38,7 @@ public class Scene
 		this.physics2D = new Physics2D(playPhysics);
 		this.renderer = new Renderer();
 		this.gameObjects = new ArrayList<>();
+		this.pendingObjects = new ArrayList<>();
 		this.isRunning = false;
 	}
 
@@ -61,7 +63,7 @@ public class Scene
 			GameObject gameObject = this.gameObjects.get(i);
 			gameObject.start();
 			renderer.add(gameObject);
-			physics2D.addGameObject(gameObject);
+			physics2D.add(gameObject);
 		}
 		isRunning = true;
 	}
@@ -76,12 +78,13 @@ public class Scene
 
 	public void addGameObject(GameObject gameObject)
 	{
-		gameObjects.add(gameObject);
-		if (isRunning)
+		if (!isRunning)
 		{
-			gameObject.start();
-			renderer.add(gameObject);
-			physics2D.addGameObject(gameObject);
+			gameObjects.add(gameObject);
+		}
+		else
+		{
+			pendingObjects.add(gameObject);
 		}
 	}
 
@@ -108,6 +111,16 @@ public class Scene
 				i--;
 			}
 		}
+
+		for (int i = 0; i < pendingObjects.size(); i++)
+		{
+			GameObject gameObject = pendingObjects.get(i);
+			gameObjects.add(gameObject);
+			gameObject.start();
+			renderer.add(gameObject);
+			physics2D.add(gameObject);
+		}
+		pendingObjects.clear();
 	}
 
 	public void update(float dt)
@@ -128,6 +141,16 @@ public class Scene
 				i--;
 			}
 		}
+
+		for (int i = 0; i < pendingObjects.size(); i++)
+		{
+			GameObject gameObject = pendingObjects.get(i);
+			gameObjects.add(gameObject);
+			gameObject.start();
+			renderer.add(gameObject);
+			physics2D.add(gameObject);
+		}
+		pendingObjects.clear();
 	}
 
 	public void render()

@@ -35,7 +35,7 @@ public class Physics2D
 		return new Vector2f(this.world.getGravity().x, this.world.getGravity().y);
 	}
 
-	public void addGameObject(GameObject gameObject)
+	public void add(GameObject gameObject)
 	{
 		Rigidbody2D rb = gameObject.getComponent(Rigidbody2D.class);
 		if (rb != null && rb.getRawBody() == null)

@@ -5,16 +5,19 @@ import me.jho5245.mario.jade.GameObject;
 import me.jho5245.mario.jade.KeyListener;
 import me.jho5245.mario.jade.Window;
 import me.jho5245.mario.physics2d.RaycastInfo;
+import me.jho5245.mario.physics2d.components.PillboxCollider;
 import me.jho5245.mario.physics2d.components.Rigidbody2D;
 import me.jho5245.mario.util.AssetPool;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.joml.Vector2f;
 
+import java.util.List;
+
 import static org.lwjgl.glfw.GLFW.*;
 
 public class PlayerController extends Component
 {
-	private enum PlayerState
+	public enum PlayerState
 	{
 		SMALL,
 		BIG,
@@ -37,8 +40,9 @@ public class PlayerController extends Component
 	private transient float groundDebounceTime = 0.1f;
 	public transient Rigidbody2D rb;
 	private transient StateMachine stateMachine;
-	private transient float bigJumpBoostFactor = 1.05f;
+	private transient float bigJumpBoostFactor = 1.2f;
 	private transient float playerWidth;
+	private transient float playerHeight;
 	private transient final float maxJumpTime = 50;
 	private transient final float maxSprintingJumpTime = 80;
 	private transient float jumpTime;
@@ -51,6 +55,7 @@ public class PlayerController extends Component
 	public void start()
 	{
 		this.playerWidth = gameObject.transform.scale.x;
+		this.playerHeight = gameObject.transform.scale.y;
 		this.rb = gameObject.getComponent(Rigidbody2D.class);
 		this.stateMachine = gameObject.getComponent(StateMachine.class);
 		this.rb.setGravityScale(0f);
@@ -162,7 +167,7 @@ public class PlayerController extends Component
 			this.velocity.x = Math.max(Math.min(this.velocity.x, this.terminalVelocity.x), -this.terminalVelocity.x);
 			this.velocity.y = Math.max(Math.min(this.velocity.y, this.terminalVelocity.y), -this.terminalVelocity.y);
 		}
-		if (this.stateMachine.getCurrentTitle().equals("Run"))
+		if (List.of("Run", "BigRun").contains(this.stateMachine.getCurrentTitle()))
 		{
 			this.stateMachine.setSpeed(Math.abs(this.velocity.x / 4));
 		}
@@ -188,7 +193,7 @@ public class PlayerController extends Component
 		Vector2f raycastBegin = new Vector2f(this.gameObject.transform.position);
 		float innerPlayerWidth = this.playerWidth * 0.6f;
 		raycastBegin.sub(innerPlayerWidth / 2f, 0f);
-		float yValue = playerState == PlayerState.SMALL ? -0.54f : -0.84f;
+		float yValue = playerState == PlayerState.SMALL ? -0.54f : -1.04f;
 		Vector2f raycastEnd = new Vector2f(raycastBegin).add(0f, yValue);
 		RaycastInfo info = Window.getPhysics().rayCast(this.gameObject, raycastBegin, raycastEnd);
 		Vector2f raycast2Begin = new Vector2f(raycastBegin).add(innerPlayerWidth, 0f);
@@ -219,8 +224,35 @@ public class PlayerController extends Component
 		}
 	}
 
-	public boolean isSmall()
+	public PlayerState getPlayerState()
 	{
-		return this.playerState == PlayerState.SMALL;
+		return this.playerState;
+	}
+
+	/**
+	 * 마리오가 버섯/꽃을 먹음
+	 */
+	public void powerUp()
+	{
+		AssetPool.getSound("assets/sounds/powerup.ogg").play();
+		switch(this.playerState)
+		{
+			case SMALL -> {
+				playerState = PlayerState.BIG;
+				gameObject.transform.scale.y = playerHeight * 2f;
+				PillboxCollider pb = gameObject.getComponent(PillboxCollider.class);
+				if (pb != null)
+				{
+					jumpBoost *= bigJumpBoostFactor;
+					walkSpeed *= bigJumpBoostFactor;
+					pb.setHeight(gameObject.transform.scale.y * 1.5f);
+				}
+			}
+			case BIG -> {
+				playerState = PlayerState.FIRE;
+			}
+		}
+
+		stateMachine.trigger("powerup");
 	}
 }

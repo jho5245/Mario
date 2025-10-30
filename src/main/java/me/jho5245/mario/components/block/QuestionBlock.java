@@ -2,10 +2,12 @@ package me.jho5245.mario.components.block;
 
 import me.jho5245.mario.animations.StateMachine;
 import me.jho5245.mario.components.PlayerController;
+import me.jho5245.mario.components.SpriteRenderer;
 import me.jho5245.mario.jade.GameObject;
 import me.jho5245.mario.jade.Prefabs;
 import me.jho5245.mario.jade.Window;
 import me.jho5245.mario.util.Settings;
+import org.joml.Vector4f;
 
 public class QuestionBlock extends Block
 {
@@ -46,9 +48,31 @@ public class QuestionBlock extends Block
 
 	private void doPowerUp(PlayerController playerController)
 	{
+		switch (playerController.getPlayerState())
+		{
+			case SMALL -> spawnMushroom();
+			case BIG -> spawnFlower();
+		}
 	}
 
 	private void doStar(PlayerController playerController)
 	{
+	}
+
+	private void spawnMushroom()
+	{
+		GameObject mushroom = Prefabs.generateMushroom();
+		mushroom.transform.position.set(this.gameObject.transform.position);
+		mushroom.transform.position.y += Settings.GRID_HEIGHT;
+		mushroom.getComponent(SpriteRenderer.class).setColor(new Vector4f(1, 1, 1, 0f));
+		Window.getCurrentScene().addGameObject(mushroom);
+	}
+
+	private void spawnFlower()
+	{
+//		GameObject flower = Prefabs.generateFlower();
+//		flower.transform.position.set(this.gameObject.transform.position);
+//		flower.transform.position.y += Settings.GRID_HEIGHT;
+//		Window.getCurrentScene().addGameObject(flower);
 	}
 }
