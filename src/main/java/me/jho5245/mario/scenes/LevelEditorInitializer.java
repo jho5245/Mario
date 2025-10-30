@@ -4,6 +4,7 @@ import imgui.ImGui;
 import imgui.ImVec2;
 import me.jho5245.mario.animations.StateMachine;
 import me.jho5245.mario.components.*;
+import me.jho5245.mario.components.block.BreakableBrick;
 import me.jho5245.mario.components.gizmo.GizmoSystem;
 import me.jho5245.mario.physics2d.components.Box2DCollider;
 import me.jho5245.mario.physics2d.components.Rigidbody2D;
@@ -18,7 +19,7 @@ import me.jho5245.mario.jade.Prefabs;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
 
 public class LevelEditorInitializer extends SceneInitializer
 {
@@ -137,9 +138,9 @@ public class LevelEditorInitializer extends SceneInitializer
 						object.addComponent(box2DCollider);
 						object.addComponent(new Ground());
 						// breakable bricks
-						if (i == 12)
+						if (List.of(1, 5, 6, 12, 13).contains(i))
 						{
-//							object.addComponent(new BreakableBrick());
+							object.addComponent(new BreakableBrick());
 						}
 
 						levelEditorStuff.getComponent(MouseControls.class).pickUpObject(object);

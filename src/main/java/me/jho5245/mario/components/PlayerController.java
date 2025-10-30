@@ -1,11 +1,13 @@
 package me.jho5245.mario.components;
 
 import me.jho5245.mario.animations.StateMachine;
+import me.jho5245.mario.jade.GameObject;
 import me.jho5245.mario.jade.KeyListener;
 import me.jho5245.mario.jade.Window;
 import me.jho5245.mario.physics2d.RaycastInfo;
 import me.jho5245.mario.physics2d.components.Rigidbody2D;
 import me.jho5245.mario.util.AssetPool;
+import org.jbox2d.dynamics.contacts.Contact;
 import org.joml.Vector2f;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -33,7 +35,7 @@ public class PlayerController extends Component
 	public transient boolean onGround = false;
 	private transient float groundDebounce;
 	private transient float groundDebounceTime = 0.1f;
-	private transient Rigidbody2D rb;
+	public transient Rigidbody2D rb;
 	private transient StateMachine stateMachine;
 	private transient float bigJumpBoostFactor = 1.05f;
 	private transient float playerWidth;
@@ -41,7 +43,7 @@ public class PlayerController extends Component
 	private transient final float maxSprintingJumpTime = 80;
 	private transient float jumpTime;
 	private transient Vector2f acceleration = new Vector2f();
-	private transient Vector2f velocity = new Vector2f();
+	public transient Vector2f velocity = new Vector2f();
 	private transient boolean isDead;
 	private transient int enemyBounce = 0;
 
@@ -111,7 +113,7 @@ public class PlayerController extends Component
 			if ((onGround || groundDebounce > 0) && jumpTime == 0)
 			{
 				AssetPool.getSound("assets/sounds/jump-small.ogg").play();
-				jumpTime = isSprinting ? maxSprintingJumpTime : maxJumpTime;
+				jumpTime = isSprinting && Math.abs(velocity.x) > walkSpeed ? maxSprintingJumpTime : maxJumpTime;
 				this.velocity.y = jumpImpulse;
 			}
 			else if (jumpTime > 0)
@@ -194,5 +196,31 @@ public class PlayerController extends Component
 		RaycastInfo info2 = Window.getPhysics().rayCast(this.gameObject, raycast2Begin, raycast2End);
 		onGround = (info.hit && info.hitObject != null && info.hitObject.getComponent(Ground.class) != null) || (info2.hit && info2.hitObject != null
 				&& info2.hitObject.getComponent(Ground.class) != null);
+	}
+
+	@Override
+	public void beginCollision(GameObject collidingObject, Contact contact, Vector2f contactNormal)
+	{
+		if (isDead) return;
+		if (collidingObject.getComponent(Ground.class) != null)
+		{
+			// hit horizontally
+			if (Math.abs(contactNormal.x) > 0.8f)
+			{
+				this.velocity.x = 0;
+			}
+			// hit bottom of block
+			else if (contactNormal.y > 0.8f)
+			{
+				this.velocity.y = 0;
+				this.acceleration.y = 0;
+				this.jumpTime = 0;
+			}
+		}
+	}
+
+	public boolean isSmall()
+	{
+		return this.playerState == PlayerState.SMALL;
 	}
 }
