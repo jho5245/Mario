@@ -8,6 +8,7 @@ import me.jho5245.mario.renderer.*;
 import me.jho5245.mario.scenes.LevelEditorInitializer;
 import me.jho5245.mario.scenes.Scene;
 import me.jho5245.mario.scenes.SceneInitializer;
+import me.jho5245.mario.sounds.Sound;
 import me.jho5245.mario.util.AssetPool;
 import org.joml.Vector2f;
 import org.lwjgl.Version;
@@ -133,6 +134,7 @@ public class Window implements Observer
 			case GAME_ENGINE_STOP_PLAY ->
 			{
 				Window.changeScene(new LevelEditorInitializer(), false);
+				AssetPool.getAllSounds().forEach(Sound::stop);
 				this.runtimePlaying = false;
 			}
 			case TOGGLE_PHYSICS_DEBUG_DRAW ->

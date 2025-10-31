@@ -3,8 +3,11 @@ package me.jho5245.mario.jade;
 import me.jho5245.mario.animations.AnimationState;
 import me.jho5245.mario.animations.StateMachine;
 import me.jho5245.mario.components.*;
+import me.jho5245.mario.components.ai.Flower;
 import me.jho5245.mario.components.ai.MushroomAI;
+import me.jho5245.mario.components.ai.StarAI;
 import me.jho5245.mario.components.block.BlockCoin;
+import me.jho5245.mario.components.block.BreakableBrickFragment;
 import me.jho5245.mario.components.block.QuestionBlock;
 import me.jho5245.mario.physics2d.components.Box2DCollider;
 import me.jho5245.mario.physics2d.components.CircleCollider;
@@ -290,5 +293,110 @@ public class Prefabs
 		mushroom.addComponent(new MushroomAI());
 
 		return mushroom;
+	}
+
+	public static GameObject generateFlower()
+	{
+		SpriteSheet items = AssetPool.getSpriteSheet("assets/images/items.png");
+		GameObject flower = generateSpriteObject(items.getSprite(20), Settings.GRID_WIDTH, Settings.GRID_HEIGHT);
+
+		Rigidbody2D rb = new Rigidbody2D();
+		rb.setBodyType(BodyType.STATIC);
+		rb.setFixedRotation(true);
+		rb.setContinuousCollision(false);
+		flower.addComponent(rb);
+
+		CircleCollider circleCollider = new CircleCollider();
+		circleCollider.setRadius(0.49f);
+		flower.addComponent(circleCollider);
+		flower.addComponent(new Flower());
+
+		AnimationState flowerAnimation = new AnimationState();
+		flowerAnimation.title = "Flower";
+		float defaultFrameTime = 0.23f;
+		flowerAnimation.addFrame(items.getSprite(20), defaultFrameTime);
+		flowerAnimation.addFrame(items.getSprite(21), defaultFrameTime);
+		flowerAnimation.addFrame(items.getSprite(22), defaultFrameTime);
+		flowerAnimation.addFrame(items.getSprite(23), defaultFrameTime);
+		flowerAnimation.setDoesLoop(true);
+
+		StateMachine stateMachine = new StateMachine();
+		stateMachine.addState(flowerAnimation);
+		stateMachine.setDefaultState(flowerAnimation.title);
+		flower.addComponent(stateMachine);
+
+		return flower;
+	}
+
+	public static GameObject generateStar()
+	{
+		SpriteSheet items = AssetPool.getSpriteSheet("assets/images/items.png");
+		GameObject star = generateSpriteObject(items.getSprite(24), Settings.GRID_WIDTH, Settings.GRID_HEIGHT);
+
+		Rigidbody2D rb = new Rigidbody2D();
+		rb.setBodyType(BodyType.DYNAMIC);
+		rb.setFixedRotation(true);
+		rb.setContinuousCollision(false);
+		star.addComponent(rb);
+
+		CircleCollider circleCollider = new CircleCollider();
+		circleCollider.setRadius(0.49f);
+		star.addComponent(circleCollider);
+		star.addComponent(new StarAI());
+
+		AnimationState starAnimation = new AnimationState();
+		starAnimation.title = "Star";
+		float defaultFrameTime = 0.23f;
+		starAnimation.addFrame(items.getSprite(24), defaultFrameTime);
+		starAnimation.addFrame(items.getSprite(25), defaultFrameTime);
+		starAnimation.addFrame(items.getSprite(26), defaultFrameTime);
+		starAnimation.addFrame(items.getSprite(27), defaultFrameTime);
+		starAnimation.setDoesLoop(true);
+
+		StateMachine stateMachine = new StateMachine();
+		stateMachine.addState(starAnimation);
+		stateMachine.setDefaultState(starAnimation.title);
+		star.addComponent(stateMachine);
+
+		return star;
+	}
+
+	public static GameObject generateBlockBreakFragment(int offset, Vector2f position)
+	{
+		SpriteSheet items = AssetPool.getSpriteSheet("assets/images/items.png");
+		GameObject fragment = generateSpriteObject(items.getSprite(5), Settings.GRID_WIDTH / 2, Settings.GRID_HEIGHT / 2);
+		Vector2f pos = new Vector2f(position.x, position.y);
+		switch (offset)
+		{
+			case 0 ->
+			{
+				pos.x -= Settings.GRID_WIDTH / 4;
+				pos.y -= Settings.GRID_HEIGHT / 4;
+				fragment.transform.rotation = 20f;
+			}
+			case 1 ->
+			{
+
+				pos.x -= Settings.GRID_WIDTH / 4;
+				pos.y += Settings.GRID_HEIGHT / 4;
+				fragment.transform.rotation = 20f;
+			}
+			case 2 ->
+			{
+				pos.x += Settings.GRID_WIDTH / 4;
+				pos.y -= Settings.GRID_HEIGHT / 4;
+				fragment.transform.rotation = -20f;
+			}
+			case 3 ->
+			{
+
+				pos.x += Settings.GRID_WIDTH / 4;
+				pos.y += Settings.GRID_HEIGHT / 4;
+				fragment.transform.rotation = -20f;
+			}
+		}
+		fragment.transform.position = new Vector2f(pos);
+		fragment.addComponent(new BreakableBrickFragment());
+		return fragment;
 	}
 }

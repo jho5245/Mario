@@ -7,10 +7,13 @@ import me.jho5245.mario.jade.Window;
 import me.jho5245.mario.physics2d.RaycastInfo;
 import me.jho5245.mario.physics2d.components.PillboxCollider;
 import me.jho5245.mario.physics2d.components.Rigidbody2D;
+import me.jho5245.mario.sounds.Sound;
 import me.jho5245.mario.util.AssetPool;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.joml.Vector2f;
+import org.joml.Vector4f;
 
+import javax.print.DocFlavor.STRING;
 import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -43,13 +46,25 @@ public class PlayerController extends Component
 	private transient float bigJumpBoostFactor = 1.2f;
 	private transient float playerWidth;
 	private transient float playerHeight;
-	private transient final float maxJumpTime = 50;
-	private transient final float maxSprintingJumpTime = 80;
+	private transient float maxJumpTime = 50;
+	private transient float maxSprintingJumpTime = 80;
 	private transient float jumpTime;
 	private transient Vector2f acceleration = new Vector2f();
 	public transient Vector2f velocity = new Vector2f();
 	private transient boolean isDead;
 	private transient int enemyBounce = 0;
+
+	private transient Sound backgroundMusic, starMusic;
+
+	private transient final float starTimeColorFlickerTimeStart = 0.1f;
+	private transient float starTimeColorFlickerTime;
+	private transient final float starTimeStart = 10f;
+	private transient float starTime;
+	private transient PlayerState previousState;
+
+	private final transient List<String> runningTitle = List.of("Run", "BigRun", "FireRun");
+
+	private transient int coinAmount;
 
 	@Override
 	public void start()
@@ -59,11 +74,17 @@ public class PlayerController extends Component
 		this.rb = gameObject.getComponent(Rigidbody2D.class);
 		this.stateMachine = gameObject.getComponent(StateMachine.class);
 		this.rb.setGravityScale(0f);
+		this.backgroundMusic = AssetPool.getSound("assets/sounds/main-theme-overworld.ogg");
+		this.starMusic = AssetPool.getSound("assets/sounds/invincible.ogg");
 	}
 
 	@Override
 	public void update(float dt)
 	{
+		if (starTime == 0 && !backgroundMusic.isPlaying())
+		{
+			backgroundMusic.play();
+		}
 		isSprinting = KeyListener.isKeyPressed(GLFW_KEY_X);
 		if (KeyListener.isKeyPressed(GLFW_KEY_RIGHT))
 		{
@@ -124,6 +145,8 @@ public class PlayerController extends Component
 			else if (jumpTime > 0)
 			{
 				jumpTime--;
+				if (jumpTime <= 0)
+					jumpTime = 0;
 				this.velocity.y = ((jumpTime / 2.2f) * jumpBoost);
 			}
 			else
@@ -167,14 +190,6 @@ public class PlayerController extends Component
 			this.velocity.x = Math.max(Math.min(this.velocity.x, this.terminalVelocity.x), -this.terminalVelocity.x);
 			this.velocity.y = Math.max(Math.min(this.velocity.y, this.terminalVelocity.y), -this.terminalVelocity.y);
 		}
-		if (List.of("Run", "BigRun").contains(this.stateMachine.getCurrentTitle()))
-		{
-			this.stateMachine.setSpeed(Math.abs(this.velocity.x / 4));
-		}
-		else
-		{
-			this.stateMachine.setSpeed(1f);
-		}
 		this.rb.setVelocity(this.velocity);
 		this.rb.setAngularVelocity(0);
 
@@ -186,6 +201,47 @@ public class PlayerController extends Component
 		{
 			stateMachine.trigger("stopJumping");
 		}
+
+		if (starTime > 0)
+		{
+			starTime -= dt;
+			starTimeColorFlickerTime -= dt;
+			if (starTimeColorFlickerTime <= 0)
+			{
+				starTimeColorFlickerTime = starTimeColorFlickerTimeStart;
+				if (starTime <= 2f)
+				{
+					float alpha = gameObject.getComponent(SpriteRenderer.class).getColor().w;
+					gameObject.getComponent(SpriteRenderer.class).setColor(new Vector4f((float) Math.random(), (float) Math.random(), (float) Math.random(), alpha == 0.3f ? 1f : 0.3f));
+				}
+				else
+				{
+					gameObject.getComponent(SpriteRenderer.class).setColor(new Vector4f((float) Math.random(), (float) Math.random(), (float) Math.random(), 1f));
+				}
+			}
+			if (starTime <= 0)
+			{
+				gameObject.getComponent(SpriteRenderer.class).setColor(new Vector4f(1f));
+				starTime = 0;
+				playerState = previousState;
+				starMusic.stop();
+				backgroundMusic.play();
+			}
+		}
+
+		setAnimationSpeed();
+	}
+
+	private void setAnimationSpeed()
+	{
+		if (runningTitle.contains(this.stateMachine.getCurrentTitle()))
+		{
+			this.stateMachine.setSpeed(Math.abs(this.velocity.x / 4));
+		}
+		else
+		{
+			this.stateMachine.setSpeed(1f);
+		}
 	}
 
 	public void checkOnGround()
@@ -193,7 +249,7 @@ public class PlayerController extends Component
 		Vector2f raycastBegin = new Vector2f(this.gameObject.transform.position);
 		float innerPlayerWidth = this.playerWidth * 0.6f;
 		raycastBegin.sub(innerPlayerWidth / 2f, 0f);
-		float yValue = playerState == PlayerState.SMALL ? -0.54f : -1.04f;
+		float yValue = playerState == PlayerState.SMALL || previousState == PlayerState.SMALL ? -0.54f : -1.04f;
 		Vector2f raycastEnd = new Vector2f(raycastBegin).add(0f, yValue);
 		RaycastInfo info = Window.getPhysics().rayCast(this.gameObject, raycastBegin, raycastEnd);
 		Vector2f raycast2Begin = new Vector2f(raycastBegin).add(innerPlayerWidth, 0f);
@@ -206,7 +262,8 @@ public class PlayerController extends Component
 	@Override
 	public void beginCollision(GameObject collidingObject, Contact contact, Vector2f contactNormal)
 	{
-		if (isDead) return;
+		if (isDead)
+			return;
 		if (collidingObject.getComponent(Ground.class) != null)
 		{
 			// hit horizontally
@@ -229,30 +286,66 @@ public class PlayerController extends Component
 		return this.playerState;
 	}
 
+	public PlayerState getPreviousState()
+	{
+		return this.previousState;
+	}
+
 	/**
 	 * 마리오가 버섯/꽃을 먹음
 	 */
 	public void powerUp()
 	{
 		AssetPool.getSound("assets/sounds/powerup.ogg").play();
-		switch(this.playerState)
+		if (playerState == PlayerState.SMALL || previousState == PlayerState.SMALL)
 		{
-			case SMALL -> {
-				playerState = PlayerState.BIG;
-				gameObject.transform.scale.y = playerHeight * 2f;
-				PillboxCollider pb = gameObject.getComponent(PillboxCollider.class);
-				if (pb != null)
-				{
-					jumpBoost *= bigJumpBoostFactor;
-					walkSpeed *= bigJumpBoostFactor;
-					pb.setHeight(gameObject.transform.scale.y * 1.5f);
-				}
-			}
-			case BIG -> {
-				playerState = PlayerState.FIRE;
+			playerState = PlayerState.BIG;
+			previousState = PlayerState.BIG;
+			gameObject.transform.scale.y = playerHeight * 2f;
+			PillboxCollider pb = gameObject.getComponent(PillboxCollider.class);
+			if (pb != null)
+			{
+				jumpBoost *= bigJumpBoostFactor;
+				walkSpeed *= bigJumpBoostFactor;
+				maxJumpTime *= bigJumpBoostFactor;
+				maxSprintingJumpTime *= bigJumpBoostFactor;
+				pb.setHeight(gameObject.transform.scale.y * 1.5f);
 			}
 		}
-
+		else if (playerState == PlayerState.BIG || previousState == PlayerState.BIG)
+		{
+			playerState = PlayerState.FIRE;
+			previousState = PlayerState.FIRE;
+		}
 		stateMachine.trigger("powerup");
+	}
+
+	public void useStar()
+	{
+		previousState = this.playerState;
+		playerState = PlayerState.INVINCIBLE;
+		this.backgroundMusic.stop();
+		this.starMusic.play();
+		starTime = starTimeStart;
+	}
+
+	public int getCoinAmount()
+	{
+		return coinAmount;
+	}
+
+	public void setCoinAmount(int coinAmount)
+	{
+		this.coinAmount = coinAmount;
+	}
+
+	public void addCoinAmount(int coinAmount)
+	{
+		this.coinAmount += coinAmount;
+		if (this.coinAmount >= 100)
+		{
+			this.coinAmount -= 100;
+			AssetPool.getSound("assets/sounds/1-up.ogg").play();
+		}
 	}
 }

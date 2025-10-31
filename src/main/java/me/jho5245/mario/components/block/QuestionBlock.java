@@ -2,6 +2,7 @@ package me.jho5245.mario.components.block;
 
 import me.jho5245.mario.animations.StateMachine;
 import me.jho5245.mario.components.PlayerController;
+import me.jho5245.mario.components.PlayerController.PlayerState;
 import me.jho5245.mario.components.SpriteRenderer;
 import me.jho5245.mario.jade.GameObject;
 import me.jho5245.mario.jade.Prefabs;
@@ -27,7 +28,7 @@ public class QuestionBlock extends Block
 		{
 			case COIN -> doCoin(playerController);
 			case POWER_UP -> doPowerUp(playerController);
-			case STAR -> doStar(playerController);
+			case STAR -> spawnStar();
 		}
 
 		StateMachine stateMachine = gameObject.getComponent(StateMachine.class);
@@ -44,19 +45,29 @@ public class QuestionBlock extends Block
 		coin.transform.position.set(this.gameObject.transform.position);
 		coin.transform.position.y += Settings.GRID_HEIGHT;
 		Window.getCurrentScene().addGameObject(coin);
+		playerController.addCoinAmount(1);
 	}
 
 	private void doPowerUp(PlayerController playerController)
 	{
-		switch (playerController.getPlayerState())
+		PlayerState playerState = playerController.getPlayerState(), previousState = playerController.getPreviousState();
+		if (playerState == PlayerState.SMALL || previousState == PlayerState.SMALL)
 		{
-			case SMALL -> spawnMushroom();
-			case BIG -> spawnFlower();
+			spawnMushroom();
+		}
+		else if (playerState == PlayerState.BIG || previousState == PlayerState.BIG)
+		{
+			spawnFlower();
 		}
 	}
 
-	private void doStar(PlayerController playerController)
+	private void spawnStar()
 	{
+		GameObject star = Prefabs.generateStar();
+		star.transform.position.set(this.gameObject.transform.position);
+		star.transform.position.y += Settings.GRID_HEIGHT;
+		star.getComponent(SpriteRenderer.class).setColor(new Vector4f(1, 1, 1, 0f));
+		Window.getCurrentScene().addGameObject(star);
 	}
 
 	private void spawnMushroom()
@@ -70,9 +81,10 @@ public class QuestionBlock extends Block
 
 	private void spawnFlower()
 	{
-//		GameObject flower = Prefabs.generateFlower();
-//		flower.transform.position.set(this.gameObject.transform.position);
-//		flower.transform.position.y += Settings.GRID_HEIGHT;
-//		Window.getCurrentScene().addGameObject(flower);
+		GameObject flower = Prefabs.generateFlower();
+		flower.transform.position.set(this.gameObject.transform.position);
+		flower.transform.position.y += Settings.GRID_HEIGHT;
+		flower.getComponent(SpriteRenderer.class).setColor(new Vector4f(1, 1, 1, 0f));
+		Window.getCurrentScene().addGameObject(flower);
 	}
 }

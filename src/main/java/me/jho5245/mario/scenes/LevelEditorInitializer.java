@@ -72,6 +72,7 @@ public class LevelEditorInitializer extends SceneInitializer
 		AssetPool.addSound("assets/sounds/stomp.ogg", false);
 		AssetPool.addSound("assets/sounds/kick.ogg", false);
 		AssetPool.addSound("assets/sounds/invincible.ogg", false);
+		AssetPool.addSound("assets/sounds/1-up.ogg", false);
 
 		for (GameObject g : scene.getGameObjects())
 		{

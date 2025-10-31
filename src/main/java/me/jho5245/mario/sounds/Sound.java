@@ -71,6 +71,7 @@ public class Sound
 
 	public void play()
 	{
+		stop();
 		int state = alGetSourcei(sourceId, AL_SOURCE_STATE);
 		if (state == AL_STOPPED)
 		{
