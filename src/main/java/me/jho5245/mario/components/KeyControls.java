@@ -16,9 +16,17 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class KeyControls extends Component
 {
+	private transient final float debounceTime = 0.2f;
+	private transient float debounceTimeLeft;
+	private transient final float tileMovement = Settings.GRID_WIDTH / Settings.GRID_HEIGHT;
+
 	@Override
 	public void editorUpdate(float dt)
 	{
+		boolean leftShiftPressed = KeyListener.isKeyPressed(GLFW_KEY_LEFT_SHIFT);
+		float tileMovementRatio = leftShiftPressed ? 0.1f : 1f;
+
+		debounceTimeLeft -= dt;
 		PropertiesWindow propertiesWindow = Window.getImGuiLayer().getPropertiesWindow();
 		GameObject activeGameObject = propertiesWindow.getActiveGameObject();
 		List<GameObject> activeGameObjects = propertiesWindow.getActiveGameObjects();
@@ -54,6 +62,54 @@ public class KeyControls extends Component
 		else if (KeyListener.keyBeginPress(GLFW_KEY_ESCAPE))
 		{
 			propertiesWindow.clearSelected();
+		}
+		else if (KeyListener.keyBeginPress(GLFW_KEY_PAGE_UP) && debounceTimeLeft < 0)
+		{
+			debounceTimeLeft = debounceTime;
+			for (GameObject gameObject : activeGameObjects)
+			{
+				gameObject.transform.zIndex++;
+			}
+		}
+		else if (KeyListener.keyBeginPress(GLFW_KEY_PAGE_DOWN) && debounceTimeLeft < 0)
+		{
+			debounceTimeLeft = debounceTime;
+			for (GameObject gameObject : activeGameObjects)
+			{
+				gameObject.transform.zIndex--;
+			}
+		}
+		else if (KeyListener.keyBeginPress(GLFW_KEY_UP) && debounceTimeLeft < 0)
+		{
+			debounceTimeLeft = debounceTime;
+			for (GameObject gameObject : activeGameObjects)
+			{
+				gameObject.transform.position.add(new Vector2f(0, tileMovement * tileMovementRatio));
+			}
+		}
+		else if (KeyListener.keyBeginPress(GLFW_KEY_DOWN) && debounceTimeLeft < 0)
+		{
+			debounceTimeLeft = debounceTime;
+			for (GameObject gameObject : activeGameObjects)
+			{
+				gameObject.transform.position.add(new Vector2f(0, -tileMovement * tileMovementRatio));
+			}
+		}
+		else if (KeyListener.keyBeginPress(GLFW_KEY_LEFT) && debounceTimeLeft < 0)
+		{
+			debounceTimeLeft = debounceTime;
+			for (GameObject gameObject : activeGameObjects)
+			{
+				gameObject.transform.position.add(new Vector2f(-tileMovement * tileMovementRatio, 0));
+			}
+		}
+		else if (KeyListener.keyBeginPress(GLFW_KEY_RIGHT) && debounceTimeLeft < 0)
+		{
+			debounceTimeLeft = debounceTime;
+			for (GameObject gameObject : activeGameObjects)
+			{
+				gameObject.transform.position.add(new Vector2f(tileMovement * tileMovementRatio, 0));
+			}
 		}
 	}
 }

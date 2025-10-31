@@ -71,7 +71,7 @@ public class EditorCamera extends Component
 			boolean moving = false;
 			float dx = 0;
 			float dy = 0;
-			if (KeyListener.isKeyPressed(GLFW_KEY_LEFT))
+			if (KeyListener.isKeyPressed(GLFW_KEY_A))
 			{
 				moving = true;
 				if (keyDelay < 0)
@@ -80,7 +80,7 @@ public class EditorCamera extends Component
 					keyDelay = keyDelayOrigin;
 				}
 			}
-			else if (KeyListener.isKeyPressed(GLFW_KEY_RIGHT))
+			else if (KeyListener.isKeyPressed(GLFW_KEY_D))
 			{
 				moving = true;
 				if (keyDelay < 0)
@@ -89,7 +89,7 @@ public class EditorCamera extends Component
 					keyDelay = keyDelayOrigin;
 				}
 			}
-			if (KeyListener.isKeyPressed(GLFW_KEY_UP))
+			if (KeyListener.isKeyPressed(GLFW_KEY_W))
 			{
 				moving = true;
 				if (keyDelay < 0)
@@ -98,7 +98,7 @@ public class EditorCamera extends Component
 					keyDelay = keyDelayOrigin;
 				}
 			}
-			else if (KeyListener.isKeyPressed(GLFW_KEY_DOWN))
+			else if (KeyListener.isKeyPressed(GLFW_KEY_S))
 			{
 				moving = true;
 				if (keyDelay < 0)
