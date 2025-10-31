@@ -4,6 +4,7 @@ import me.jho5245.mario.animations.AnimationState;
 import me.jho5245.mario.animations.StateMachine;
 import me.jho5245.mario.components.*;
 import me.jho5245.mario.components.ai.Flower;
+import me.jho5245.mario.components.ai.GoombaAI;
 import me.jho5245.mario.components.ai.MushroomAI;
 import me.jho5245.mario.components.ai.StarAI;
 import me.jho5245.mario.components.block.BlockCoin;
@@ -87,6 +88,11 @@ public class Prefabs
 		bigJump.addFrame(bigPlayerSprites.getSprite(5), 0.1f);
 		bigJump.setDoesLoop(false);
 
+		AnimationState bigSit = new AnimationState();
+		bigSit.title = "BigSit";
+		bigSit.addFrame(bigPlayerSprites.getSprite(6), 0.1f);
+		bigSit.setDoesLoop(false);
+
 		// Fire mario animations
 		int fireOffset = 21;
 		AnimationState fireRun = new AnimationState();
@@ -114,6 +120,11 @@ public class Prefabs
 		fireJump.addFrame(bigPlayerSprites.getSprite(fireOffset + 5), 0.1f);
 		fireJump.setDoesLoop(false);
 
+		AnimationState fireSit = new AnimationState();
+		fireSit.title = "FireSit";
+		fireSit.addFrame(bigPlayerSprites.getSprite(fireOffset + 6), 0.1f);
+		fireSit.setDoesLoop(false);
+
 		AnimationState die = new AnimationState();
 		die.title = "Die";
 		die.addFrame(playerSprites.getSprite(6), 0.1f);
@@ -128,11 +139,13 @@ public class Prefabs
 
 		stateMachine.addState(bigRun);
 		stateMachine.addState(bigIdle);
+		stateMachine.addState(bigSit);
 		stateMachine.addState(bigSwitchDirection);
 		stateMachine.addState(bigJump);
 
 		stateMachine.addState(fireRun);
 		stateMachine.addState(fireIdle);
+		stateMachine.addState(fireSit);
 		stateMachine.addState(fireSwitchDirection);
 		stateMachine.addState(fireJump);
 
@@ -156,6 +169,9 @@ public class Prefabs
 		stateMachine.addState(bigIdle.title, bigRun.title, "startRunning");
 		stateMachine.addState(bigIdle.title, bigJump.title, "jump");
 		stateMachine.addState(bigJump.title, bigIdle.title, "stopJumping");
+		stateMachine.addState(bigIdle.title, bigSit.title, "sit");
+		stateMachine.addState(bigRun.title, bigSit.title, "sit");
+		stateMachine.addState(bigSit.title, bigIdle.title, "stopSitting");
 
 		stateMachine.addState(fireRun.title, fireSwitchDirection.title, "switchDirection");
 		stateMachine.addState(fireRun.title, fireIdle.title, "stopRunning");
@@ -166,6 +182,9 @@ public class Prefabs
 		stateMachine.addState(fireIdle.title, fireRun.title, "startRunning");
 		stateMachine.addState(fireIdle.title, fireJump.title, "jump");
 		stateMachine.addState(fireJump.title, fireIdle.title, "stopJumping");
+		stateMachine.addState(fireIdle.title, fireSit.title, "sit");
+		stateMachine.addState(fireRun.title, fireSit.title, "sit");
+		stateMachine.addState(fireSit.title, fireIdle.title, "stopSitting");
 
 		stateMachine.addState(run.title, bigRun.title, "powerup");
 		stateMachine.addState(idle.title, bigIdle.title, "powerup");
@@ -201,7 +220,7 @@ public class Prefabs
 
 		PillboxCollider pillboxCollider = new PillboxCollider();
 		pillboxCollider.setWidth(1.56f);
-		pillboxCollider.setHeight(1.04f);
+		pillboxCollider.setHeight(0.84f);
 		Rigidbody2D rigidbody2D = new Rigidbody2D();
 		rigidbody2D.setBodyType(BodyType.DYNAMIC);
 		rigidbody2D.setContinuousCollision(false);
@@ -250,6 +269,38 @@ public class Prefabs
 		questionBlock.addComponent(new Ground());
 
 		return questionBlock;
+	}
+
+
+	public static GameObject generateCoin()
+	{
+		SpriteSheet items = AssetPool.getSpriteSheet("assets/images/items.png");
+		GameObject coin = generateSpriteObject(items.getSprite(7), Settings.GRID_WIDTH, Settings.GRID_HEIGHT);
+
+		Rigidbody2D rb = new Rigidbody2D();
+		rb.setBodyType(BodyType.STATIC);
+		rb.setFixedRotation(true);
+		rb.setContinuousCollision(false);
+		coin.addComponent(rb);
+
+		CircleCollider circleCollider = new CircleCollider();
+		circleCollider.setRadius(0.49f);
+		coin.addComponent(circleCollider);
+
+		AnimationState coinFlip = new AnimationState();
+		coinFlip.title = "CoinFlip";
+		float defaultFrameTime = 0.23f;
+		coinFlip.addFrame(items.getSprite(7), defaultFrameTime);
+		coinFlip.addFrame(items.getSprite(8), defaultFrameTime);
+		coinFlip.addFrame(items.getSprite(9), defaultFrameTime);
+		coinFlip.setDoesLoop(true);
+
+		StateMachine stateMachine = new StateMachine();
+		stateMachine.addState(coinFlip);
+		stateMachine.setDefaultState(coinFlip.title);
+		coin.addComponent(stateMachine);
+		coin.addComponent(new Coin());
+		return coin;
 	}
 
 	public static GameObject generateBlockCoin()
@@ -398,5 +449,44 @@ public class Prefabs
 		fragment.transform.position = new Vector2f(pos);
 		fragment.addComponent(new BreakableBrickFragment());
 		return fragment;
+	}
+
+	public static GameObject generateGoomba()
+	{
+		SpriteSheet sprites = AssetPool.getSpriteSheet("assets/images/spritesheet.png");
+		GameObject goomba = generateSpriteObject(sprites.getSprite(14), Settings.GRID_WIDTH, Settings.GRID_HEIGHT);
+
+		AnimationState walk = new AnimationState();
+		walk.title = "Walk";
+		float defaultFrameTime = 0.23f;
+		walk.addFrame(sprites.getSprite(14), defaultFrameTime);
+		walk.addFrame(sprites.getSprite(15), defaultFrameTime);
+		walk.setDoesLoop(true);
+
+		AnimationState squashed = new AnimationState();
+		squashed.title = "Squashed";
+		squashed.addFrame(sprites.getSprite(16), 0.1f);
+		squashed.setDoesLoop(false);
+
+		StateMachine stateMachine = new StateMachine();
+		stateMachine.addState(walk);
+		stateMachine.addState(squashed);
+		stateMachine.addState(walk.title, squashed.title, "squashMe");
+		stateMachine.setDefaultState(walk.title);
+		goomba.addComponent(stateMachine);
+
+		Rigidbody2D rb = new Rigidbody2D();
+		rb.setBodyType(BodyType.DYNAMIC);
+		rb.setFixedRotation(true);
+		rb.setMass(0.1f);
+		goomba.addComponent(rb);
+
+		CircleCollider circleCollider = new CircleCollider();
+		circleCollider.setRadius(0.49f);
+		goomba.addComponent(circleCollider);
+
+		goomba.addComponent(new GoombaAI());
+
+		return goomba;
 	}
 }

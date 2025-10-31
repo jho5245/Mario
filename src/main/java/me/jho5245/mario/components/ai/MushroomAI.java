@@ -5,6 +5,7 @@ import me.jho5245.mario.components.PlayerController;
 import me.jho5245.mario.components.SpriteRenderer;
 import me.jho5245.mario.jade.GameObject;
 import me.jho5245.mario.jade.Window;
+import me.jho5245.mario.physics2d.Physics2D;
 import me.jho5245.mario.physics2d.components.Rigidbody2D;
 import me.jho5245.mario.util.AssetPool;
 import org.jbox2d.dynamics.contacts.Contact;

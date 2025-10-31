@@ -67,7 +67,6 @@ public class Window implements Observer
 			originCameraPosition = currentScene.getCamera().getPosition();
 			currentScene.destroy();
 		}
-		getImGuiLayer().getPropertiesWindow().setActiveGameObject(null);
 		currentScene = new Scene(sceneInitializer, playPhysics);
 		currentScene.load();
 		currentScene.init(originCameraPosition);
@@ -127,12 +126,14 @@ public class Window implements Observer
 		{
 			case GAME_ENGINE_START_PLAY ->
 			{
+				Window.getImGuiLayer().getPropertiesWindow().clearSelected();
 				currentScene.save();
 				Window.changeScene(new LevelEditorInitializer(), true);
 				this.runtimePlaying = true;
 			}
 			case GAME_ENGINE_STOP_PLAY ->
 			{
+				Window.getImGuiLayer().getPropertiesWindow().clearSelected();
 				Window.changeScene(new LevelEditorInitializer(), false);
 				AssetPool.getAllSounds().forEach(Sound::stop);
 				this.runtimePlaying = false;

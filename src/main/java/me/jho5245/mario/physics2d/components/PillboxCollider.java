@@ -89,6 +89,16 @@ public class PillboxCollider extends Component
 		resetFixture();
 	}
 
+	public Vector2f getOffset()
+	{
+		return offset;
+	}
+
+	public void setOffset(Vector2f offset)
+	{
+		this.offset = new Vector2f(offset);
+	}
+
 	public void recalculateColliders()
 	{
 		float circleRadius = width / 4f;

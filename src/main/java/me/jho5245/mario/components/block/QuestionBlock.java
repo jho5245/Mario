@@ -55,7 +55,7 @@ public class QuestionBlock extends Block
 		{
 			spawnMushroom();
 		}
-		else if (playerState == PlayerState.BIG || previousState == PlayerState.BIG)
+		else if (playerState == PlayerState.BIG || previousState == PlayerState.BIG || playerState == PlayerState.FIRE  || previousState == PlayerState.FIRE)
 		{
 			spawnFlower();
 		}

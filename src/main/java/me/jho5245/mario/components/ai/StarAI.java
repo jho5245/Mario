@@ -7,6 +7,7 @@ import me.jho5245.mario.components.PlayerController.PlayerState;
 import me.jho5245.mario.components.SpriteRenderer;
 import me.jho5245.mario.jade.GameObject;
 import me.jho5245.mario.jade.Window;
+import me.jho5245.mario.physics2d.Physics2D;
 import me.jho5245.mario.physics2d.RaycastInfo;
 import me.jho5245.mario.physics2d.components.Rigidbody2D;
 import me.jho5245.mario.util.AssetPool;
@@ -44,7 +45,7 @@ public class StarAI extends Component
 
 		if (spawnTime > 0)
 		{
-			gameObject.transform.zIndex = - 100;
+			gameObject.transform.zIndex = -100;
 			spawnTime -= dt;
 			gameObject.transform.position.y = originY - spawnTime * 2f;
 			gameObject.getComponent(SpriteRenderer.class).setColor(new Vector4f(1, 1, 1, 1f));
@@ -93,16 +94,8 @@ public class StarAI extends Component
 
 	public void checkOnGround()
 	{
-		Vector2f raycastBegin = new Vector2f(this.gameObject.transform.position);
 		float innerWidth = this.gameObject.transform.scale.y * 0.6f;
-		raycastBegin.sub(innerWidth / 2f, 0f);
 		float yValue = -0.54f;
-		Vector2f raycastEnd = new Vector2f(raycastBegin).add(0f, yValue);
-		RaycastInfo info = Window.getPhysics().rayCast(this.gameObject, raycastBegin, raycastEnd);
-		Vector2f raycast2Begin = new Vector2f(raycastBegin).add(innerWidth, 0f);
-		Vector2f raycast2End = new Vector2f(raycastEnd).add(innerWidth, 0f);
-		RaycastInfo info2 = Window.getPhysics().rayCast(this.gameObject, raycast2Begin, raycast2End);
-		onGround = (info.hit && info.hitObject != null && info.hitObject.getComponent(Ground.class) != null) || (info2.hit && info2.hitObject != null
-				&& info2.hitObject.getComponent(Ground.class) != null);
+		onGround = Physics2D.checkOnGround(gameObject, innerWidth, yValue);
 	}
 }

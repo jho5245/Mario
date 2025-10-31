@@ -1,17 +1,23 @@
 package me.jho5245.mario.physics2d;
 
+import me.jho5245.mario.components.Ground;
 import me.jho5245.mario.components.Transform;
 import me.jho5245.mario.jade.GameObject;
+import me.jho5245.mario.jade.Window;
 import me.jho5245.mario.physics2d.components.Box2DCollider;
 import me.jho5245.mario.physics2d.components.CircleCollider;
 import me.jho5245.mario.physics2d.components.PillboxCollider;
 import me.jho5245.mario.physics2d.components.Rigidbody2D;
+import me.jho5245.mario.renderer.DebugDraw;
 import me.jho5245.mario.util.Settings;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.*;
 import org.joml.Vector2f;
+import org.joml.Vector3f;
+
+import java.util.Set;
 
 public class Physics2D
 {
@@ -267,5 +273,39 @@ public class Physics2D
 		RaycastInfo callback = new RaycastInfo(requestingObject);
 		world.raycast(callback, new Vec2(point1.x, point1.y), new Vec2(point2.x, point2.y));
 		return callback;
+	}
+
+	public static boolean checkOnGround(GameObject gameObject, float innerPlayerWidth, float height)
+	{
+		Vector2f raycastBegin = new Vector2f(gameObject.transform.position);
+		raycastBegin.sub(innerPlayerWidth / 2f, 0f);
+		Vector2f raycastEnd = new Vector2f(raycastBegin).add(0f, height);
+		RaycastInfo info = Window.getPhysics().rayCast(gameObject, raycastBegin, raycastEnd);
+		Vector2f raycast2Begin = new Vector2f(raycastBegin).add(innerPlayerWidth, 0f);
+		Vector2f raycast2End = new Vector2f(raycastEnd).add(innerPlayerWidth, 0f);
+		RaycastInfo info2 = Window.getPhysics().rayCast(gameObject, raycast2Begin, raycast2End);
+
+//		DebugDraw.addLine2D(raycastBegin, raycastEnd, new Vector3f(1,0,0));
+//		DebugDraw.addLine2D(raycast2Begin, raycast2End, new Vector3f(1,0,0));
+
+		return (info.hit && info.hitObject != null && info.hitObject.getComponent(Ground.class) != null) || (info2.hit && info2.hitObject != null
+				&& info2.hitObject.getComponent(Ground.class) != null);
+	}
+
+	public static boolean checkCeling(GameObject gameObject, float innerPlayerWidth, float height)
+	{
+		Vector2f raycastEnd = new Vector2f(gameObject.transform.position).add(innerPlayerWidth / 2f, 0.1f);
+		Vector2f raycastBegin = new Vector2f(raycastEnd).add(0f, height);
+		RaycastInfo info = Window.getPhysics().rayCast(gameObject, raycastBegin, raycastEnd);
+
+		Vector2f raycast2Begin = new Vector2f(raycastBegin).add(-innerPlayerWidth, 0f);
+		Vector2f raycast2End = new Vector2f(raycastEnd).add(-innerPlayerWidth, 0f);
+		RaycastInfo info2 = Window.getPhysics().rayCast(gameObject, raycast2Begin, raycast2End);
+
+//		DebugDraw.addLine2D(raycastBegin, raycastEnd, new Vector3f(1,0,0));
+//		DebugDraw.addLine2D(raycast2Begin, raycast2End, new Vector3f(1,0,0));
+
+		return (info.hit && info.hitObject != null && info.hitObject.getComponent(Ground.class) != null) || (info2.hit && info2.hitObject != null
+				&& info2.hitObject.getComponent(Ground.class) != null);
 	}
 }
