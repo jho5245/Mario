@@ -9,7 +9,6 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-import java.lang.module.Configuration;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
@@ -143,6 +142,10 @@ public abstract class Component
 					{
 						field.set(this, type.getEnumConstants()[index.get()]);
 					}
+				}
+				else if (type == String.class)
+				{
+					field.set(this, JImGui.inputText(field.getName() + ":", (String) value));
 				}
 
 				if (isPrivate)

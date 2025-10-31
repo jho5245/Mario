@@ -202,4 +202,12 @@ public class Rigidbody2D extends Component
 	{
 		this.isPlaying = val;
 	}
+
+	public void setPosition(Vector2f position)
+	{
+		if (rawBody != null)
+		{
+			rawBody.setTransform(new Vec2(position.x, position.y), gameObject.transform.rotation);
+		}
+	}
 }

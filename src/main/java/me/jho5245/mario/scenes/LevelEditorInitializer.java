@@ -6,6 +6,7 @@ import me.jho5245.mario.animations.StateMachine;
 import me.jho5245.mario.components.*;
 import me.jho5245.mario.components.block.BreakableBrick;
 import me.jho5245.mario.components.gizmo.GizmoSystem;
+import me.jho5245.mario.jade.PipeDirection;
 import me.jho5245.mario.physics2d.components.Box2DCollider;
 import me.jho5245.mario.physics2d.components.Rigidbody2D;
 import me.jho5245.mario.physics2d.enums.BodyType;
@@ -280,6 +281,28 @@ public class LevelEditorInitializer extends SceneInitializer
 					}
 					ImGui.popID();
 					ImGui.sameLine();
+				}
+				// Pipes
+				{
+					SpriteSheet pipes = AssetPool.getSpriteSheet("assets/images/pipes.png");
+					for (PipeDirection direction : PipeDirection.values())
+					{
+						Sprite sprite = pipes.getSprite(direction.ordinal());
+						float spriteWidth = sprite.getWidth() * 2;
+						float spriteHeight = sprite.getHeight() * 2;
+						int id = sprite.getTexId();
+						Vector2f[] texCoords = sprite.getTexCoords();
+
+						ImGui.pushID(uid++);
+						if (ImGui.imageButton(id, spriteWidth, spriteHeight, texCoords[2].x, texCoords[0].y, texCoords[0].x, texCoords[2].y))
+						{
+							GameObject object = Prefabs.generatePipe(direction);
+							object.transform.zIndex = 10;
+							levelEditorStuff.getComponent(MouseControls.class).pickUpObject(object);
+						}
+						ImGui.popID();
+						ImGui.sameLine();
+					}
 				}
 
 				ImGui.endTabItem();

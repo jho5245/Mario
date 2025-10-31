@@ -1,7 +1,10 @@
 package me.jho5245.mario.components;
 
 import me.jho5245.mario.animations.StateMachine;
-import me.jho5245.mario.jade.*;
+import me.jho5245.mario.jade.Camera;
+import me.jho5245.mario.jade.GameObject;
+import me.jho5245.mario.jade.KeyListener;
+import me.jho5245.mario.jade.Window;
 import me.jho5245.mario.observers.ObserverHandler;
 import me.jho5245.mario.observers.events.Event;
 import me.jho5245.mario.observers.events.EventType;
@@ -15,13 +18,13 @@ import org.jbox2d.dynamics.contacts.Contact;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 
-import javax.print.attribute.standard.MediaSize.ISO;
 import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.*;
 
 public class PlayerController extends Component
 {
+
 	public enum PlayerState
 	{
 		SMALL,
@@ -73,9 +76,13 @@ public class PlayerController extends Component
 
 	private final transient float powerUpSimulationTime = 0.5f;
 	private transient float powerUpSimulationTimeLeft;
+	// 파워업 아이템을 먹었을 당시 마리오의 Y축 좌표
+	private transient float powerUpStartY;
 
 	private transient final float hurtSimulationTime = 0.5f;
 	private transient float hurtSimulationTimeLeft;
+	// 피해를 입었을 당시 마리오의 Y축 좌표
+	private transient float hurtStartY;
 
 	private transient final float hurtInvincibleTime = 2f;
 	private transient float hurtInvincibleTimeLeft;
@@ -83,10 +90,16 @@ public class PlayerController extends Component
 	private transient float hurtTimeColorFlickerTimeLeft;
 
 	private transient float dieAnimationTime;
+	// 죽었을 당시 마리오의 Y축 좌표
 	private transient Float diePositionY;
 
 	private transient boolean isSitting;
 	private transient boolean upCeiling;
+
+	private transient float stopSittingTimeLeft;
+
+	// 파이프 이동 등 특정 행동을 할 때 플레이어 zIndex에 변화를 주고 다시 원래 값으로 복구할 값
+	private transient int startZIndex;
 
 	@Override
 	public void start()
@@ -104,6 +117,8 @@ public class PlayerController extends Component
 		this.oneUpSound = AssetPool.getSound("assets/sounds/1-up.ogg");
 		this.smallJumpSound = AssetPool.getSound("assets/sounds/jump-small.ogg");
 		this.superJumpSound = AssetPool.getSound("assets/sounds/jump-super.ogg");
+
+		this.startZIndex = gameObject.transform.zIndex;
 	}
 
 	@Override
@@ -331,14 +346,20 @@ public class PlayerController extends Component
 
 	private void sitUpdate(float dt)
 	{
+		// 아래로 들어가는 파이프 사용 시 일정 시간 동안 앉기 동작 불가능
+		stopSittingTimeLeft -= dt;
+		if (stopSittingTimeLeft < 0)
+		{
+			stopSittingTimeLeft = 0;
+		}
+
 		float innerPlayerWidth = this.playerWidth * 0.6f;
 		float yValue = playerState == PlayerState.SMALL || previousState == PlayerState.SMALL ? -0.54f : -1.04f;
 		upCeiling = Physics2D.checkCeling(gameObject, innerPlayerWidth, yValue);
-
 		if (playerState == PlayerState.BIG || playerState == PlayerState.FIRE || previousState == PlayerState.BIG || previousState == PlayerState.FIRE)
 		{
 			// 앉기 키를 누르거나/천장에 닿여있는 상태
-			isSitting = KeyListener.isKeyPressed(GLFW_KEY_DOWN) || upCeiling;
+			isSitting = stopSittingTimeLeft <= 0 && (KeyListener.isKeyPressed(GLFW_KEY_DOWN) || upCeiling);
 			PillboxCollider pb = gameObject.getComponent(PillboxCollider.class);
 			if (isSitting)
 			{
@@ -353,7 +374,6 @@ public class PlayerController extends Component
 				pb.setHeight(gameObject.transform.scale.y * 1.5f);
 				pb.setOffset(new Vector2f());
 			}
-			System.out.println(gameObject.transform.position.y);
 		}
 	}
 
@@ -365,7 +385,7 @@ public class PlayerController extends Component
 			if (playerState == PlayerState.BIG || previousState == PlayerState.BIG)
 			{
 				gameObject.transform.scale.y = playerHeight * (2f - powerUpSimulationTimeLeft * 2);
-				gameObject.transform.position.y += (0.5f - powerUpSimulationTimeLeft);
+				setPosition(new Vector2f(gameObject.transform.position.x, powerUpStartY + (0.5f - powerUpSimulationTimeLeft)));
 			}
 			boolean isFire = false;
 			if (playerState == PlayerState.FIRE || previousState == PlayerState.FIRE)
@@ -398,13 +418,18 @@ public class PlayerController extends Component
 			if (playerState == PlayerState.SMALL || previousState == PlayerState.SMALL)
 			{
 				gameObject.transform.scale.y = playerHeight * (hurtSimulationTimeLeft + 0.5f) * 2;
-				gameObject.transform.position.y -= (0.5f - hurtSimulationTimeLeft);
+				setPosition(new Vector2f(gameObject.transform.position.x, hurtStartY - (0.5f - hurtSimulationTimeLeft)));
 			}
 			Window.getPhysics().setPlaying(false);
 			if (hurtSimulationTimeLeft <= 0)
 			{
 				hurtSimulationTimeLeft = 0;
 				Window.getPhysics().setPlaying(true);
+				if (isSitting && playerState == PlayerState.SMALL)
+				{
+					gameObject.getComponent(PillboxCollider.class).setHeight(gameObject.transform.scale.y / 1.5f);
+					isSitting = false;
+				}
 			}
 		}
 
@@ -514,7 +539,7 @@ public class PlayerController extends Component
 	public void powerUp()
 	{
 		powerUpSound.play();
-
+		powerUpStartY = gameObject.transform.position.y;
 		if (!(playerState == PlayerState.FIRE || previousState == PlayerState.FIRE))
 		{
 			stateMachine.trigger("powerup");
@@ -610,6 +635,7 @@ public class PlayerController extends Component
 
 	public void hurt()
 	{
+		hurtStartY = gameObject.transform.position.y;
 		switch (playerState)
 		{
 			case SMALL ->
@@ -636,6 +662,7 @@ public class PlayerController extends Component
 					maxJumpTime /= bigJumpBoostFactor;
 					maxSprintingJumpTime /= bigJumpBoostFactor;
 					pb.setHeight(gameObject.transform.scale.y / 1.5f);
+					pb.setOffset(new Vector2f());
 				}
 				hurtSimulationTimeLeft = hurtSimulationTime;
 				hurtInvincibleTimeLeft = hurtInvincibleTime;
@@ -656,5 +683,37 @@ public class PlayerController extends Component
 	public float getStarTimeLeft()
 	{
 		return starTimeLeft;
+	}
+
+	public void setPosition(Vector2f position)
+	{
+		this.gameObject.transform.position.set(position);
+		this.rb.setPosition(position);
+	}
+
+	public void preventSittingFor(float stopSittingTime)
+	{
+		this.isSitting = false;
+		this.stopSittingTimeLeft = stopSittingTime;
+	}
+
+	public float getStopSittingTimeLeft()
+	{
+		return stopSittingTimeLeft;
+	}
+
+	public void setStopSittingTimeLeft(float stopSittingTimeLeft)
+	{
+		this.stopSittingTimeLeft = stopSittingTimeLeft;
+	}
+
+	public StateMachine getStateMachine()
+	{
+		return stateMachine;
+	}
+
+	public int getStartZIndex()
+	{
+		return startZIndex;
 	}
 }

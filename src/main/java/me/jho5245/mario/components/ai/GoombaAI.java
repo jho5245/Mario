@@ -44,12 +44,6 @@ public class GoombaAI extends Component
 		if (!Window.getPhysics().isPlaying())
 			return;
 
-		// 아직 이동하지 않은 곳(카메라 오른쪽 밖)의 굼바는 움직이지 않는다.
-		Camera camera = Window.getCurrentScene().getCamera();
-		if (gameObject.transform.position.x > camera.getPosition().x + camera.getProjectionSize().x * camera.getZoom())
-		{
-			return;
-		}
 
 		if (isDead)
 		{
@@ -64,6 +58,13 @@ public class GoombaAI extends Component
 				gameObject.destroy();
 				return;
 			}
+		}
+
+		// 아직 이동하지 않은 곳(카메라 오른쪽 밖)의 굼바는 움직이지 않는다.
+		Camera camera = Window.getCurrentScene().getCamera();
+		if (gameObject.transform.position.x > camera.getPosition().x + camera.getProjectionSize().x * camera.getZoom())
+		{
+			return;
 		}
 
 		if (Math.abs(rb.getVelocity().x) < maxSpeed)

@@ -9,6 +9,7 @@ import me.jho5245.mario.components.ai.MushroomAI;
 import me.jho5245.mario.components.ai.StarAI;
 import me.jho5245.mario.components.block.BlockCoin;
 import me.jho5245.mario.components.block.BreakableBrickFragment;
+import me.jho5245.mario.components.block.Pipe;
 import me.jho5245.mario.components.block.QuestionBlock;
 import me.jho5245.mario.physics2d.components.Box2DCollider;
 import me.jho5245.mario.physics2d.components.CircleCollider;
@@ -203,6 +204,8 @@ public class Prefabs
 		stateMachine.addState(fireIdle.title, bigIdle.title, "damage");
 		stateMachine.addState(fireSwitchDirection.title, bigSwitchDirection.title, "damage");
 		stateMachine.addState(fireJump.title, bigJump.title, "damage");
+		stateMachine.addState(bigSit.title, idle.title, "damage");
+		stateMachine.addState(fireSit.title, bigSit.title, "damage");
 
 		stateMachine.addState(run.title, die.title, "die");
 		stateMachine.addState(switchDirection.title, die.title, "die");
@@ -220,7 +223,7 @@ public class Prefabs
 
 		PillboxCollider pillboxCollider = new PillboxCollider();
 		pillboxCollider.setWidth(1.56f);
-		pillboxCollider.setHeight(0.84f);
+		pillboxCollider.setHeight(0.98f);
 		Rigidbody2D rigidbody2D = new Rigidbody2D();
 		rigidbody2D.setBodyType(BodyType.DYNAMIC);
 		rigidbody2D.setContinuousCollision(false);
@@ -281,6 +284,7 @@ public class Prefabs
 		rb.setBodyType(BodyType.STATIC);
 		rb.setFixedRotation(true);
 		rb.setContinuousCollision(false);
+		rb.setIsSensor();
 		coin.addComponent(rb);
 
 		CircleCollider circleCollider = new CircleCollider();
@@ -488,5 +492,26 @@ public class Prefabs
 		goomba.addComponent(new GoombaAI());
 
 		return goomba;
+	}
+
+	public static GameObject generatePipe(PipeDirection direction)
+	{
+		SpriteSheet pipes = AssetPool.getSpriteSheet("assets/images/pipes.png");
+		GameObject pipe = generateSpriteObject(pipes.getSprite(direction.ordinal()), Settings.GRID_WIDTH * 2, Settings.GRID_HEIGHT * 2);
+
+		Rigidbody2D rb = new Rigidbody2D();
+		rb.setBodyType(BodyType.STATIC);
+		rb.setFixedRotation(true);
+		rb.setContinuousCollision(false);
+		pipe.addComponent(rb);
+
+		Box2DCollider boxCollider = new Box2DCollider();
+		boxCollider.setHalfSize(new Vector2f(Settings.GRID_WIDTH * 2, Settings.GRID_HEIGHT * 2));
+		pipe.addComponent(boxCollider);
+
+		pipe.addComponent(new Pipe(direction));
+		pipe.addComponent(new Ground());
+
+		return pipe;
 	}
 }

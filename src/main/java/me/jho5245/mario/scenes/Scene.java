@@ -94,6 +94,12 @@ public class Scene
 		return result.orElse(null);
 	}
 
+	public GameObject getGameObject(String name)
+	{
+		Optional<GameObject> result = this.gameObjects.stream().filter(gameObject -> gameObject.name.equals(name)).findFirst();
+		return result.orElse(null);
+	}
+
 	public void editorUpdate(float dt)
 	{
 		this.camera.adjustProjection();
