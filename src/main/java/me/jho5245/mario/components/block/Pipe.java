@@ -18,11 +18,12 @@ public class Pipe extends Component
 	private PipeDirection direction;
 
 	private String connectingPipeName = "";
+	@SuppressWarnings("unused")
 	private boolean isEntrance;
 
 	private transient GameObject connectingPipeGameObject;
 	private transient Pipe connectingPipe;
-	private transient final float entranceVectorTolerance = 0.6f;
+	transient final float entranceVectorTolerance = 0.6f;
 	private transient GameObject playerGameObject;
 	private transient PlayerController playerController;
 	// 파이프 사용 애니메이션 재생 시간
@@ -195,9 +196,6 @@ public class Pipe extends Component
 			Vector2f pipeScale = gameObject.transform.scale;
 			Vector2f playerPosition = object.transform.position;
 			Vector2f playerScale = new Vector2f(object.transform.scale).absolute();
-			//			System.out.println("playerX: " + playerPosition.x + ", pipeX: " + pipePosition.x);
-			//			System.out.println("pipeScaleX " + pipeScale.x + ", pipeYScale: " + pipeScale.y);
-			//			System.out.println("playerScaleX " + playerScale.x + ", playerScaleY: " + playerScale.y);
 			switch (direction)
 			{
 				case DOWN ->
