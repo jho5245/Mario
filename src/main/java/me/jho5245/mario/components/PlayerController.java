@@ -12,6 +12,8 @@ import me.jho5245.mario.physics2d.Physics2D;
 import me.jho5245.mario.physics2d.components.PillboxCollider;
 import me.jho5245.mario.physics2d.components.Rigidbody2D;
 import me.jho5245.mario.physics2d.enums.BodyType;
+import me.jho5245.mario.scenes.LevelEditorSceneInitializer;
+import me.jho5245.mario.scenes.LevelSceneInitializer;
 import me.jho5245.mario.sounds.Sound;
 import me.jho5245.mario.util.AssetPool;
 import org.jbox2d.dynamics.contacts.Contact;
@@ -24,7 +26,6 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class PlayerController extends Component
 {
-
 	public enum PlayerState
 	{
 		SMALL,
@@ -51,8 +52,8 @@ public class PlayerController extends Component
 	private transient final float bigJumpBoostFactor = 1.2f;
 	private transient float playerWidth;
 	private transient float playerHeight;
-	private transient float maxJumpTime = 50;
-	private transient float maxSprintingJumpTime = 80;
+	private transient float maxJumpTime = 80;
+	private transient float maxSprintingJumpTime = 110;
 	private transient float jumpTime;
 	private transient final Vector2f acceleration = new Vector2f();
 	public transient Vector2f velocity = new Vector2f();
@@ -101,6 +102,9 @@ public class PlayerController extends Component
 	// 파이프 이동 등 특정 행동을 할 때 플레이어 zIndex에 변화를 주고 다시 원래 값으로 복구할 값
 	private transient int startZIndex;
 
+	// 지하에 있니?
+	private transient boolean isUndergrond;
+
 	@Override
 	public void start()
 	{
@@ -129,7 +133,14 @@ public class PlayerController extends Component
 		// 화면 아래로 떨어지면 상태에 관계없이 즉시 사망
 		if (!isDead && gameObject.transform.position.y <= camera.getPosition().y - 3)
 		{
-			kill();
+			if (isUndergrond)
+			{
+				System.out.println("test");
+			}
+			else
+			{
+				kill();
+			}
 		}
 		if (isDead)
 		{
@@ -147,7 +158,9 @@ public class PlayerController extends Component
 			}
 			if (dieAnimationTime > 3f)
 			{
-				ObserverHandler.notify(null, new Event(EventType.GAME_ENGINE_STOP_PLAY));
+				Window.getImGuiLayer().getPropertiesWindow().clearSelected();
+				Window.changeScene(new LevelSceneInitializer(), false);
+				AssetPool.getAllSounds().forEach(Sound::stop);
 			}
 			return;
 		}
@@ -259,6 +272,7 @@ public class PlayerController extends Component
 
 	private void jumpUpdate(float dt)
 	{
+		System.out.println(jumpTime);
 		if ((KeyListener.isKeyPressed(GLFW_KEY_Z)) && (jumpTime > 0 || onGround || groundDebounce > 0))
 		{
 			if ((onGround || groundDebounce > 0) && jumpTime == 0)
@@ -715,5 +729,20 @@ public class PlayerController extends Component
 	public int getStartZIndex()
 	{
 		return startZIndex;
+	}
+
+	public boolean hasWon()
+	{
+		return false;
+	}
+
+	public boolean isUndergrond()
+	{
+		return isUndergrond;
+	}
+
+	public void setUndergrond(boolean undergrond)
+	{
+		isUndergrond = undergrond;
 	}
 }

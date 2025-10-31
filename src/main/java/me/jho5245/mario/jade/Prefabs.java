@@ -195,6 +195,7 @@ public class Prefabs
 		stateMachine.addState(bigIdle.title, fireIdle.title, "powerup");
 		stateMachine.addState(bigSwitchDirection.title, fireSwitchDirection.title, "powerup");
 		stateMachine.addState(bigJump.title, fireJump.title, "powerup");
+		stateMachine.addState(bigSit.title, fireSit.title, "powerup");
 
 		stateMachine.addState(bigRun.title, run.title, "damage");
 		stateMachine.addState(bigIdle.title, idle.title, "damage");

@@ -1,9 +1,11 @@
 package me.jho5245.mario.jade;
 
+import imgui.app.Color;
 import me.jho5245.mario.util.Settings;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 public class Camera
 {
@@ -14,6 +16,8 @@ public class Camera
 	private Vector2f projectionSize = new Vector2f(projectionWidth, projectionHeight);
 
 	private float zoom = 1f;
+
+	public Vector4f clearColor = new Vector4f(1, 1, 1, 1);
 
 	public Camera()
 	{

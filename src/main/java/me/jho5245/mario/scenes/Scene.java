@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import me.jho5245.mario.components.Component;
 import me.jho5245.mario.components.ComponentDeserializer;
+import me.jho5245.mario.components.PlayerController;
 import me.jho5245.mario.components.Transform;
 import me.jho5245.mario.jade.Camera;
 import me.jho5245.mario.jade.GameObject;
@@ -185,6 +186,24 @@ public class Scene
 		gameObject.addComponent(new Transform());
 		gameObject.transform = gameObject.getComponent(Transform.class);
 		return gameObject;
+	}
+
+	/**
+	 * 특정 {@link Component}를 가지고 있는 가장 첫 번째 게임오브젝트를 반환함.
+	 * @param clazz 게임오브젝트가 가지고 있는 컴포넌트
+	 * @return 해당 컴포넌트를 가지고 있는 게임오브젝트 혹은 없을 경우 <code>null</code>
+	 * @param <T> 컴포넌트 유형
+	 */
+	public <T extends Component> GameObject getGameObjectWith(Class<T> clazz)
+	{
+		for (GameObject gameObject : gameObjects)
+		{
+			if (gameObject.getComponent(clazz) != null)
+			{
+				return gameObject;
+			}
+		}
+		return null;
 	}
 
 	public void save()

@@ -5,12 +5,14 @@ import me.jho5245.mario.observers.ObserverHandler;
 import me.jho5245.mario.observers.events.Event;
 import me.jho5245.mario.physics2d.Physics2D;
 import me.jho5245.mario.renderer.*;
-import me.jho5245.mario.scenes.LevelEditorInitializer;
+import me.jho5245.mario.scenes.LevelEditorSceneInitializer;
+import me.jho5245.mario.scenes.LevelSceneInitializer;
 import me.jho5245.mario.scenes.Scene;
 import me.jho5245.mario.scenes.SceneInitializer;
 import me.jho5245.mario.sounds.Sound;
 import me.jho5245.mario.util.AssetPool;
 import org.joml.Vector2f;
+import org.joml.Vector4f;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.openal.AL;
@@ -128,13 +130,13 @@ public class Window implements Observer
 			{
 				Window.getImGuiLayer().getPropertiesWindow().clearSelected();
 				currentScene.save();
-				Window.changeScene(new LevelEditorInitializer(), true);
+				Window.changeScene(new LevelSceneInitializer(), true);
 				this.runtimePlaying = true;
 			}
 			case GAME_ENGINE_STOP_PLAY ->
 			{
 				Window.getImGuiLayer().getPropertiesWindow().clearSelected();
-				Window.changeScene(new LevelEditorInitializer(), false);
+				Window.changeScene(new LevelEditorSceneInitializer(), false);
 				AssetPool.getAllSounds().forEach(Sound::stop);
 				this.runtimePlaying = false;
 			}
@@ -148,7 +150,7 @@ public class Window implements Observer
 			}
 			case LOAD_LEVEL ->
 			{
-				Window.changeScene(new LevelEditorInitializer(), true);
+				Window.changeScene(new LevelEditorSceneInitializer(), true);
 			}
 		}
 	}
@@ -237,7 +239,7 @@ public class Window implements Observer
 		this.imGuiLayer = new ImGuiLayer(glfwWindow, pickingTexture);
 		this.imGuiLayer.initImGui();
 
-		Window.changeScene(new LevelEditorInitializer(), false);
+		Window.changeScene(new LevelEditorSceneInitializer(), false);
 	}
 
 	private void destroy()
@@ -295,7 +297,9 @@ public class Window implements Observer
 
 			this.frameBuffer.bind();
 
-			glClearColor(1, 1, 1, 1);
+			Vector4f clearColor = currentScene.getCamera().clearColor;
+			glViewport(0, 0, width, height);
+			glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
 			glClear(GL_COLOR_BUFFER_BIT);
 
 			if (dt >= 0)

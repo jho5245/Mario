@@ -22,7 +22,7 @@ import java.io.File;
 import java.util.Collection;
 import java.util.List;
 
-public class LevelEditorInitializer extends SceneInitializer
+public class LevelEditorSceneInitializer extends SceneInitializer
 {
 	private SpriteSheet sprites;
 	private GameObject levelEditorStuff;

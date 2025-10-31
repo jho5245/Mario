@@ -157,35 +157,34 @@ public class Pipe extends Component
 		Vector2f exitPipeScale = connectingPipeGameObject.transform.scale;
 		Vector2f playerScale = new Vector2f(playerGameObject.transform.scale).absolute();
 
-		switch (direction)
+		return switch (direction)
 		{
 			case DOWN ->
 			{
 				if (pipeUseAnimationTimeLeft >= pipeUseAnimationTime / 2)
-					return new Vector2f(enterPipePosition).add(0, enterPipeScale.y * (pipeUseAnimationTimeLeft - 1.2f));
+					yield new Vector2f(enterPipePosition).add(0, enterPipeScale.y * (pipeUseAnimationTimeLeft - 1.2f));
 				else
-					return new Vector2f(exitPipePosition).add(0, exitPipeScale.y * (pipeUseAnimationTimeLeft - 0.8f));
+					yield new Vector2f(exitPipePosition).add(0, exitPipeScale.y * (pipeUseAnimationTimeLeft - 0.8f));
 			}
 			case LEFT -> {
 				if (pipeUseAnimationTimeLeft >= pipeUseAnimationTime / 2)
-					return new Vector2f(enterPipePosition).add(enterPipeScale.x * (pipeUseAnimationTimeLeft - 1.2f), playerScale.y == 1f ? enterPipeScale.y / -8 : 0);
+					yield new Vector2f(enterPipePosition).add(enterPipeScale.x * (pipeUseAnimationTimeLeft - 1.2f), playerScale.y == 1f ? enterPipeScale.y / -8 : 0);
 				else
-					return new Vector2f(exitPipePosition).add(exitPipeScale.x * (pipeUseAnimationTimeLeft - 0.8f),  playerScale.y == 1f ? enterPipeScale.y / -8 : 0);
+					yield new Vector2f(exitPipePosition).add(exitPipeScale.x * (pipeUseAnimationTimeLeft - 0.8f),  playerScale.y == 1f ? enterPipeScale.y / -8 : 0);
 			}
 			case RIGHT -> {
 				if (pipeUseAnimationTimeLeft >= pipeUseAnimationTime / 2)
-					return new Vector2f(enterPipePosition).add(enterPipeScale.x * (1.2f - pipeUseAnimationTimeLeft),  playerScale.y == 1f ? enterPipeScale.y / -8 : 0);
+					yield new Vector2f(enterPipePosition).add(enterPipeScale.x * (1.2f - pipeUseAnimationTimeLeft),  playerScale.y == 1f ? enterPipeScale.y / -8 : 0);
 				else
-					return new Vector2f(exitPipePosition).add(exitPipeScale.x * (0.8f - pipeUseAnimationTimeLeft),  playerScale.y == 1f ? enterPipeScale.y / -8 : 0);
+					yield new Vector2f(exitPipePosition).add(exitPipeScale.x * (0.8f - pipeUseAnimationTimeLeft),  playerScale.y == 1f ? enterPipeScale.y / -8 : 0);
 			}
 			case UP -> {
 				if (pipeUseAnimationTimeLeft >= pipeUseAnimationTime / 2)
-					return new Vector2f(enterPipePosition).add(0, enterPipeScale.y * (1.2f - pipeUseAnimationTimeLeft));
+					yield new Vector2f(enterPipePosition).add(0, enterPipeScale.y * (1.2f - pipeUseAnimationTimeLeft));
 				else
-					return new Vector2f(exitPipePosition).add(0, exitPipeScale.y * (0.8f - pipeUseAnimationTimeLeft));
+					yield new Vector2f(exitPipePosition).add(0, exitPipeScale.y * (0.8f - pipeUseAnimationTimeLeft));
 			}
-		}
-		return null;
+		};
 	}
 
 	@Override
@@ -215,7 +214,6 @@ public class Pipe extends Component
 				{
 					if (x < entranceVectorTolerance || playerPosition.y > pipePosition.y + pipeScale.y * 0.8f || playerPosition.y < pipePosition.y - pipeScale.y * 0.4f)
 					{
-						System.out.println("no");
 						return;
 					}
 				}
