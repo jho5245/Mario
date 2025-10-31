@@ -13,7 +13,6 @@ import org.jbox2d.dynamics.contacts.Contact;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 
-import javax.print.DocFlavor.STRING;
 import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -65,6 +64,9 @@ public class PlayerController extends Component
 	private final transient List<String> runningTitle = List.of("Run", "BigRun", "FireRun");
 
 	private transient int coinAmount;
+
+	private final transient float powerUpSimulationTimeStart = 0.5f;
+	private transient float powerUpSimulationTime;
 
 	@Override
 	public void start()
@@ -134,6 +136,43 @@ public class PlayerController extends Component
 		}
 
 		checkOnGround();
+		jumpUpdate(dt);
+
+		this.acceleration.y = Window.getPhysics().getGravity().y * 0.8f;
+
+		this.velocity.x += this.acceleration.x * dt;
+		this.velocity.y += this.acceleration.y * dt;
+		if (isSprinting)
+		{
+			this.velocity.x = Math.max(Math.min(this.velocity.x, this.terminalSprintingVelocity.x), -this.terminalSprintingVelocity.x);
+			this.velocity.y = Math.max(Math.min(this.velocity.y, this.terminalSprintingVelocity.y), -this.terminalSprintingVelocity.y);
+		}
+		else
+		{
+			this.velocity.x = Math.max(Math.min(this.velocity.x, this.terminalVelocity.x), -this.terminalVelocity.x);
+			this.velocity.y = Math.max(Math.min(this.velocity.y, this.terminalVelocity.y), -this.terminalVelocity.y);
+		}
+		this.rb.setVelocity(this.velocity);
+		this.rb.setAngularVelocity(0);
+
+		if (!onGround)
+		{
+			stateMachine.trigger("jump");
+		}
+		else
+		{
+			stateMachine.trigger("stopJumping");
+		}
+
+		starUpdate(dt);
+
+		powerUpSimulationUpdate(dt);
+
+		setAnimationSpeed();
+	}
+
+	private void jumpUpdate(float dt)
+	{
 		if (KeyListener.isKeyPressed(GLFW_KEY_Z) && (jumpTime > 0 || onGround || groundDebounce > 0))
 		{
 			if ((onGround || groundDebounce > 0) && jumpTime == 0)
@@ -175,33 +214,29 @@ public class PlayerController extends Component
 		//		{
 		//
 		//		}
+	}
 
-		this.acceleration.y = Window.getPhysics().getGravity().y * 0.8f;
+	private void powerUpSimulationUpdate(float dt)
+	{
+		if (powerUpSimulationTime > 0)
+		{
+			powerUpSimulationTime -= dt;
+			if (playerState == PlayerState.BIG || previousState == PlayerState.BIG)
+			{
+				gameObject.transform.scale.y = playerHeight * (2f - powerUpSimulationTime * 2);
+				gameObject.transform.position.y += (0.5f - powerUpSimulationTime);
+			}
+			Window.getPhysics().setPlaying(false);
+			if (powerUpSimulationTime <= 0)
+			{
+				powerUpSimulationTime = 0;
+				Window.getPhysics().setPlaying(true);
+			}
+		}
+	}
 
-		this.velocity.x += this.acceleration.x * dt;
-		this.velocity.y += this.acceleration.y * dt;
-		if (isSprinting)
-		{
-			this.velocity.x = Math.max(Math.min(this.velocity.x, this.terminalSprintingVelocity.x), -this.terminalSprintingVelocity.x);
-			this.velocity.y = Math.max(Math.min(this.velocity.y, this.terminalSprintingVelocity.y), -this.terminalSprintingVelocity.y);
-		}
-		else
-		{
-			this.velocity.x = Math.max(Math.min(this.velocity.x, this.terminalVelocity.x), -this.terminalVelocity.x);
-			this.velocity.y = Math.max(Math.min(this.velocity.y, this.terminalVelocity.y), -this.terminalVelocity.y);
-		}
-		this.rb.setVelocity(this.velocity);
-		this.rb.setAngularVelocity(0);
-
-		if (!onGround)
-		{
-			stateMachine.trigger("jump");
-		}
-		else
-		{
-			stateMachine.trigger("stopJumping");
-		}
-
+	private void starUpdate(float dt)
+	{
 		if (starTime > 0)
 		{
 			starTime -= dt;
@@ -212,7 +247,8 @@ public class PlayerController extends Component
 				if (starTime <= 2f)
 				{
 					float alpha = gameObject.getComponent(SpriteRenderer.class).getColor().w;
-					gameObject.getComponent(SpriteRenderer.class).setColor(new Vector4f((float) Math.random(), (float) Math.random(), (float) Math.random(), alpha == 0.3f ? 1f : 0.3f));
+					gameObject.getComponent(SpriteRenderer.class)
+							.setColor(new Vector4f((float) Math.random(), (float) Math.random(), (float) Math.random(), alpha == 0.3f ? 1f : 0.3f));
 				}
 				else
 				{
@@ -228,8 +264,6 @@ public class PlayerController extends Component
 				backgroundMusic.play();
 			}
 		}
-
-		setAnimationSpeed();
 	}
 
 	private void setAnimationSpeed()
@@ -318,6 +352,7 @@ public class PlayerController extends Component
 			previousState = PlayerState.FIRE;
 		}
 		stateMachine.trigger("powerup");
+		powerUpSimulationTime = powerUpSimulationTimeStart;
 	}
 
 	public void useStar()

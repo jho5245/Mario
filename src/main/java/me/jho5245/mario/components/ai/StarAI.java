@@ -39,6 +39,9 @@ public class StarAI extends Component
 	@Override
 	public void update(float dt)
 	{
+		if (!Window.getPhysics().isPlaying())
+			return;
+
 		if (spawnTime > 0)
 		{
 			gameObject.transform.zIndex = - 100;

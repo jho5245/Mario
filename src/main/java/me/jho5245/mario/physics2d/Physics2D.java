@@ -113,6 +113,16 @@ public class Physics2D
 		}
 	}
 
+	public boolean isPlaying()
+	{
+		return isPlaying;
+	}
+
+	public void setPlaying(boolean playing)
+	{
+		isPlaying = playing;
+	}
+
 	public void debugDraw()
 	{
 		world.drawDebugData();
