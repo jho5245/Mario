@@ -243,15 +243,15 @@ public class PlayerController extends Component
 			starTimeColorFlickerTime -= dt;
 			if (starTimeColorFlickerTime <= 0)
 			{
-				starTimeColorFlickerTime = starTimeColorFlickerTimeStart;
-				if (starTime <= 2f)
+				if (starTime <= 3f)
 				{
+					starTimeColorFlickerTime = starTimeColorFlickerTimeStart * starTime / 3;
 					float alpha = gameObject.getComponent(SpriteRenderer.class).getColor().w;
-					gameObject.getComponent(SpriteRenderer.class)
-							.setColor(new Vector4f((float) Math.random(), (float) Math.random(), (float) Math.random(), alpha == 0.3f ? 1f : 0.3f));
+					gameObject.getComponent(SpriteRenderer.class).setColor(new Vector4f(1f, 1f, 1f, alpha == 0.3f ? 1f : 0.3f));
 				}
 				else
 				{
+					starTimeColorFlickerTime = starTimeColorFlickerTimeStart;
 					gameObject.getComponent(SpriteRenderer.class).setColor(new Vector4f((float) Math.random(), (float) Math.random(), (float) Math.random(), 1f));
 				}
 			}
