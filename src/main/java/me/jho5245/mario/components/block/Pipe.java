@@ -102,49 +102,54 @@ public class Pipe extends Component
 			return;
 		}
 
-		if (pipeEntering)
+		// 최초 1회 소리 재생
+		if (pipeUseAnimationTimeLeft == pipeUseAnimationTime)
 		{
-			// 최초 1회 소리 재생
-			if (pipeUseAnimationTimeLeft == pipeUseAnimationTime)
+			pipeSound.play();
+			// 파이프 사용하는 도중 앉기 방지
+			playerController.preventSittingFor(pipeUseAnimationTime);
+		}
+		Window.getPhysics().setPlaying(false);
+		pipeUseAnimationTimeLeft -= dt;
+
+		playerController.getStateMachine().trigger("stopJumping");
+		playerController.getStateMachine().trigger("stopRunning");
+		playerGameObject.transform.zIndex = -100;
+
+		Vector2f position;
+
+		// 파이프 나오기 시작할 때 1번만 소리 재생
+		if (pipeUseAnimationTimeLeft <= pipeUseAnimationTime / 2)
+		{
+			position = enteringPipe(connectingPipe.direction.inverse());
+			if (!pipeExited)
 			{
+				pipeExited = true;
 				pipeSound.play();
-				// 파이프 사용하는 도중 앉기 방지
-				playerController.preventSittingFor(pipeUseAnimationTime);
 			}
-			Window.getPhysics().setPlaying(false);
-			pipeUseAnimationTimeLeft -= dt;
-			Vector2f position = enteringPipe();
-			playerController.setPosition(position);
-			playerController.getStateMachine().trigger("stopJumping");
-			playerGameObject.transform.zIndex = -100;
+		}
+		else
+		{
+			position = enteringPipe(this.direction);
+		}
+		playerController.setPosition(position);
 
-			// 파이프 나오기 시작할 때 1번만 소리 재생
-			if (pipeUseAnimationTimeLeft <= pipeUseAnimationTime / 2)
-			{
-				if (!pipeExited)
-				{
-					pipeExited = true;
-					pipeSound.play();
-				}
-			}
-
-			// 파이프 다 빠져나옴
-			if (pipeUseAnimationTimeLeft < 0)
-			{
-				pipeUseAnimationTimeLeft = 0;
-				pipeEntering = false;
-				pipeExited = false;
-				Window.getPhysics().setPlaying(true);
-				playerController.velocity.set(0f);
-				playerGameObject.transform.zIndex = playerController.getStartZIndex();
-				playerController.setStopSittingTimeLeft(0);
-				playerGameObject = null;
-				playerController = null;
-			}
+		// 파이프 다 빠져나옴
+		if (pipeUseAnimationTimeLeft < 0)
+		{
+			pipeUseAnimationTimeLeft = 0;
+			pipeEntering = false;
+			pipeExited = false;
+			Window.getPhysics().setPlaying(true);
+			playerController.velocity.set(0f);
+			playerGameObject.transform.zIndex = playerController.getStartZIndex();
+			playerController.setStopSittingTimeLeft(0);
+			playerGameObject = null;
+			playerController = null;
 		}
 	}
 
-	private Vector2f enteringPipe()
+	private Vector2f enteringPipe(PipeDirection direction)
 	{
 		Vector2f enterPipePosition = gameObject.transform.position;
 		Vector2f enterPipeScale = gameObject.transform.scale;
