@@ -474,8 +474,6 @@ public class PlayerController extends Component
 			else
 			{
 				stateMachine.trigger("stopSitting");
-//				pb.setHeight(2f);
-//				pb.offset = new Vector2f();
 			}
 		}
 	}
