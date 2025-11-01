@@ -5,7 +5,6 @@ import me.jho5245.mario.components.PlayerController;
 import me.jho5245.mario.components.SpriteRenderer;
 import me.jho5245.mario.jade.GameObject;
 import me.jho5245.mario.jade.Window;
-import me.jho5245.mario.physics2d.Physics2D;
 import me.jho5245.mario.physics2d.components.Rigidbody2D;
 import me.jho5245.mario.util.AssetPool;
 import org.jbox2d.dynamics.contacts.Contact;
@@ -22,6 +21,17 @@ public class MushroomAI extends Component
 	private transient float spawnTime = 0.5f;
 	private transient int originZIndex;
 	private transient float originY;
+	private transient boolean isOneUp;
+
+	public MushroomAI()
+	{
+
+	}
+
+	public MushroomAI(boolean isOneUp)
+	{
+		this.isOneUp = isOneUp;
+	}
 
 	@Override
 	public void start()
@@ -67,7 +77,13 @@ public class MushroomAI extends Component
 			contact.setEnabled(false);
 			if (!hitPlayer)
 			{
-				playerController.powerUp();
+				if (isOneUp)
+				{
+					playerController.oneUp();
+				}
+				else{
+					playerController.powerUp();
+				}
 				this.gameObject.destroy();
 				hitPlayer = true;
 			}

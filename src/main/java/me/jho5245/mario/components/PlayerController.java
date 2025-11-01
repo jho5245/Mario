@@ -52,8 +52,8 @@ public class PlayerController extends Component
 	private transient final float bigJumpBoostFactor = 1.2f;
 	private transient float playerWidth;
 	private transient float playerHeight;
-	private transient float maxJumpTime = 80;
-	private transient float maxSprintingJumpTime = 110;
+	private transient float maxJumpTime = 50;
+	private transient float maxSprintingJumpTime = 80;
 	private transient float jumpTime;
 	private transient final Vector2f acceleration = new Vector2f();
 	public transient Vector2f velocity = new Vector2f();
@@ -153,8 +153,7 @@ public class PlayerController extends Component
 			}
 			if (dieAnimationTime > 3f)
 			{
-				Window.getImGuiLayer().getPropertiesWindow().clearSelected();
-				Window.changeScene(new LevelSceneInitializer(), false);
+				Window.changeScene(new LevelSceneInitializer(), true);
 				AssetPool.getAllSounds().forEach(Sound::stop);
 			}
 			return;
@@ -581,6 +580,14 @@ public class PlayerController extends Component
 			playerState = PlayerState.FIRE;
 			previousState = PlayerState.FIRE;
 		}
+	}
+
+	/**
+	 * 마리오가 1UP 버섯을 먹음
+	 */
+	public void oneUp()
+	{
+		oneUpSound.play();
 	}
 
 	public void useStar()

@@ -17,6 +17,7 @@ public class QuestionBlock extends Block
 		COIN,
 		POWER_UP,
 		STAR,
+		ONE_UP_MUSHROOM,
 	}
 
 	public BlockType blockType = BlockType.COIN;
@@ -29,6 +30,7 @@ public class QuestionBlock extends Block
 			case COIN -> doCoin(playerController);
 			case POWER_UP -> doPowerUp(playerController);
 			case STAR -> spawnStar();
+			case ONE_UP_MUSHROOM -> spawnOneUpMushroom();
 		}
 
 		StateMachine stateMachine = gameObject.getComponent(StateMachine.class);
@@ -66,7 +68,7 @@ public class QuestionBlock extends Block
 		GameObject star = Prefabs.generateStar();
 		star.transform.position.set(this.gameObject.transform.position);
 		star.transform.position.y += Settings.GRID_HEIGHT;
-		star.getComponent(SpriteRenderer.class).setColor(new Vector4f(1, 1, 1, 0f));
+		star.getComponent(SpriteRenderer.class).setColor(new Vector4f(0));
 		Window.getCurrentScene().addGameObject(star);
 	}
 
@@ -75,7 +77,7 @@ public class QuestionBlock extends Block
 		GameObject mushroom = Prefabs.generateMushroom();
 		mushroom.transform.position.set(this.gameObject.transform.position);
 		mushroom.transform.position.y += Settings.GRID_HEIGHT;
-		mushroom.getComponent(SpriteRenderer.class).setColor(new Vector4f(1, 1, 1, 0f));
+		mushroom.getComponent(SpriteRenderer.class).setColor(new Vector4f(0));
 		Window.getCurrentScene().addGameObject(mushroom);
 	}
 
@@ -84,7 +86,16 @@ public class QuestionBlock extends Block
 		GameObject flower = Prefabs.generateFlower();
 		flower.transform.position.set(this.gameObject.transform.position);
 		flower.transform.position.y += Settings.GRID_HEIGHT;
-		flower.getComponent(SpriteRenderer.class).setColor(new Vector4f(1, 1, 1, 0f));
+		flower.getComponent(SpriteRenderer.class).setColor(new Vector4f(0));
 		Window.getCurrentScene().addGameObject(flower);
+	}
+
+	private void spawnOneUpMushroom()
+	{
+		GameObject star = Prefabs.generateOneUpMushroom();
+		star.transform.position.set(this.gameObject.transform.position);
+		star.transform.position.y += Settings.GRID_HEIGHT;
+		star.getComponent(SpriteRenderer.class).setColor(new Vector4f(0));
+		Window.getCurrentScene().addGameObject(star);
 	}
 }

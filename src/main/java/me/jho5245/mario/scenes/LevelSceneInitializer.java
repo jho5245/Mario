@@ -9,11 +9,14 @@ public class LevelSceneInitializer extends SceneInitializer
 {
 	private GameObject cameraObject;
 
+	public GameCamera gameCamera;
+
 	@Override
 	public void init(Scene scene)
 	{
 		cameraObject = scene.createGameObject("GameCamera");
-		cameraObject.addComponent(new GameCamera(scene.getCamera()));
+		this.gameCamera =new GameCamera(scene.getCamera(), 0, 0);
+		cameraObject.addComponent(gameCamera);
 		cameraObject.start();
 		scene.addGameObject(cameraObject);
 	}

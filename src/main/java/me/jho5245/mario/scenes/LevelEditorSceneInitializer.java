@@ -239,7 +239,25 @@ public class LevelEditorSceneInitializer extends SceneInitializer
 					ImGui.pushID(uid++);
 					if (ImGui.imageButton(id, spriteWidth, spriteHeight, texCoords[2].x, texCoords[0].y, texCoords[0].x, texCoords[2].y))
 					{
-						GameObject object = Prefabs.generateQuestionBlock();
+						GameObject object = Prefabs.generateQuestionBlock(false);
+						levelEditorStuff.getComponent(MouseControls.class).pickUpObject(object);
+					}
+					ImGui.popID();
+					ImGui.sameLine();
+				}
+				// Hidden Question Block
+				{
+					SpriteSheet items = AssetPool.getSpriteSheet("assets/images/items.png");
+					Sprite sprite = items.getSprite(1);
+					float spriteWidth = sprite.getWidth() * 2;
+					float spriteHeight = sprite.getHeight() * 2;
+					int id = sprite.getTexId();
+					Vector2f[] texCoords = sprite.getTexCoords();
+
+					ImGui.pushID(uid++);
+					if (ImGui.imageButton(id, spriteWidth, spriteHeight, texCoords[2].x, texCoords[0].y, texCoords[0].x, texCoords[2].y))
+					{
+						GameObject object = Prefabs.generateQuestionBlock(true);
 						levelEditorStuff.getComponent(MouseControls.class).pickUpObject(object);
 					}
 					ImGui.popID();
@@ -276,7 +294,26 @@ public class LevelEditorSceneInitializer extends SceneInitializer
 					ImGui.pushID(uid++);
 					if (ImGui.imageButton(id, spriteWidth, spriteHeight, texCoords[2].x, texCoords[0].y, texCoords[0].x, texCoords[2].y))
 					{
-						GameObject object = Prefabs.generateGoomba();
+						GameObject object = Prefabs.generateGoomba(false);
+						object.transform.zIndex = 10;
+						levelEditorStuff.getComponent(MouseControls.class).pickUpObject(object);
+					}
+					ImGui.popID();
+					ImGui.sameLine();
+				}
+				// UndergroundGoomba
+				{
+					SpriteSheet playerSprites = AssetPool.getSpriteSheet("assets/images/spritesheet.png");
+					Sprite sprite = playerSprites.getSprite(20);
+					float spriteWidth = sprite.getWidth() * 2;
+					float spriteHeight = sprite.getHeight() * 2;
+					int id = sprite.getTexId();
+					Vector2f[] texCoords = sprite.getTexCoords();
+
+					ImGui.pushID(uid++);
+					if (ImGui.imageButton(id, spriteWidth, spriteHeight, texCoords[2].x, texCoords[0].y, texCoords[0].x, texCoords[2].y))
+					{
+						GameObject object = Prefabs.generateGoomba(true);
 						object.transform.zIndex = 10;
 						levelEditorStuff.getComponent(MouseControls.class).pickUpObject(object);
 					}

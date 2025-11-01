@@ -7,10 +7,7 @@ import me.jho5245.mario.components.ai.Flower;
 import me.jho5245.mario.components.ai.GoombaAI;
 import me.jho5245.mario.components.ai.MushroomAI;
 import me.jho5245.mario.components.ai.StarAI;
-import me.jho5245.mario.components.block.BlockCoin;
-import me.jho5245.mario.components.block.BreakableBrickFragment;
-import me.jho5245.mario.components.block.Pipe;
-import me.jho5245.mario.components.block.QuestionBlock;
+import me.jho5245.mario.components.block.*;
 import me.jho5245.mario.physics2d.components.Box2DCollider;
 import me.jho5245.mario.physics2d.components.CircleCollider;
 import me.jho5245.mario.physics2d.components.PillboxCollider;
@@ -238,7 +235,7 @@ public class Prefabs
 		return mario;
 	}
 
-	public static GameObject generateQuestionBlock()
+	public static GameObject generateQuestionBlock(boolean hidden)
 	{
 		SpriteSheet items = AssetPool.getSpriteSheet("assets/images/items.png");
 		GameObject questionBlock = generateSpriteObject(items.getSprite(0), Settings.GRID_WIDTH, Settings.GRID_HEIGHT);
@@ -263,6 +260,10 @@ public class Prefabs
 		stateMachine.addState(flicker.title, inactive.title, "setInactive");
 		questionBlock.addComponent(stateMachine);
 		questionBlock.addComponent(new QuestionBlock());
+		if (hidden)
+		{
+			questionBlock.addComponent(new HiddenBlock());
+		}
 
 		Rigidbody2D rb = new Rigidbody2D();
 		rb.setBodyType(BodyType.STATIC);
@@ -274,7 +275,6 @@ public class Prefabs
 
 		return questionBlock;
 	}
-
 
 	public static GameObject generateCoin()
 	{
@@ -335,7 +335,7 @@ public class Prefabs
 	public static GameObject generateMushroom()
 	{
 		SpriteSheet items = AssetPool.getSpriteSheet("assets/images/items.png");
-		GameObject mushroom = generateSpriteObject(items.getSprite(10), Settings.GRID_WIDTH, Settings.GRID_HEIGHT);
+		GameObject mushroom = generateSpriteObject(items.getSprite(15), Settings.GRID_WIDTH, Settings.GRID_HEIGHT);
 
 		Rigidbody2D rb = new Rigidbody2D();
 		rb.setBodyType(BodyType.DYNAMIC);
@@ -456,16 +456,16 @@ public class Prefabs
 		return fragment;
 	}
 
-	public static GameObject generateGoomba()
+	public static GameObject generateGoomba(boolean underground)
 	{
 		SpriteSheet sprites = AssetPool.getSpriteSheet("assets/images/spritesheet.png");
-		GameObject goomba = generateSpriteObject(sprites.getSprite(14), Settings.GRID_WIDTH, Settings.GRID_HEIGHT);
+		GameObject goomba = generateSpriteObject(sprites.getSprite(underground ? 20 : 14), Settings.GRID_WIDTH, Settings.GRID_HEIGHT);
 
 		AnimationState walk = new AnimationState();
 		walk.title = "Walk";
 		float defaultFrameTime = 0.23f;
-		walk.addFrame(sprites.getSprite(14), defaultFrameTime);
-		walk.addFrame(sprites.getSprite(15), defaultFrameTime);
+		walk.addFrame(sprites.getSprite(underground ? 20 : 14), defaultFrameTime);
+		walk.addFrame(sprites.getSprite(underground ? 21 : 15), defaultFrameTime);
 		walk.setDoesLoop(true);
 
 		AnimationState squashed = new AnimationState();
@@ -514,5 +514,24 @@ public class Prefabs
 		pipe.addComponent(new Ground());
 
 		return pipe;
+	}
+
+	public static GameObject generateOneUpMushroom()
+	{
+		SpriteSheet items = AssetPool.getSpriteSheet("assets/images/items.png");
+		GameObject mushroom = generateSpriteObject(items.getSprite(18), Settings.GRID_WIDTH, Settings.GRID_HEIGHT);
+
+		Rigidbody2D rb = new Rigidbody2D();
+		rb.setBodyType(BodyType.DYNAMIC);
+		rb.setFixedRotation(true);
+		rb.setContinuousCollision(false);
+		mushroom.addComponent(rb);
+
+		CircleCollider circleCollider = new CircleCollider();
+		circleCollider.setRadius(0.49f);
+		mushroom.addComponent(circleCollider);
+		mushroom.addComponent(new MushroomAI(true));
+
+		return mushroom;
 	}
 }

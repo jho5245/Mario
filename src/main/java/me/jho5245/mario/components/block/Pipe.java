@@ -6,6 +6,7 @@ import me.jho5245.mario.jade.GameObject;
 import me.jho5245.mario.jade.KeyListener;
 import me.jho5245.mario.jade.PipeDirection;
 import me.jho5245.mario.jade.Window;
+import me.jho5245.mario.scenes.LevelSceneInitializer;
 import me.jho5245.mario.sounds.Sound;
 import me.jho5245.mario.util.AssetPool;
 import org.jbox2d.dynamics.contacts.Contact;
@@ -130,10 +131,13 @@ public class Pipe extends Component
 				pipeSound.play();
 				if (toggleUnderground)
 				{
+					if (Window.getCurrentScene().getSceneInitializer() instanceof LevelSceneInitializer levelSceneInitializer)
+					{
+						levelSceneInitializer.gameCamera.lerpDt = 1f;
+					}
 					playerController.setUndergrond(!playerController.isUndergrond());
 					if (playerController.isUndergrond())
 					{
-						System.out.println("hi");
 						playerController.backgroundMusic.stop();
 						playerController.undergroundMusic.play();
 					}
@@ -163,6 +167,13 @@ public class Pipe extends Component
 			playerController.setStopSittingTimeLeft(0);
 			playerGameObject = null;
 			playerController = null;
+			if (toggleUnderground)
+			{
+				if (Window.getCurrentScene().getSceneInitializer() instanceof LevelSceneInitializer levelSceneInitializer)
+				{
+					levelSceneInitializer.gameCamera.lerpDt = levelSceneInitializer.gameCamera.startLerpDt;
+				}
+			}
 		}
 	}
 

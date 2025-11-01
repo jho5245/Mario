@@ -281,4 +281,9 @@ public class Scene
 	{
 		return this.physics2D;
 	}
+
+	public SceneInitializer getSceneInitializer()
+	{
+		return sceneInitializer;
+	}
 }

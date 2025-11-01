@@ -74,5 +74,10 @@ public abstract class Block extends Component
 		this.active = false;
 	}
 
+	public boolean isActive()
+	{
+		return this.active;
+	}
+
 	abstract void playerHit(PlayerController playerController);
 }
