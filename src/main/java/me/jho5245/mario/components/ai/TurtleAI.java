@@ -9,6 +9,7 @@ import me.jho5245.mario.jade.Window;
 import me.jho5245.mario.physics2d.Physics2D;
 import me.jho5245.mario.physics2d.components.Rigidbody2D;
 import me.jho5245.mario.physics2d.enums.BodyType;
+import me.jho5245.mario.sounds.Sound;
 import me.jho5245.mario.util.AssetPool;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.joml.Vector2f;
@@ -151,26 +152,11 @@ public class TurtleAI extends Component
 		AssetPool.getSound("assets/sounds/stomp.ogg").play();
 	}
 
-	private void stompByStar(PlayerController playerController)
-	{
-		this.isDead = true;
-		this.isStompByStar = true;
-		this.starForce = playerController.rb.getVelocity().x;
-		this.deadY = gameObject.transform.position.y;
-		this.rb.setVelocity(new Vector2f(0f, 0f));
-		this.rb.setGravityScale(0f);
-		this.rb.setIsSensor();
-		this.rb.setBodyType(BodyType.STATIC);
-		this.gameObject.transform.scale.y *= -1;
-		this.stateMachine.trigger("squashMe");
-		AssetPool.getSound("assets/sounds/kick.ogg").play();
-	}
-
-	private void stompByShell(TurtleAI turtleAI)
+	public void stompByForce(float force, Sound forceSound)
 	{
 		this.isDead = true;
 		this.isStompByShell = true;
-		this.starForce = turtleAI.rb.getVelocity().x;
+		this.starForce = force;
 		this.deadY = gameObject.transform.position.y;
 		this.rb.setVelocity(new Vector2f(0f, 0f));
 		this.rb.setGravityScale(0f);
@@ -178,7 +164,7 @@ public class TurtleAI extends Component
 		this.rb.setBodyType(BodyType.STATIC);
 		this.gameObject.transform.scale.y *= -1;
 		this.stateMachine.trigger("squashMe");
-		AssetPool.getSound("assets/sounds/kick.ogg").play();
+		forceSound.play();
 	}
 
 	@Override
@@ -203,7 +189,7 @@ public class TurtleAI extends Component
 			{
 				if (playerController.getStarTimeLeft() > 0)
 				{
-					stompByStar(playerController);
+					stompByForce(playerController.rb.getVelocity().x, AssetPool.getSound("assets/sounds/kick.ogg"));
 				}
 				else
 				{
@@ -250,17 +236,15 @@ public class TurtleAI extends Component
 		GoombaAI goomba = obj.getComponent(GoombaAI.class);
 		if (isDead && isMoving && goomba != null)
 		{
-			goomba.stompByShell(this);
+			goomba.stompByForce(rb.getVelocity().x, AssetPool.getSound("assets/sounds/kick.ogg"));
 			contact.setEnabled(false);
-			AssetPool.getSound("assets/sounds/kick.ogg").play();
 		}
 
 		TurtleAI turtle = obj.getComponent(TurtleAI.class);
 		if (isDead && isMoving && turtle != null)
 		{
-			turtle.stompByShell(this);
+			turtle.stompByForce(rb.getVelocity().x, AssetPool.getSound("assets/sounds/kick.ogg"));
 			contact.setEnabled(false);
-			AssetPool.getSound("assets/sounds/kick.ogg").play();
 		}
 
 		PlayerController playerController = obj.getComponent(PlayerController.class);
@@ -272,7 +256,7 @@ public class TurtleAI extends Component
 			}
 			else if (playerController.getStarTimeLeft() > 0)
 			{
-				stompByStar(playerController);
+				stompByForce(playerController.rb.getVelocity().x, AssetPool.getSound("assets/sounds/kick.ogg"));
 			}
 		}
 	}

@@ -674,4 +674,24 @@ public class Prefabs
 
 		return goalFlag;
 	}
+
+	public static GameObject generateFireball(Vector2f position)
+	{
+		SpriteSheet items = AssetPool.getSpriteSheet("assets/images/items.png");
+		GameObject fireball = generateSpriteObject(items.getSprite(32), Settings.GRID_WIDTH * 0.4f, Settings.GRID_HEIGHT * 0.4f);
+
+		Rigidbody2D rb = new Rigidbody2D();
+		rb.setBodyType(BodyType.DYNAMIC);
+		rb.setFixedRotation(true);
+		rb.setContinuousCollision(false);
+		fireball.addComponent(rb);
+
+		CircleCollider circleCollider = new CircleCollider();
+		circleCollider.setRadius(Settings.GRID_WIDTH * 0.2f);
+		fireball.addComponent(circleCollider);
+		fireball.addComponent(new Fireball());
+		fireball.transform.position.set(position);
+
+		return fireball;
+	}
 }

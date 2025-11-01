@@ -3,10 +3,7 @@ package me.jho5245.mario.components;
 import me.jho5245.mario.animations.StateMachine;
 import me.jho5245.mario.components.ai.GoombaAI;
 import me.jho5245.mario.components.ai.TurtleAI;
-import me.jho5245.mario.jade.Camera;
-import me.jho5245.mario.jade.GameObject;
-import me.jho5245.mario.jade.KeyListener;
-import me.jho5245.mario.jade.Window;
+import me.jho5245.mario.jade.*;
 import me.jho5245.mario.physics2d.Physics2D;
 import me.jho5245.mario.physics2d.components.PillboxCollider;
 import me.jho5245.mario.physics2d.components.Rigidbody2D;
@@ -283,6 +280,17 @@ public class PlayerController extends Component
 					stateMachine.trigger("sit");
 				}
 			}
+		}
+
+		// fireball
+		if (KeyListener.keyBeginPress(GLFW_KEY_X) && (playerState == PlayerState.FIRE || previousState == PlayerState.FIRE) && Fireball.canSpawn())
+		{
+			boolean goingRight = this.gameObject.transform.scale.x > 0;
+			Vector2f position = new Vector2f(this.gameObject.transform.position).add(new Vector2f(goingRight ? 0.25f : -0.25f, 0.3f));
+			GameObject fireball = Prefabs.generateFireball(position);
+			fireball.getComponent(Fireball.class).goingRight = goingRight;
+			Window.getCurrentScene().addGameObject(fireball);
+			AssetPool.getSound("assets/sounds/fireball.ogg").play();
 		}
 
 		checkOnGround();
