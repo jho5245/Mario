@@ -120,7 +120,7 @@ public class GoombaAI extends Component
 			if (!playerController.isDead())
 			{
 				// 플레이어가 굼바를 밟음
-				if (!playerController.isHurtInvincible() && contactNormal.y > 0.7f)
+				if (contactNormal.y > 0.58f)
 				{
 					playerController.enemyBounce();
 					stomp();

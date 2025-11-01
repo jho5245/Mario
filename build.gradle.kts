@@ -1,5 +1,7 @@
+
 plugins {
     id("java")
+    id("com.github.johnrengelman.shadow") version "7.0.0"
 }
 
 group = "me.jho5245"
@@ -44,4 +46,15 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+tasks {
+    shadowJar {
+        manifest {
+            attributes("Main-Class" to "me.jho5245.mario.Main")
+        }
+        archiveBaseName.set("Mario")
+        archiveClassifier.set("")
+        archiveVersion.set("")
+    }
 }

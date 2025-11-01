@@ -269,8 +269,8 @@ public class Prefabs
 		mario.addComponent(stateMachine);
 
 		PillboxCollider pillboxCollider = new PillboxCollider();
-		pillboxCollider.setWidth(1.56f);
-		pillboxCollider.setHeight(0.98f);
+		pillboxCollider.setWidth(0.84f);
+		pillboxCollider.setHeight(1f);
 		Rigidbody2D rigidbody2D = new Rigidbody2D();
 		rigidbody2D.setBodyType(BodyType.DYNAMIC);
 		rigidbody2D.setContinuousCollision(false);
@@ -445,7 +445,7 @@ public class Prefabs
 		star.addComponent(rb);
 
 		CircleCollider circleCollider = new CircleCollider();
-		circleCollider.setRadius(0.49f);
+		circleCollider.setRadius(0.45f);
 		star.addComponent(circleCollider);
 		star.addComponent(new StarAI());
 
@@ -536,7 +536,7 @@ public class Prefabs
 		goomba.addComponent(rb);
 
 		CircleCollider circleCollider = new CircleCollider();
-		circleCollider.setRadius(0.49f);
+		circleCollider.setRadius(0.45f);
 		goomba.addComponent(circleCollider);
 
 		goomba.addComponent(new GoombaAI());
@@ -625,7 +625,7 @@ public class Prefabs
 		turtle.addComponent(rb);
 
 		CircleCollider circleCollider = new CircleCollider();
-		circleCollider.setRadius(0.49f);
+		circleCollider.setRadius(0.45f);
 		circleCollider.setOffset(new Vector2f(0f, -0.2f));
 		turtle.addComponent(circleCollider);
 

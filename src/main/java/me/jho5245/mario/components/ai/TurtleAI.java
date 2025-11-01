@@ -177,7 +177,11 @@ public class TurtleAI extends Component
 		PlayerController playerController = obj.getComponent(PlayerController.class);
 		if (playerController != null)
 		{
-			if (!isDead && !playerController.isDead() && !playerController.isHurtInvincible() && contactNormal.y > 0.58f)
+			if (isDead && isMoving && contactNormal.y < 0.7f && !playerController.isHurtInvincible())
+			{
+				playerController.hurt();
+			}
+			if (!isDead && !playerController.isDead() && contactNormal.y > 0.7f)
 			{
 				shellTimeLeft = shellTime;
 				playerController.enemyBounce();
@@ -214,6 +218,8 @@ public class TurtleAI extends Component
 					movingDebounce = 0.32f;
 					AssetPool.getSound("assets/sounds/kick.ogg").play();
 					this.stateMachine.trigger("squashMe");
+					goingRight = contactNormal.x < 0;
+					playerController.hurtInvincibleTimeLeft += 0.01f;
 				}
 			}
 		}

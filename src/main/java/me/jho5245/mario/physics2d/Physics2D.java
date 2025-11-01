@@ -8,16 +8,12 @@ import me.jho5245.mario.physics2d.components.Box2DCollider;
 import me.jho5245.mario.physics2d.components.CircleCollider;
 import me.jho5245.mario.physics2d.components.PillboxCollider;
 import me.jho5245.mario.physics2d.components.Rigidbody2D;
-import me.jho5245.mario.renderer.DebugDraw;
 import me.jho5245.mario.util.Settings;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.*;
 import org.joml.Vector2f;
-import org.joml.Vector3f;
-
-import java.util.Set;
 
 public class Physics2D
 {
@@ -231,8 +227,8 @@ public class Physics2D
 		Body body = rb.getRawBody();
 		assert body != null: "Raw body must not be null";
 
-		addBox2DCollider(rb, pillboxCollider.getCenterBox());
-		addCircleCollider(rb, pillboxCollider.getTopCircle());
+		addBox2DCollider(rb, pillboxCollider.getBox());
+//		addCircleCollider(rb, pillboxCollider.getTopCircle());
 		addCircleCollider(rb, pillboxCollider.getBottomCircle());
 	}
 

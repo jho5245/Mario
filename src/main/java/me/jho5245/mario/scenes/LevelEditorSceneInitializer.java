@@ -283,6 +283,25 @@ public class LevelEditorSceneInitializer extends SceneInitializer
 					ImGui.popID();
 					ImGui.sameLine();
 				}
+				// Mushroom
+				{
+					SpriteSheet playerSprites = AssetPool.getSpriteSheet("assets/images/items.png");
+					Sprite sprite = playerSprites.getSprite(15);
+					float spriteWidth = sprite.getWidth() * 2;
+					float spriteHeight = sprite.getHeight() * 2;
+					int id = sprite.getTexId();
+					Vector2f[] texCoords = sprite.getTexCoords();
+
+					ImGui.pushID(uid++);
+					if (ImGui.imageButton(id, spriteWidth, spriteHeight, texCoords[2].x, texCoords[0].y, texCoords[0].x, texCoords[2].y))
+					{
+						GameObject object = Prefabs.generateMushroom();
+						object.transform.zIndex = 10;
+						levelEditorStuff.getComponent(MouseControls.class).pickUpObject(object);
+					}
+					ImGui.popID();
+					ImGui.sameLine();
+				}
 				// Goomba
 				{
 					SpriteSheet playerSprites = AssetPool.getSpriteSheet("assets/images/spritesheet.png");

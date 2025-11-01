@@ -15,6 +15,9 @@ import org.jbox2d.dynamics.contacts.Contact;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 
+import javax.swing.tree.TreeNode;
+import java.security.Key;
+import java.util.Currency;
 import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -81,7 +84,7 @@ public class PlayerController extends Component
 	private transient float hurtStartY;
 
 	private transient final float hurtInvincibleTime = 2f;
-	private transient float hurtInvincibleTimeLeft;
+	public transient float hurtInvincibleTimeLeft;
 	private transient final float hurtTimeColorFlickerTime = 0.1f;
 	private transient float hurtTimeColorFlickerTimeLeft;
 
@@ -91,7 +94,7 @@ public class PlayerController extends Component
 
 	private transient boolean isSitting;
 
-	private transient boolean upCeiling;
+	private transient boolean upCeiling, lastUpCeiling;
 
 	private transient float stopSittingTimeLeft;
 
@@ -224,7 +227,9 @@ public class PlayerController extends Component
 				backgroundMusic.play();
 			}
 		}
+
 		isSprinting = !isSitting && KeyListener.isKeyPressed(GLFW_KEY_X);
+
 		if (KeyListener.isKeyPressed(GLFW_KEY_RIGHT))
 		{
 			this.gameObject.transform.scale.x = playerWidth;
@@ -232,7 +237,6 @@ public class PlayerController extends Component
 			{
 				this.acceleration.x = isSprinting ? sprintSpeed : walkSpeed;
 			}
-
 			if (this.velocity.x < 0)
 			{
 				this.stateMachine.trigger("switchDirection");
@@ -300,6 +304,26 @@ public class PlayerController extends Component
 		if (isSitting || (!KeyListener.isKeyPressed(GLFW_KEY_LEFT) && !KeyListener.isKeyPressed(GLFW_KEY_RIGHT)))
 		{
 			sitUpdate(dt);
+		}
+
+		// 앉아서 일어날 때 크기를 천천히 키움(안그러면 바닥에 낑겨서 갑자기 점프해버리는 버그 발생)
+		{
+			PillboxCollider pb = gameObject.getComponent(PillboxCollider.class);
+			if (!isSitting && playerState != PlayerState.SMALL && previousState != PlayerState.SMALL)
+			{
+				if (pb.offset.y != 0)
+				{
+					pb.offset.y = 0;
+				}
+				if (pb.height != 2f)
+				{
+					pb.setHeight(pb.height + dt * 16f);
+					if (pb.height > 2)
+					{
+						pb.setHeight(2f);
+					}
+				}
+			}
 		}
 
 		this.acceleration.y = Window.getPhysics().getGravity().y * 0.8f;
@@ -422,8 +446,6 @@ public class PlayerController extends Component
 		}
 	}
 
-	float test;
-
 	private void sitUpdate(float dt)
 	{
 		// 아래로 들어가는 파이프 사용 시 일정 시간 동안 앉기 동작 불가능
@@ -435,24 +457,25 @@ public class PlayerController extends Component
 
 		float innerPlayerWidth = this.playerWidth * 0.6f;
 		float yValue = playerState == PlayerState.SMALL || previousState == PlayerState.SMALL ? -0.54f : -1.04f;
+		lastUpCeiling = upCeiling;
 		upCeiling = Physics2D.checkCeling(gameObject, innerPlayerWidth, yValue);
+
+		PillboxCollider pb = gameObject.getComponent(PillboxCollider.class);
 		if (playerState == PlayerState.BIG || playerState == PlayerState.FIRE || previousState == PlayerState.BIG || previousState == PlayerState.FIRE)
 		{
 			// 앉기 키를 누르거나/천장에 닿여있는 상태
 			isSitting = stopSittingTimeLeft <= 0 && (KeyListener.isKeyPressed(GLFW_KEY_DOWN) || upCeiling);
-			PillboxCollider pb = gameObject.getComponent(PillboxCollider.class);
 			if (isSitting)
 			{
 				stateMachine.trigger("sit");
-				pb.setHeight(gameObject.transform.scale.y / 1.8f);
-				pb.setOffset(new Vector2f(0, -0.5f));
-
+				pb.setHeight(1f);
+				pb.offset = new Vector2f(0, -0.5f);
 			}
 			else
 			{
 				stateMachine.trigger("stopSitting");
-				pb.setHeight(gameObject.transform.scale.y * 1.5f);
-				pb.setOffset(new Vector2f());
+//				pb.setHeight(2f);
+//				pb.offset = new Vector2f();
 			}
 		}
 	}
@@ -507,7 +530,7 @@ public class PlayerController extends Component
 				Window.getPhysics().setPlaying(true);
 				if (isSitting && playerState == PlayerState.SMALL)
 				{
-					gameObject.getComponent(PillboxCollider.class).setHeight(gameObject.transform.scale.y / 1.5f);
+					gameObject.getComponent(PillboxCollider.class).setHeight(1f);
 					isSitting = false;
 				}
 			}
@@ -650,7 +673,7 @@ public class PlayerController extends Component
 				walkSpeed *= bigJumpBoostFactor;
 				maxJumpTime *= bigJumpBoostFactor;
 				maxSprintingJumpTime *= bigJumpBoostFactor;
-				pb.setHeight(gameObject.transform.scale.y * 1.5f);
+				pb.setHeight(2f);
 			}
 		}
 		else if (playerState == PlayerState.BIG || previousState == PlayerState.BIG)
@@ -765,8 +788,8 @@ public class PlayerController extends Component
 					walkSpeed /= bigJumpBoostFactor;
 					maxJumpTime /= bigJumpBoostFactor;
 					maxSprintingJumpTime /= bigJumpBoostFactor;
-					pb.setHeight(gameObject.transform.scale.y / 1.5f);
-					pb.setOffset(new Vector2f());
+					pb.setHeight(1f);
+					pb.offset = new Vector2f();
 				}
 				hurtSimulationTimeLeft = hurtSimulationTime;
 				hurtInvincibleTimeLeft = hurtInvincibleTime;
