@@ -1,6 +1,7 @@
 package me.jho5245.mario.components.ai;
 
 import me.jho5245.mario.components.Component;
+import me.jho5245.mario.components.Ground;
 import me.jho5245.mario.components.PlayerController;
 import me.jho5245.mario.components.SpriteRenderer;
 import me.jho5245.mario.jade.GameObject;
@@ -87,6 +88,13 @@ public class MushroomAI extends Component
 				this.gameObject.destroy();
 				hitPlayer = true;
 			}
+			return;
+		}
+
+		// 블록이 아닌 다른 대상과는 충돌하지 않는다.
+		if (gameObject.getComponent(Ground.class) == null)
+		{
+			contact.setEnabled(false);
 			return;
 		}
 

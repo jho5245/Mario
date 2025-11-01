@@ -75,13 +75,19 @@ public class StarAI extends Component
 		PlayerController playerController = gameObject.getComponent(PlayerController.class);
 		if (playerController != null)
 		{
-			contact.setEnabled(false);
 			if (!hitPlayer)
 			{
 				playerController.useStar();
 				this.gameObject.destroy();
 				hitPlayer = true;
 			}
+			return;
+		}
+
+		// 블록이 아닌 다른 대상과는 충돌하지 않는다.
+		if (gameObject.getComponent(Ground.class) == null)
+		{
+			contact.setEnabled(false);
 			return;
 		}
 

@@ -179,7 +179,14 @@ public class TurtleAI extends Component
 		{
 			if (isDead && isMoving && contactNormal.y < 0.7f && !playerController.isHurtInvincible())
 			{
-				playerController.hurt();
+				if (playerController.getStarTimeLeft() > 0)
+				{
+					stompByForce(playerController.rb.getVelocity().x, AssetPool.getSound("assets/sounds/kick.ogg"));
+				}
+				else
+				{
+					playerController.hurt();
+				}
 			}
 			if (!isDead && !playerController.isDead() && contactNormal.y > 0.7f)
 			{

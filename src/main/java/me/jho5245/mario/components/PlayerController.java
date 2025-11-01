@@ -290,7 +290,7 @@ public class PlayerController extends Component
 		if (KeyListener.keyBeginPress(GLFW_KEY_X) && (playerState == PlayerState.FIRE || previousState == PlayerState.FIRE) && Fireball.canSpawn())
 		{
 			boolean goingRight = this.gameObject.transform.scale.x > 0;
-			Vector2f position = new Vector2f(this.gameObject.transform.position).add(new Vector2f(goingRight ? 0.25f : -0.25f, 0.3f));
+			Vector2f position = new Vector2f(this.gameObject.transform.position).add(new Vector2f(goingRight ? 0.25f : -0.25f, isSitting ? -0.3f : 0.3f));
 			GameObject fireball = Prefabs.generateFireball(position);
 			fireball.getComponent(Fireball.class).goingRight = goingRight;
 			Window.getCurrentScene().addGameObject(fireball);
@@ -317,7 +317,7 @@ public class PlayerController extends Component
 				}
 				if (pb.height != 2f)
 				{
-					pb.setHeight(pb.height + dt * 16f);
+					pb.setHeight(pb.height + dt * 32f);
 					if (pb.height > 2)
 					{
 						pb.setHeight(2f);
