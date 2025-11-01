@@ -2,6 +2,7 @@ package me.jho5245.mario.components.ai;
 
 import me.jho5245.mario.animations.StateMachine;
 import me.jho5245.mario.components.Component;
+import me.jho5245.mario.components.Ground;
 import me.jho5245.mario.components.PlayerController;
 import me.jho5245.mario.jade.Camera;
 import me.jho5245.mario.jade.GameObject;
@@ -210,19 +211,27 @@ public class TurtleAI extends Component
 				else if (isDead && !isMoving)
 				{
 					isMoving = true;
-					goingRight = contactNormal.x < 0;
 					movingDebounce = 0.32f;
 					AssetPool.getSound("assets/sounds/kick.ogg").play();
 					this.stateMachine.trigger("squashMe");
 				}
 			}
 		}
-		else if (Math.abs(contactNormal.y) < 0.1f && !obj.isDead())
+		else if (Math.abs(contactNormal.y) < 0.1f)
 		{
-			goingRight = contactNormal.x < 0;
-			if (isMoving && isDead)
+			Ground ground = obj.getComponent(Ground.class);
+
+			// 죽어있을 때: 벽만 방향 전환
+			if (isMoving && isDead && ground != null)
 			{
 				AssetPool.getSound("assets/sounds/bump.ogg").play();
+				goingRight = contactNormal.x < 0;
+			}
+
+			// 살아있을 때: 항상 방향 전환
+			if (!isMoving && !isDead)
+			{
+				goingRight = contactNormal.x < 0;
 			}
 		}
 	}

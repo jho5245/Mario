@@ -23,6 +23,7 @@ public class Pipe extends Component
 	@SuppressWarnings("unused")
 	private boolean isEntrance;
 	private boolean toggleUnderground;
+	private boolean lerpCamera = true;
 
 	private transient GameObject connectingPipeGameObject;
 	private transient Pipe connectingPipe;
@@ -59,6 +60,12 @@ public class Pipe extends Component
 	@Override
 	public void update(float dt)
 	{
+		if (connectingPipeName.startsWith("random:") && connectingPipe == null)
+		{
+			String[] split = connectingPipeName.substring("random:".length()).split(",");
+			connectingPipeGameObject = Window.getCurrentScene().getGameObject(split[(int) (split.length * Math.random())]);
+			connectingPipe =  connectingPipeGameObject.getComponent(Pipe.class);
+		}
 		if (connectingPipeGameObject == null || connectingPipe == null || playerController == null || playerGameObject == null)
 		{
 			return;
@@ -68,6 +75,7 @@ public class Pipe extends Component
 		{
 			return;
 		}
+
 
 		if (!pipeEntering)
 		{
@@ -129,12 +137,12 @@ public class Pipe extends Component
 			{
 				pipeExited = true;
 				pipeSound.play();
+				if (!lerpCamera && Window.getCurrentScene().getSceneInitializer() instanceof LevelSceneInitializer levelSceneInitializer)
+				{
+					levelSceneInitializer.gameCamera.lerpDt = 1f;
+				}
 				if (toggleUnderground)
 				{
-					if (Window.getCurrentScene().getSceneInitializer() instanceof LevelSceneInitializer levelSceneInitializer)
-					{
-						levelSceneInitializer.gameCamera.lerpDt = 1f;
-					}
 					playerController.setUndergrond(!playerController.isUndergrond());
 					if (!playerController.starMusic.isPlaying())
 					{
@@ -170,12 +178,16 @@ public class Pipe extends Component
 			playerController.setStopSittingTimeLeft(0);
 			playerGameObject = null;
 			playerController = null;
-			if (toggleUnderground)
+			if (!lerpCamera)
 			{
 				if (Window.getCurrentScene().getSceneInitializer() instanceof LevelSceneInitializer levelSceneInitializer)
 				{
 					levelSceneInitializer.gameCamera.lerpDt = levelSceneInitializer.gameCamera.startLerpDt;
 				}
+			}
+			if (connectingPipeName.startsWith("random:"))
+			{
+				connectingPipe = null;
 			}
 		}
 	}

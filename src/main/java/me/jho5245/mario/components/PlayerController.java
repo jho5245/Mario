@@ -44,10 +44,10 @@ public class PlayerController extends Component
 	private transient final float groundDebounceTime = 0.1f;
 	public transient Rigidbody2D rb;
 	private transient StateMachine stateMachine;
-	private transient final float bigJumpBoostFactor = 1.2f;
+	private transient final float bigJumpBoostFactor = 1.1f;
 	private transient float playerWidth;
 	private transient float playerHeight;
-	private transient float maxJumpTime = 50;
+	private transient float maxJumpTime = 70;
 	private transient float maxSprintingJumpTime = 80;
 	private transient float jumpTime;
 	private transient final Vector2f acceleration = new Vector2f();

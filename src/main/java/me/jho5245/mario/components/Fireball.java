@@ -74,7 +74,6 @@ public class Fireball extends Component
 		}
 
 		checkOnGround();
-		System.out.println(onGround);
 		if (onGround)
 		{
 			this.acceleration.y = 10f;
@@ -99,7 +98,7 @@ public class Fireball extends Component
 	@Override
 	public void preSolve(GameObject object, Contact contact, Vector2f contactNormal)
 	{
-		if (object.getComponent(PlayerController.class) != null || object.getComponent(Fireball.class) != null)
+		if (object.getComponent(PlayerController.class) != null || object.getComponent(Fireball.class) != null || object.isDead())
 		{
 			contact.setEnabled(false);
 		}

@@ -18,7 +18,7 @@ import static org.lwjgl.opengl.GL20.*;
 
 public class DebugDraw
 {
-	private static final int MAX_LINES = 20000;
+	private static final int MAX_LINES = 200000;
 
 	private static List<Line2D> lines = new ArrayList<>();
 
