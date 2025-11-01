@@ -95,6 +95,7 @@ public class PlayerController extends Component
 	private transient Float diePositionY;
 
 	private transient boolean isSitting;
+
 	private transient boolean upCeiling;
 
 	private transient float stopSittingTimeLeft;
@@ -129,6 +130,7 @@ public class PlayerController extends Component
 	@Override
 	public void update(float dt)
 	{
+		System.out.println(isUpCeiling());
 		Camera camera = Window.getCurrentScene().getCamera();
 
 		if (!isDead && gameObject.transform.position.y <= camera.getPosition().y - 3 && Window.getPhysics().isPlaying())
@@ -455,7 +457,8 @@ public class PlayerController extends Component
 			{
 				hurtTimeColorFlickerTimeLeft = hurtTimeColorFlickerTime * hurtInvincibleTimeLeft / hurtInvincibleTime;
 				float alpha = gameObject.getComponent(SpriteRenderer.class).getColor().w;
-				gameObject.getComponent(SpriteRenderer.class).setColor(new Vector4f(1f, 1f, 1f, alpha == 0.3f ? 1f : 0.3f));
+				gameObject.getComponent(SpriteRenderer.class)
+						.setColor(new Vector4f(alpha == 0f ? 1f : 0f, alpha == 0f ? 1f : 0f, alpha == 0f ? 1f : 0f, alpha == 0f ? 1f : 0f));
 			}
 			if (hurtInvincibleTimeLeft <= 0)
 			{
@@ -469,17 +472,19 @@ public class PlayerController extends Component
 	{
 		if (starTimeLeft > 0)
 		{
-			starTimeLeft -= dt;
+			// 게임 플레이 중에만 무적 시간이 경과하도록 함
+			if (Window.getPhysics().isPlaying())
+				starTimeLeft -= dt;
 			starTimeColorFlickerTimeLeft -= dt;
 			if (starTimeColorFlickerTimeLeft <= 0)
 			{
-				if (starTimeLeft <= 3f)
-				{
-					starTimeColorFlickerTimeLeft = starTimeColorFlickerTime * starTimeLeft / 3;
-					float alpha = gameObject.getComponent(SpriteRenderer.class).getColor().w;
-					gameObject.getComponent(SpriteRenderer.class).setColor(new Vector4f(1f, 1f, 1f, alpha == 0.3f ? 1f : 0.3f));
-				}
-				else
+				//				if (starTimeLeft <= 3f)
+				//				{
+				//					starTimeColorFlickerTimeLeft = starTimeColorFlickerTime * starTimeLeft / 3;
+				//					float alpha = gameObject.getComponent(SpriteRenderer.class).getColor().w;
+				//					gameObject.getComponent(SpriteRenderer.class).setColor(new Vector4f(alpha == 0f ? 1f : 0f, alpha == 0f ? 1f : 0f, alpha == 0f ? 1f : 0f, alpha == 0f ? 1f : 0f));
+				//				}
+				//				else
 				{
 					starTimeColorFlickerTimeLeft = starTimeColorFlickerTime;
 					gameObject.getComponent(SpriteRenderer.class).setColor(new Vector4f((float) Math.random(), (float) Math.random(), (float) Math.random(), 1f));
@@ -487,11 +492,20 @@ public class PlayerController extends Component
 			}
 			if (starTimeLeft <= 0)
 			{
+				hurtInvincibleTimeLeft = hurtInvincibleTime;
 				gameObject.getComponent(SpriteRenderer.class).setColor(new Vector4f(1f));
 				starTimeLeft = 0;
 				playerState = previousState;
 				starMusic.stop();
-				backgroundMusic.play();
+				if (isUndergrond)
+				{
+					undergroundMusic.play();
+				}
+				else
+				{
+
+					backgroundMusic.play();
+				}
 			}
 		}
 	}
@@ -590,6 +604,9 @@ public class PlayerController extends Component
 		oneUpSound.play();
 	}
 
+	/**
+	 * 마리오가 별을 먹음
+	 */
 	public void useStar()
 	{
 		if (playerState != PlayerState.INVINCIBLE)
@@ -598,6 +615,7 @@ public class PlayerController extends Component
 			playerState = PlayerState.INVINCIBLE;
 		}
 		this.backgroundMusic.stop();
+		this.undergroundMusic.stop();
 		if (!this.starMusic.isPlaying())
 		{
 			this.starMusic.play();
@@ -752,5 +770,10 @@ public class PlayerController extends Component
 	public void setUndergrond(boolean undergrond)
 	{
 		isUndergrond = undergrond;
+	}
+
+	public boolean isUpCeiling()
+	{
+		return upCeiling;
 	}
 }

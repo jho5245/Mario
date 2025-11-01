@@ -136,15 +136,18 @@ public class Pipe extends Component
 						levelSceneInitializer.gameCamera.lerpDt = 1f;
 					}
 					playerController.setUndergrond(!playerController.isUndergrond());
-					if (playerController.isUndergrond())
+					if (!playerController.starMusic.isPlaying())
 					{
-						playerController.backgroundMusic.stop();
-						playerController.undergroundMusic.play();
-					}
-					else
-					{
-						playerController.undergroundMusic.stop();
-						playerController.backgroundMusic.play();
+						if (playerController.isUndergrond())
+						{
+							playerController.backgroundMusic.stop();
+							playerController.undergroundMusic.play();
+						}
+						else
+						{
+							playerController.undergroundMusic.stop();
+							playerController.backgroundMusic.play();
+						}
 					}
 				}
 			}

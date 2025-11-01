@@ -3,10 +3,7 @@ package me.jho5245.mario.jade;
 import me.jho5245.mario.animations.AnimationState;
 import me.jho5245.mario.animations.StateMachine;
 import me.jho5245.mario.components.*;
-import me.jho5245.mario.components.ai.Flower;
-import me.jho5245.mario.components.ai.GoombaAI;
-import me.jho5245.mario.components.ai.MushroomAI;
-import me.jho5245.mario.components.ai.StarAI;
+import me.jho5245.mario.components.ai.*;
 import me.jho5245.mario.components.block.*;
 import me.jho5245.mario.physics2d.components.Box2DCollider;
 import me.jho5245.mario.physics2d.components.CircleCollider;
@@ -533,5 +530,55 @@ public class Prefabs
 		mushroom.addComponent(new MushroomAI(true));
 
 		return mushroom;
+	}
+
+	public static GameObject generateTurtle()
+	{
+		SpriteSheet sprites = AssetPool.getSpriteSheet("assets/images/turtle.png");
+		GameObject turtle = generateSpriteObject(sprites.getSprite(0), Settings.GRID_WIDTH, Settings.GRID_HEIGHT * 1.4f);
+
+		AnimationState walk = new AnimationState();
+		walk.title = "Walk";
+		float defaultFrameTime = 0.23f;
+		walk.addFrame(sprites.getSprite(0), defaultFrameTime);
+		walk.addFrame(sprites.getSprite(1), defaultFrameTime);
+		walk.setDoesLoop(true);
+
+		AnimationState squashed = new AnimationState();
+		squashed.title = "Squashed";
+		squashed.addFrame(sprites.getSprite(2), 0.1f);
+		squashed.setDoesLoop(false);
+
+		AnimationState wake = new AnimationState();
+		wake.title = "Wake";
+		wake.addFrame(sprites.getSprite(2), 0.2f);
+		wake.addFrame(sprites.getSprite(3), 0.2f);
+		wake.setDoesLoop(true);
+
+		StateMachine stateMachine = new StateMachine();
+		stateMachine.addState(walk);
+		stateMachine.addState(wake);
+		stateMachine.addState(squashed);
+		stateMachine.addState(walk.title, squashed.title, "squashMe");
+		stateMachine.addState(wake.title, squashed.title, "squashMe");
+		stateMachine.addState(squashed.title, wake.title, "wake");
+		stateMachine.addState(wake.title, walk.title, "walk");
+		stateMachine.setDefaultState(walk.title);
+		turtle.addComponent(stateMachine);
+
+		Rigidbody2D rb = new Rigidbody2D();
+		rb.setBodyType(BodyType.DYNAMIC);
+		rb.setFixedRotation(true);
+		rb.setMass(0.1f);
+		turtle.addComponent(rb);
+
+		CircleCollider circleCollider = new CircleCollider();
+		circleCollider.setRadius(0.49f);
+		circleCollider.setOffset(new Vector2f(0f, -0.2f));
+		turtle.addComponent(circleCollider);
+
+		turtle.addComponent(new TurtleAI());
+
+		return turtle;
 	}
 }

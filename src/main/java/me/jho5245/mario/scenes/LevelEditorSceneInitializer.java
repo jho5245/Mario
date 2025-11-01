@@ -301,6 +301,25 @@ public class LevelEditorSceneInitializer extends SceneInitializer
 					ImGui.popID();
 					ImGui.sameLine();
 				}
+				// Turtle
+				{
+					SpriteSheet turtle = AssetPool.getSpriteSheet("assets/images/turtle.png");
+					Sprite sprite = turtle.getSprite(0);
+					float spriteWidth = sprite.getWidth() * 2;
+					float spriteHeight = sprite.getHeight() * 2;
+					int id = sprite.getTexId();
+					Vector2f[] texCoords = sprite.getTexCoords();
+
+					ImGui.pushID(uid++);
+					if (ImGui.imageButton(id, spriteWidth, spriteHeight, texCoords[2].x, texCoords[0].y, texCoords[0].x, texCoords[2].y))
+					{
+						GameObject object = Prefabs.generateTurtle();
+						object.transform.zIndex = 10;
+						levelEditorStuff.getComponent(MouseControls.class).pickUpObject(object);
+					}
+					ImGui.popID();
+					ImGui.sameLine();
+				}
 				// UndergroundGoomba
 				{
 					SpriteSheet playerSprites = AssetPool.getSpriteSheet("assets/images/spritesheet.png");

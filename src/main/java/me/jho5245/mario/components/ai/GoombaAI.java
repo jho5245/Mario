@@ -6,6 +6,7 @@ import me.jho5245.mario.components.PlayerController;
 import me.jho5245.mario.jade.Camera;
 import me.jho5245.mario.jade.GameObject;
 import me.jho5245.mario.jade.Window;
+import me.jho5245.mario.physics2d.Physics2D;
 import me.jho5245.mario.physics2d.components.Rigidbody2D;
 import me.jho5245.mario.physics2d.enums.BodyType;
 import me.jho5245.mario.util.AssetPool;
@@ -16,8 +17,11 @@ public class GoombaAI extends Component
 {
 	private transient boolean goingRight;
 	private transient Rigidbody2D rb;
-	private transient Vector2f speed = new Vector2f(3f, 0f);
-	private transient float maxSpeed = 3.2f;
+	private transient float walkSpeed = 2.4f;
+	private transient Vector2f velocity = new Vector2f();
+	private transient Vector2f acceleration = new Vector2f();
+	private transient Vector2f terminalVelocity = new Vector2f(8.4f, 12.4f);
+	private transient boolean onGround = false;
 	private transient boolean isDead;
 	private transient boolean isStompByStar;
 	/**
@@ -67,10 +71,37 @@ public class GoombaAI extends Component
 			return;
 		}
 
-		if (Math.abs(rb.getVelocity().x) < maxSpeed)
+		if (goingRight)
 		{
-			rb.addVelocity(goingRight ? speed : new Vector2f(-speed.x, speed.y));
+			gameObject.transform.scale.x = -1f;
+			velocity.x = walkSpeed;
 		}
+		else
+		{
+			gameObject.transform.scale.x = 1f;
+			velocity.x = -walkSpeed;
+		}
+
+		checkOnGround();
+		if (onGround)
+		{
+			this.acceleration.y = 0;
+			this.velocity.y = 0;
+		}
+		else
+		{
+			this.acceleration.y = Window.getPhysics().getGravity().y * 0.7f;
+		}
+		this.velocity.y += this.acceleration.y * dt;
+		this.velocity.y = Math.max(Math.min(this.velocity.y, this.terminalVelocity.y), -terminalVelocity.y);
+		this.rb.setVelocity(velocity);
+	}
+
+	public void checkOnGround()
+	{
+		float innerPlayerWidth = 0.7f;
+		float yVal = -0.5f;
+		onGround = Physics2D.checkOnGround(this.gameObject, innerPlayerWidth, yVal);
 	}
 
 	@Override
@@ -88,7 +119,7 @@ public class GoombaAI extends Component
 			if (!playerController.isDead())
 			{
 				// 플레이어가 굼바를 밟음
-				if (!playerController.isHurtInvincible() && contactNormal.y > 0.8f)
+				if (!playerController.isHurtInvincible() && contactNormal.y > 0.7f)
 				{
 					playerController.enemyBounce();
 					stomp();
@@ -124,7 +155,6 @@ public class GoombaAI extends Component
 	private void stomp(boolean playSound)
 	{
 		this.isDead = true;
-		this.speed = new Vector2f(0f, 0f);
 		this.rb.setVelocity(new Vector2f(0f, 0f));
 		this.rb.setGravityScale(0f);
 		this.stateMachine.trigger("squashMe");
@@ -143,12 +173,26 @@ public class GoombaAI extends Component
 		this.timeToKill = 4f;
 		this.starForce = playerController.rb.getVelocity().x;
 		this.deadY = gameObject.transform.position.y;
-		this.speed = new Vector2f(0f, 0f);
 		this.rb.setVelocity(new Vector2f(0f, 0f));
 		this.rb.setGravityScale(0f);
 		this.rb.setIsSensor();
 		this.rb.setBodyType(BodyType.STATIC);
 		this.gameObject.transform.scale.y *= -1;
 		AssetPool.getSound("assets/sounds/stomp.ogg").play();
+	}
+
+	public void stompByShell(TurtleAI turtleAI)
+	{
+		this.isDead = true;
+		this.isStompByStar = true;
+		this.timeToKill = 4f;
+		this.starForce = turtleAI.rb.getVelocity().x;
+		this.deadY = gameObject.transform.position.y;
+		this.rb.setVelocity(new Vector2f(0f, 0f));
+		this.rb.setGravityScale(0f);
+		this.rb.setIsSensor();
+		this.rb.setBodyType(BodyType.STATIC);
+		this.gameObject.transform.scale.y *= -1;
+		AssetPool.getSound("assets/sounds/kick.ogg").play();
 	}
 }

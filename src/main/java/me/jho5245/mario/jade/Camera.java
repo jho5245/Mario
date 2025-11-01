@@ -11,7 +11,7 @@ public class Camera
 {
 	private Matrix4f projectionMatrix, viewMatrix, inverseProjection, inverseView;
 
-	protected Vector2f position;
+	public Vector2f position;
 	private float projectionWidth = 36f, projectionHeight = 18f;
 	private Vector2f projectionSize = new Vector2f(projectionWidth, projectionHeight);
 

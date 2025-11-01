@@ -139,10 +139,10 @@ public class DebugDraw
 	public static void addLine2D(Vector2f from, Vector2f to, Vector3f color, int lifetime)
 	{
 		Camera camera = Window.getCurrentScene().getCamera();
-		Vector2f cameraBottomLeft = new Vector2f(camera.getPosition()).add(new Vector2f(-2f, -2f));
+		Vector2f cameraBottomLeft = new Vector2f(camera.getPosition()).add(new Vector2f(-4f, -4f));
 		Vector2f cameraTopRight = new Vector2f(camera.getPosition()).add(camera.getProjectionSize()).mul(camera.getZoom()).add(new Vector2f(4f, 4f));
-		if (!(from.x >= cameraBottomLeft.x && from.x <= cameraTopRight.x && from.y >= cameraBottomLeft.y && from.y <= cameraTopRight.y
-				|| to.x >= cameraBottomLeft.x && to.x <= cameraTopRight.x && to.y >= cameraBottomLeft.y && to.y <= cameraTopRight.y))
+		if (!(from.x >= cameraBottomLeft.x || from.x <= cameraTopRight.x || from.y >= cameraBottomLeft.y || from.y <= cameraTopRight.y
+				|| to.x >= cameraBottomLeft.x || to.x <= cameraTopRight.x || to.y >= cameraBottomLeft.y || to.y <= cameraTopRight.y))
 			return;
 		if (lines.size() >= MAX_LINES)
 			return;
