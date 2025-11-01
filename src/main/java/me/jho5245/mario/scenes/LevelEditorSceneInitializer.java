@@ -59,6 +59,7 @@ public class LevelEditorSceneInitializer extends SceneInitializer
 		AssetPool.addSpriteSheet("assets/images/gizmos.png", 24, 48, 3, 0);
 
 		AssetPool.addSound("assets/sounds/main-theme-overworld.ogg", true);
+		AssetPool.addSound("assets/sounds/main-theme-underground.ogg", true);
 		AssetPool.addSound("assets/sounds/flagpole.ogg", false);
 		AssetPool.addSound("assets/sounds/break_block.ogg", false);
 		AssetPool.addSound("assets/sounds/bump.ogg", false);

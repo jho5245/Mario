@@ -18,8 +18,10 @@ public class Pipe extends Component
 	private PipeDirection direction;
 
 	private String connectingPipeName = "";
+
 	@SuppressWarnings("unused")
 	private boolean isEntrance;
+	private boolean toggleUnderground;
 
 	private transient GameObject connectingPipeGameObject;
 	private transient Pipe connectingPipe;
@@ -126,6 +128,21 @@ public class Pipe extends Component
 			{
 				pipeExited = true;
 				pipeSound.play();
+				if (toggleUnderground)
+				{
+					playerController.setUndergrond(!playerController.isUndergrond());
+					if (playerController.isUndergrond())
+					{
+						System.out.println("hi");
+						playerController.backgroundMusic.stop();
+						playerController.undergroundMusic.play();
+					}
+					else
+					{
+						playerController.undergroundMusic.stop();
+						playerController.backgroundMusic.play();
+					}
+				}
 			}
 		}
 		else
@@ -166,19 +183,22 @@ public class Pipe extends Component
 				else
 					yield new Vector2f(exitPipePosition).add(0, exitPipeScale.y * (pipeUseAnimationTimeLeft - 0.8f));
 			}
-			case LEFT -> {
+			case LEFT ->
+			{
 				if (pipeUseAnimationTimeLeft >= pipeUseAnimationTime / 2)
 					yield new Vector2f(enterPipePosition).add(enterPipeScale.x * (pipeUseAnimationTimeLeft - 1.2f), playerScale.y == 1f ? enterPipeScale.y / -8 : 0);
 				else
-					yield new Vector2f(exitPipePosition).add(exitPipeScale.x * (pipeUseAnimationTimeLeft - 0.8f),  playerScale.y == 1f ? enterPipeScale.y / -8 : 0);
+					yield new Vector2f(exitPipePosition).add(exitPipeScale.x * (pipeUseAnimationTimeLeft - 0.8f), playerScale.y == 1f ? enterPipeScale.y / -8 : 0);
 			}
-			case RIGHT -> {
+			case RIGHT ->
+			{
 				if (pipeUseAnimationTimeLeft >= pipeUseAnimationTime / 2)
-					yield new Vector2f(enterPipePosition).add(enterPipeScale.x * (1.2f - pipeUseAnimationTimeLeft),  playerScale.y == 1f ? enterPipeScale.y / -8 : 0);
+					yield new Vector2f(enterPipePosition).add(enterPipeScale.x * (1.2f - pipeUseAnimationTimeLeft), playerScale.y == 1f ? enterPipeScale.y / -8 : 0);
 				else
-					yield new Vector2f(exitPipePosition).add(exitPipeScale.x * (0.8f - pipeUseAnimationTimeLeft),  playerScale.y == 1f ? enterPipeScale.y / -8 : 0);
+					yield new Vector2f(exitPipePosition).add(exitPipeScale.x * (0.8f - pipeUseAnimationTimeLeft), playerScale.y == 1f ? enterPipeScale.y / -8 : 0);
 			}
-			case UP -> {
+			case UP ->
+			{
 				if (pipeUseAnimationTimeLeft >= pipeUseAnimationTime / 2)
 					yield new Vector2f(enterPipePosition).add(0, enterPipeScale.y * (1.2f - pipeUseAnimationTimeLeft));
 				else

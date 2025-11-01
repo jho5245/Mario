@@ -61,7 +61,7 @@ public class PlayerController extends Component
 	private transient boolean isDead;
 	private transient int enemyBounce = 0;
 
-	private transient Sound backgroundMusic, starMusic;
+	public transient Sound backgroundMusic, starMusic, undergroundMusic;
 	private transient Sound powerUpSound, dieSound, hurtSound, oneUpSound, smallJumpSound, superJumpSound;
 
 	private transient final float starTimeColorFlickerTime = 0.1f;
@@ -114,6 +114,7 @@ public class PlayerController extends Component
 		this.stateMachine = gameObject.getComponent(StateMachine.class);
 		this.rb.setGravityScale(0f);
 		this.backgroundMusic = AssetPool.getSound("assets/sounds/main-theme-overworld.ogg");
+		this.undergroundMusic = AssetPool.getSound("assets/sounds/main-theme-underground.ogg");
 		this.starMusic = AssetPool.getSound("assets/sounds/invincible.ogg");
 		this.powerUpSound = AssetPool.getSound("assets/sounds/powerup.ogg");
 		this.dieSound = AssetPool.getSound("assets/sounds/mario_die.ogg");
@@ -130,18 +131,11 @@ public class PlayerController extends Component
 	{
 		Camera camera = Window.getCurrentScene().getCamera();
 
-		// 화면 아래로 떨어지면 상태에 관계없이 즉시 사망
-		if (!isDead && gameObject.transform.position.y <= camera.getPosition().y - 3)
+		if (!isDead && gameObject.transform.position.y <= camera.getPosition().y - 3 && Window.getPhysics().isPlaying())
 		{
-			if (isUndergrond)
-			{
-				System.out.println("test");
-			}
-			else
-			{
-				kill();
-			}
+			kill();
 		}
+
 		if (isDead)
 		{
 			if (diePositionY == null)
@@ -150,6 +144,7 @@ public class PlayerController extends Component
 			}
 			starMusic.stop();
 			backgroundMusic.stop();
+			undergroundMusic.stop();
 			Window.getPhysics().setPlaying(false);
 			dieAnimationTime += dt;
 			if (dieAnimationTime >= 0.5f)
@@ -164,9 +159,16 @@ public class PlayerController extends Component
 			}
 			return;
 		}
-		if (starTimeLeft <= 0 && !backgroundMusic.isPlaying())
+		if (starTimeLeft <= 0)
 		{
-			backgroundMusic.play();
+			if (isUndergrond && !undergroundMusic.isPlaying())
+			{
+				undergroundMusic.play();
+			}
+			else if (!isUndergrond && !backgroundMusic.isPlaying())
+			{
+				backgroundMusic.play();
+			}
 		}
 		isSprinting = !isSitting && KeyListener.isKeyPressed(GLFW_KEY_X);
 		if (KeyListener.isKeyPressed(GLFW_KEY_RIGHT))
@@ -272,7 +274,6 @@ public class PlayerController extends Component
 
 	private void jumpUpdate(float dt)
 	{
-		System.out.println(jumpTime);
 		if ((KeyListener.isKeyPressed(GLFW_KEY_Z)) && (jumpTime > 0 || onGround || groundDebounce > 0))
 		{
 			if ((onGround || groundDebounce > 0) && jumpTime == 0)
