@@ -103,6 +103,13 @@ public class GameCamera extends Component
 		{
 			return;
 		}
+
+		// 플레이어 골인 : 카메라 움직임 정지
+		if (playerController.isGoaled())
+		{
+			return;
+		}
+
 		centerToPlayer(player);
 		//		camera.getPosition().x = Math.max(player.transform.position.x - 5f, highestX);
 		camera.getPosition().lerp(new Vector2f(xOffset, yOffset), lerpDt);

@@ -56,6 +56,14 @@ public class Prefabs
 		jump.title = "Jump";
 		jump.addFrame(playerSprites.getSprite(5), 0.1f);
 		jump.setDoesLoop(false);
+		
+		AnimationState goalDown = new AnimationState();
+		goalDown.title = "Goal Down";
+		goalDown.addFrame(playerSprites.getSprite(7), 0.1f);
+		
+		AnimationState goalSit = new AnimationState();
+		goalSit.title = "Goal Sit";
+		goalSit.addFrame(playerSprites.getSprite(8), 0.1f);
 
 		// Big mario animations
 		AnimationState bigRun = new AnimationState();
@@ -87,6 +95,14 @@ public class Prefabs
 		bigSit.title = "BigSit";
 		bigSit.addFrame(bigPlayerSprites.getSprite(6), 0.1f);
 		bigSit.setDoesLoop(false);
+
+		AnimationState bigGoalDown = new AnimationState();
+		bigGoalDown.title = "Big Goal Down";
+		bigGoalDown.addFrame(bigPlayerSprites.getSprite(7), 0.1f);
+
+		AnimationState bigGoalSit = new AnimationState();
+		bigGoalSit.title = "Big Goal Sit";
+		bigGoalSit.addFrame(bigPlayerSprites.getSprite(8), 0.1f);
 
 		// Fire mario animations
 		int fireOffset = 21;
@@ -120,6 +136,14 @@ public class Prefabs
 		fireSit.addFrame(bigPlayerSprites.getSprite(fireOffset + 6), 0.1f);
 		fireSit.setDoesLoop(false);
 
+		AnimationState fireGoalDown = new AnimationState();
+		fireGoalDown.title = "Fire Goal Down";
+		fireGoalDown.addFrame(bigPlayerSprites.getSprite(fireOffset + 7), 0.1f);
+
+		AnimationState fireGoalSit = new AnimationState();
+		fireGoalSit.title = "Fire Goal Sit";
+		fireGoalSit.addFrame(bigPlayerSprites.getSprite(fireOffset + 8), 0.1f);
+
 		AnimationState die = new AnimationState();
 		die.title = "Die";
 		die.addFrame(playerSprites.getSprite(6), 0.1f);
@@ -131,18 +155,24 @@ public class Prefabs
 		stateMachine.addState(switchDirection);
 		stateMachine.addState(jump);
 		stateMachine.addState(die);
+		stateMachine.addState(goalDown);
+		stateMachine.addState(goalSit);
 
 		stateMachine.addState(bigRun);
 		stateMachine.addState(bigIdle);
 		stateMachine.addState(bigSit);
 		stateMachine.addState(bigSwitchDirection);
 		stateMachine.addState(bigJump);
+		stateMachine.addState(bigGoalDown);
+		stateMachine.addState(bigGoalSit);
 
 		stateMachine.addState(fireRun);
 		stateMachine.addState(fireIdle);
 		stateMachine.addState(fireSit);
 		stateMachine.addState(fireSwitchDirection);
 		stateMachine.addState(fireJump);
+		stateMachine.addState(fireGoalDown);
+		stateMachine.addState(fireGoalSit);
 
 		stateMachine.setDefaultState(idle.title);
 		stateMachine.addState(run.title, switchDirection.title, "switchDirection");
@@ -150,6 +180,7 @@ public class Prefabs
 		stateMachine.addState(run.title, jump.title, "jump");
 		stateMachine.addState(switchDirection.title, idle.title, "stopRunning");
 		stateMachine.addState(switchDirection.title, run.title, "startRunning");
+		stateMachine.addState(goalSit.title, run.title, "startRunning");
 		stateMachine.addState(switchDirection.title, jump.title, "jump");
 		stateMachine.addState(idle.title, run.title, "startRunning");
 		stateMachine.addState(idle.title, jump.title, "jump");
@@ -162,6 +193,7 @@ public class Prefabs
 		stateMachine.addState(bigSwitchDirection.title, bigRun.title, "startRunning");
 		stateMachine.addState(bigSwitchDirection.title, bigJump.title, "jump");
 		stateMachine.addState(bigIdle.title, bigRun.title, "startRunning");
+		stateMachine.addState(bigGoalSit.title, bigRun.title, "startRunning");
 		stateMachine.addState(bigIdle.title, bigJump.title, "jump");
 		stateMachine.addState(bigJump.title, bigIdle.title, "stopJumping");
 		stateMachine.addState(bigIdle.title, bigSit.title, "sit");
@@ -175,6 +207,7 @@ public class Prefabs
 		stateMachine.addState(fireSwitchDirection.title, fireRun.title, "startRunning");
 		stateMachine.addState(fireSwitchDirection.title, fireJump.title, "jump");
 		stateMachine.addState(fireIdle.title, fireRun.title, "startRunning");
+		stateMachine.addState(fireGoalSit.title, fireRun.title, "startRunning");
 		stateMachine.addState(fireIdle.title, fireJump.title, "jump");
 		stateMachine.addState(fireJump.title, fireIdle.title, "stopJumping");
 		stateMachine.addState(fireIdle.title, fireSit.title, "sit");
@@ -214,6 +247,25 @@ public class Prefabs
 		stateMachine.addState(fireSwitchDirection.title, bigSwitchDirection.title, "die");
 		stateMachine.addState(fireIdle.title, bigIdle.title, "die");
 		stateMachine.addState(fireJump.title, bigJump.title, "die");
+
+		stateMachine.addState(run.title, goalDown.title, "goalDown");
+		stateMachine.addState(switchDirection.title, goalDown.title, "goalDown");
+		stateMachine.addState(idle.title, goalDown.title, "goalDown");
+		stateMachine.addState(jump.title, goalDown.title, "goalDown");
+		stateMachine.addState(bigRun.title, bigGoalDown.title, "goalDown");
+		stateMachine.addState(bigSwitchDirection.title, bigGoalDown.title, "goalDown");
+		stateMachine.addState(bigIdle.title, bigGoalDown.title, "goalDown");
+		stateMachine.addState(bigJump.title, bigGoalDown.title, "goalDown");
+		stateMachine.addState(bigSit.title, bigGoalDown.title, "goalDown");
+		stateMachine.addState(fireRun.title, fireGoalDown.title, "goalDown");
+		stateMachine.addState(fireSwitchDirection.title, fireGoalDown.title, "goalDown");
+		stateMachine.addState(fireIdle.title, fireGoalDown.title, "goalDown");
+		stateMachine.addState(fireJump.title, fireGoalDown.title, "goalDown");
+		stateMachine.addState(fireSit.title, fireGoalDown.title, "goalDown");
+
+		stateMachine.addState(goalDown.title, goalSit.title, "goalSit");
+		stateMachine.addState(bigGoalDown.title, bigGoalSit.title, "goalSit");
+		stateMachine.addState(fireGoalDown.title, fireGoalSit.title, "goalSit");
 		mario.addComponent(stateMachine);
 
 		PillboxCollider pillboxCollider = new PillboxCollider();
@@ -399,7 +451,7 @@ public class Prefabs
 
 		AnimationState starAnimation = new AnimationState();
 		starAnimation.title = "Star";
-		float defaultFrameTime = 0.23f;
+		float defaultFrameTime = 0.15f;
 		starAnimation.addFrame(items.getSprite(24), defaultFrameTime);
 		starAnimation.addFrame(items.getSprite(25), defaultFrameTime);
 		starAnimation.addFrame(items.getSprite(26), defaultFrameTime);
@@ -580,5 +632,46 @@ public class Prefabs
 		turtle.addComponent(new TurtleAI());
 
 		return turtle;
+	}
+
+	public static GameObject generateGoalFlagPole()
+	{
+		SpriteSheet items = AssetPool.getSpriteSheet("assets/images/items.png");
+		GameObject goalPole = generateSpriteObject(items.getSprite(33), Settings.GRID_WIDTH, Settings.GRID_HEIGHT);
+
+		Rigidbody2D rb = new Rigidbody2D();
+		rb.setBodyType(BodyType.STATIC);
+		rb.setFixedRotation(true);
+		rb.setContinuousCollision(false);
+		goalPole.addComponent(rb);
+
+		Box2DCollider box2dCollider = new Box2DCollider();
+		box2dCollider.setHalfSize(new Vector2f(Settings.GRID_WIDTH * 0.4f, Settings.GRID_HEIGHT));
+		box2dCollider.setOffset(new Vector2f(Settings.GRID_WIDTH * -0.3f, 0));
+		goalPole.addComponent(box2dCollider);
+		goalPole.addComponent(new GoalFlag(false));
+
+		return goalPole;
+	}
+
+	public static GameObject generateGoalFlag()
+	{
+		SpriteSheet items = AssetPool.getSpriteSheet("assets/images/items.png");
+		GameObject goalFlag = generateSpriteObject(items.getSprite(6), Settings.GRID_WIDTH, Settings.GRID_HEIGHT);
+
+		Rigidbody2D rb = new Rigidbody2D();
+		rb.setBodyType(BodyType.STATIC);
+		rb.setFixedRotation(true);
+		rb.setContinuousCollision(false);
+		goalFlag.addComponent(rb);
+
+
+		Box2DCollider box2dCollider = new Box2DCollider();
+		box2dCollider.setHalfSize(new Vector2f(Settings.GRID_WIDTH * 0.4f, Settings.GRID_HEIGHT));
+		box2dCollider.setOffset(new Vector2f(Settings.GRID_WIDTH * -0.3f, 0));
+		goalFlag.addComponent(box2dCollider);
+		goalFlag.addComponent(new GoalFlag(true));
+
+		return goalFlag;
 	}
 }

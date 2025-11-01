@@ -301,25 +301,6 @@ public class LevelEditorSceneInitializer extends SceneInitializer
 					ImGui.popID();
 					ImGui.sameLine();
 				}
-				// Turtle
-				{
-					SpriteSheet turtle = AssetPool.getSpriteSheet("assets/images/turtle.png");
-					Sprite sprite = turtle.getSprite(0);
-					float spriteWidth = sprite.getWidth() * 2;
-					float spriteHeight = sprite.getHeight() * 2;
-					int id = sprite.getTexId();
-					Vector2f[] texCoords = sprite.getTexCoords();
-
-					ImGui.pushID(uid++);
-					if (ImGui.imageButton(id, spriteWidth, spriteHeight, texCoords[2].x, texCoords[0].y, texCoords[0].x, texCoords[2].y))
-					{
-						GameObject object = Prefabs.generateTurtle();
-						object.transform.zIndex = 10;
-						levelEditorStuff.getComponent(MouseControls.class).pickUpObject(object);
-					}
-					ImGui.popID();
-					ImGui.sameLine();
-				}
 				// UndergroundGoomba
 				{
 					SpriteSheet playerSprites = AssetPool.getSpriteSheet("assets/images/spritesheet.png");
@@ -333,6 +314,25 @@ public class LevelEditorSceneInitializer extends SceneInitializer
 					if (ImGui.imageButton(id, spriteWidth, spriteHeight, texCoords[2].x, texCoords[0].y, texCoords[0].x, texCoords[2].y))
 					{
 						GameObject object = Prefabs.generateGoomba(true);
+						object.transform.zIndex = 10;
+						levelEditorStuff.getComponent(MouseControls.class).pickUpObject(object);
+					}
+					ImGui.popID();
+					ImGui.sameLine();
+				}
+				// Turtle
+				{
+					SpriteSheet turtle = AssetPool.getSpriteSheet("assets/images/turtle.png");
+					Sprite sprite = turtle.getSprite(0);
+					float spriteWidth = sprite.getWidth() * 2;
+					float spriteHeight = sprite.getHeight() * 2;
+					int id = sprite.getTexId();
+					Vector2f[] texCoords = sprite.getTexCoords();
+
+					ImGui.pushID(uid++);
+					if (ImGui.imageButton(id, spriteWidth, spriteHeight, texCoords[2].x, texCoords[0].y, texCoords[0].x, texCoords[2].y))
+					{
+						GameObject object = Prefabs.generateTurtle();
 						object.transform.zIndex = 10;
 						levelEditorStuff.getComponent(MouseControls.class).pickUpObject(object);
 					}
@@ -360,6 +360,44 @@ public class LevelEditorSceneInitializer extends SceneInitializer
 						ImGui.popID();
 						ImGui.sameLine();
 					}
+				}
+				// GoalFlagPole
+				{
+					SpriteSheet goalFlagPole = AssetPool.getSpriteSheet("assets/images/items.png");
+					Sprite sprite = goalFlagPole.getSprite(33);
+					float spriteWidth = sprite.getWidth() * 2;
+					float spriteHeight = sprite.getHeight() * 2;
+					int id = sprite.getTexId();
+					Vector2f[] texCoords = sprite.getTexCoords();
+
+					ImGui.pushID(uid++);
+					if (ImGui.imageButton(id, spriteWidth, spriteHeight, texCoords[2].x, texCoords[0].y, texCoords[0].x, texCoords[2].y))
+					{
+						GameObject object = Prefabs.generateGoalFlagPole();
+						object.transform.zIndex = 10;
+						levelEditorStuff.getComponent(MouseControls.class).pickUpObject(object);
+					}
+					ImGui.popID();
+					ImGui.sameLine();
+				}
+				// GoalFlag
+				{
+					SpriteSheet goalFlag = AssetPool.getSpriteSheet("assets/images/items.png");
+					Sprite sprite = goalFlag.getSprite(6);
+					float spriteWidth = sprite.getWidth() * 2;
+					float spriteHeight = sprite.getHeight() * 2;
+					int id = sprite.getTexId();
+					Vector2f[] texCoords = sprite.getTexCoords();
+
+					ImGui.pushID(uid++);
+					if (ImGui.imageButton(id, spriteWidth, spriteHeight, texCoords[2].x, texCoords[0].y, texCoords[0].x, texCoords[2].y))
+					{
+						GameObject object = Prefabs.generateGoalFlag();
+						object.transform.zIndex = 10;
+						levelEditorStuff.getComponent(MouseControls.class).pickUpObject(object);
+					}
+					ImGui.popID();
+					ImGui.sameLine();
 				}
 
 				ImGui.endTabItem();

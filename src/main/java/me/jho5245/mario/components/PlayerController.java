@@ -1,18 +1,16 @@
 package me.jho5245.mario.components;
 
 import me.jho5245.mario.animations.StateMachine;
+import me.jho5245.mario.components.ai.GoombaAI;
+import me.jho5245.mario.components.ai.TurtleAI;
 import me.jho5245.mario.jade.Camera;
 import me.jho5245.mario.jade.GameObject;
 import me.jho5245.mario.jade.KeyListener;
 import me.jho5245.mario.jade.Window;
-import me.jho5245.mario.observers.ObserverHandler;
-import me.jho5245.mario.observers.events.Event;
-import me.jho5245.mario.observers.events.EventType;
 import me.jho5245.mario.physics2d.Physics2D;
 import me.jho5245.mario.physics2d.components.PillboxCollider;
 import me.jho5245.mario.physics2d.components.Rigidbody2D;
 import me.jho5245.mario.physics2d.enums.BodyType;
-import me.jho5245.mario.scenes.LevelEditorSceneInitializer;
 import me.jho5245.mario.scenes.LevelSceneInitializer;
 import me.jho5245.mario.sounds.Sound;
 import me.jho5245.mario.util.AssetPool;
@@ -62,7 +60,7 @@ public class PlayerController extends Component
 	private transient int enemyBounce = 0;
 
 	public transient Sound backgroundMusic, starMusic, undergroundMusic;
-	private transient Sound powerUpSound, dieSound, hurtSound, oneUpSound, smallJumpSound, superJumpSound;
+	private transient Sound powerUpSound, dieSound, hurtSound, oneUpSound, smallJumpSound, superJumpSound, stageClearSound, flagPoleSound;
 
 	private transient final float starTimeColorFlickerTime = 0.1f;
 	private transient float starTimeColorFlickerTimeLeft;
@@ -106,6 +104,17 @@ public class PlayerController extends Component
 	// 지하에 있니?
 	private transient boolean isUndergrond;
 
+	// 깃대 잡는 연출 중이니?
+	private transient boolean playWinAnimation;
+
+	// 깃대 잡고 내려와서 걷는 중이니?
+	private transient boolean isGoaled;
+
+	public boolean isGoaled()
+	{
+		return isGoaled;
+	}
+
 	@Override
 	public void start()
 	{
@@ -123,6 +132,8 @@ public class PlayerController extends Component
 		this.oneUpSound = AssetPool.getSound("assets/sounds/1-up.ogg");
 		this.smallJumpSound = AssetPool.getSound("assets/sounds/jump-small.ogg");
 		this.superJumpSound = AssetPool.getSound("assets/sounds/jump-super.ogg");
+		this.flagPoleSound = AssetPool.getSound("assets/sounds/flagpole.ogg");
+		this.stageClearSound = AssetPool.getSound("assets/sounds/stage_clear.ogg");
 
 		this.startZIndex = gameObject.transform.zIndex;
 	}
@@ -130,7 +141,52 @@ public class PlayerController extends Component
 	@Override
 	public void update(float dt)
 	{
-		System.out.println(isUpCeiling());
+		if (playWinAnimation)
+		{
+			checkOnGround();
+			// 왼쪽을 바라보게 하기(깃대 잡기)
+			// 깃대를 타고 내려오는 중
+			if (!onGround)
+			{
+				if (!isGoaled)
+					gameObject.transform.scale.x = -Math.abs(gameObject.transform.scale.x);
+				setPosition(new Vector2f(gameObject.transform.position.x, gameObject.transform.position.y - dt * 4));
+				stateMachine.trigger("stopRunning");
+				stateMachine.trigger("stopJumping");
+			}
+			// 깃대를 타고 다 내려옴. 이제 걸어야함
+			else
+			{
+				// 깃대 타는 소리 끝날 때까지 대기
+				if (flagPoleSound.isPlaying())
+					return;
+				isGoaled = true;
+				timeToCastle -= dt;
+				walkTime -= dt;
+				if (this.walkTime > 4.75f)
+				{
+					stateMachine.trigger("goalSit");
+				}
+				else if (this.walkTime > 0)
+				{
+					gameObject.transform.scale.x = Math.abs(gameObject.transform.scale.x);
+					setPosition(new Vector2f(gameObject.transform.position.x + dt * 2, gameObject.transform.position.y));
+					stateMachine.trigger("startRunning");
+				}
+				if (stageClearSound != null && !stageClearSound.isPlaying())
+				{
+					stageClearSound.play();
+					stageClearSound = null;
+				}
+				if (timeToCastle < 0)
+				{
+					Window.changeScene(new LevelSceneInitializer(), true);
+					AssetPool.getAllSounds().forEach(Sound::stop);
+				}
+			}
+			return;
+		}
+
 		Camera camera = Window.getCurrentScene().getCamera();
 
 		if (!isDead && gameObject.transform.position.y <= camera.getPosition().y - 3 && Window.getPhysics().isPlaying())
@@ -775,5 +831,37 @@ public class PlayerController extends Component
 	public boolean isUpCeiling()
 	{
 		return upCeiling;
+	}
+
+	private transient float timeToCastle = 8f;
+	private transient float walkTime = 5f;
+
+	public void playWinAnimation(GameObject flag)
+	{
+		if (playWinAnimation)
+			return;
+
+		// 적 전부 삭제
+		for (GameObject o : Window.getCurrentScene().getGameObjects())
+		{
+			if (o.getComponent(GoombaAI.class) != null || o.getComponent(TurtleAI.class) != null)
+			{
+				o.destroy();
+			}
+		}
+
+		starMusic.stop();
+		undergroundMusic.stop();
+		backgroundMusic.stop();
+		playWinAnimation = true;
+		Window.getPhysics().setPlaying(false);
+		velocity.set(0, 0);
+		rb.setBodyType(BodyType.STATIC);
+		setPosition(new Vector2f(flag.transform.position.x, gameObject.transform.position.y));
+		gameObject.getComponent(SpriteRenderer.class).setColor(new Vector4f(1));
+		gameObject.transform.scale.x = -Math.abs(gameObject.transform.scale.x);
+		flagPoleSound.play();
+		stateMachine.trigger("goalDown");
+		stateMachine.setSpeed(0.75f);
 	}
 }
