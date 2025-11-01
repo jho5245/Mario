@@ -16,7 +16,7 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class KeyControls extends Component
 {
-	private transient final float debounceTime = 0.2f;
+	private transient final float debounceTime = 0.1f;
 	private transient float debounceTimeLeft;
 	private transient final float tileMovement = Settings.GRID_WIDTH / Settings.GRID_HEIGHT;
 

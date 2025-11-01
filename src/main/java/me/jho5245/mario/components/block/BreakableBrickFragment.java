@@ -19,7 +19,7 @@ public class BreakableBrickFragment extends Component
 	{
 		fragmentRemoveTime -= dt;
 
-		gameObject.transform.position.x += gameObject.transform.rotation <= 0 ? dt / 2 : -dt / 2;
+		gameObject.transform.position.x += gameObject.transform.rotation <= 0 ? dt : -dt;
 
 		float functionX = 2f - fragmentRemoveTime;
 		gameObject.transform.position.y = (float) (-16 * Math.pow(functionX - 0.25, 2) + 1 + startPosition.y);
