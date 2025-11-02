@@ -98,7 +98,7 @@ public class PlayerController extends Component
 	private transient int startZIndex;
 
 	// 지하에 있니?
-	private boolean isUndergrond;
+	private boolean isUnderground;
 
 	private transient boolean shouldPlayWinAnimation = true;
 
@@ -279,11 +279,11 @@ public class PlayerController extends Component
 		}
 		if (starTimeLeft <= 0 && !stoppingSound)
 		{
-			if (isUndergrond && !undergroundMusic.isPlaying())
+			if (isUnderground && !undergroundMusic.isPlaying())
 			{
 				undergroundMusic.play();
 			}
-			else if (!isUndergrond && !backgroundMusic.isPlaying())
+			else if (!isUnderground && !backgroundMusic.isPlaying())
 			{
 				backgroundMusic.play();
 			}
@@ -643,7 +643,7 @@ public class PlayerController extends Component
 				gameObject.getComponent(SpriteRenderer.class).setColor(new Vector4f(1f));
 				starTimeLeft = 0;
 				starMusic.stop();
-				if (isUndergrond)
+				if (isUnderground)
 				{
 					undergroundMusic.play();
 				}
@@ -894,14 +894,14 @@ public class PlayerController extends Component
 		return false;
 	}
 
-	public boolean isUndergrond()
+	public boolean isUnderground()
 	{
-		return isUndergrond;
+		return isUnderground;
 	}
 
-	public void setUndergrond(boolean undergrond)
+	public void setUnderground(boolean underground)
 	{
-		isUndergrond = undergrond;
+		isUnderground = underground;
 	}
 
 	public boolean isUpCeiling()

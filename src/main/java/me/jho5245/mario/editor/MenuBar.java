@@ -21,7 +21,7 @@ public class MenuBar
 
 		if (ImGui.beginMenu("File"))
 		{
-			if (ImGui.menuItem("Save (CTRL + S)"))
+			if (ImGui.menuItem("Save (Ctrl + S)"))
 			{
 				ObserverHandler.notify(null, new Event(EventType.SAVE_LEVEL));
 			}
@@ -44,7 +44,7 @@ public class MenuBar
 
 		if (ImGui.beginMenu("Settings"))
 		{
-			if (ImGui.menuItem("Toggle Physics Debug Draw"))
+			if (ImGui.menuItem("Toggle Physics Debug Draw (F3)"))
 			{
 				ObserverHandler.notify(null, new Event(EventType.TOGGLE_PHYSICS_DEBUG_DRAW));
 			}

@@ -48,7 +48,7 @@ public class GameCamera extends Component
 		this.player = Window.getCurrentScene().getGameObjectWith(PlayerController.class);
 		this.playerController = Optional.ofNullable(player).orElse(new GameObject("what")).getComponent(PlayerController.class);
 		this.camera = Window.getCurrentScene().getCamera();
-		if (playerController != null && playerController.isUndergrond())
+		if (playerController != null && playerController.isUnderground())
 		{
 			this.camera.clearColor.set(undergroundColor);
 			camera.getPosition().set(new Vector2f(-0.5f, undergroundYLevel));
@@ -66,7 +66,7 @@ public class GameCamera extends Component
 		{
 			xOffset = lowestX;
 		}
-		if (playerController.isUndergrond())
+		if (playerController.isUnderground())
 		{
 			if (yOffset < undergroundLowestY)
 			{
@@ -141,7 +141,7 @@ public class GameCamera extends Component
 			lowestX = Math.max(camera.getPosition().x, lowestX);
 		}
 
-		if (playerController.isUndergrond())
+		if (playerController.isUnderground())
 		{
 			//			this.camera.getPosition().y = undergroundYLevel;
 			this.camera.clearColor.set(undergroundColor);

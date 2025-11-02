@@ -163,10 +163,10 @@ public class Pipe extends Component
 				}
 				if (toggleUnderground)
 				{
-					playerController.setUndergrond(!playerController.isUndergrond());
+					playerController.setUnderground(!playerController.isUnderground());
 					if (!playerController.starMusic.isPlaying())
 					{
-						if (playerController.isUndergrond())
+						if (playerController.isUnderground())
 						{
 							playerController.backgroundMusic.stop();
 							playerController.undergroundMusic.play();
