@@ -94,28 +94,28 @@ public class Pipe extends Component
 			{
 				case LEFT ->
 				{
-					if (KeyListener.isKeyPressed(GLFW_KEY_LEFT))
+					if (KeyListener.isKeyPressed(GLFW_KEY_LEFT) || KeyListener.isKeyPressed(GLFW_KEY_A))
 					{
 						pipeEntering = true;
 					}
 				}
 				case RIGHT ->
 				{
-					if (KeyListener.isKeyPressed(GLFW_KEY_RIGHT))
+					if (KeyListener.isKeyPressed(GLFW_KEY_RIGHT) || KeyListener.isKeyPressed(GLFW_KEY_D))
 					{
 						pipeEntering = true;
 					}
 				}
 				case UP ->
 				{
-					if (KeyListener.isKeyPressed(GLFW_KEY_UP))
+					if (KeyListener.isKeyPressed(GLFW_KEY_UP) || KeyListener.isKeyPressed(GLFW_KEY_W))
 					{
 						pipeEntering = true;
 					}
 				}
 				case DOWN ->
 				{
-					if (KeyListener.isKeyPressed(GLFW_KEY_DOWN))
+					if (KeyListener.isKeyPressed(GLFW_KEY_DOWN) || KeyListener.isKeyPressed(GLFW_KEY_S))
 					{
 						pipeEntering = true;
 					}
