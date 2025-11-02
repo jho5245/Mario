@@ -228,7 +228,7 @@ public class PlayerController extends Component
 			}
 		}
 
-		isSprinting = !isSitting && (KeyListener.keyBeginPress(GLFW_KEY_X) || KeyListener.keyBeginPress(GLFW_KEY_LEFT_SHIFT));
+		isSprinting = !isSitting && (KeyListener.isKeyPressed(GLFW_KEY_X) || KeyListener.isKeyPressed(GLFW_KEY_LEFT_SHIFT));
 		if (KeyListener.isKeyPressed(GLFW_KEY_RIGHT) || KeyListener.isKeyPressed(GLFW_KEY_D))
 		{
 			this.gameObject.transform.scale.x = playerWidth;
