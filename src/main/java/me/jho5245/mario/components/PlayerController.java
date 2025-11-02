@@ -180,7 +180,7 @@ public class PlayerController extends Component
 				}
 				if (timeToCastle < 0)
 				{
-					Window.changeScene(new LevelSceneInitializer(), true);
+					Window.changeScene(new LevelSceneInitializer(), true, "level.json");
 					AssetPool.getAllSounds().forEach(Sound::stop);
 				}
 			}
@@ -211,7 +211,7 @@ public class PlayerController extends Component
 			}
 			if (dieAnimationTime > 3f)
 			{
-				Window.changeScene(new LevelSceneInitializer(), true);
+				Window.changeScene(new LevelSceneInitializer(), true, "level.json");
 				AssetPool.getAllSounds().forEach(Sound::stop);
 			}
 			return;
@@ -229,9 +229,6 @@ public class PlayerController extends Component
 		}
 
 		isSprinting = !isSitting && KeyListener.isKeyPressed(GLFW_KEY_X);
-
-		System.out.println(playerWidth);
-
 		if (KeyListener.isKeyPressed(GLFW_KEY_RIGHT))
 		{
 			this.gameObject.transform.scale.x = playerWidth;

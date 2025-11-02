@@ -71,7 +71,7 @@ public class Window implements Observer
 		return window;
 	}
 
-	public static void changeScene(SceneInitializer sceneInitializer, boolean playPhysics)
+	public static void changeScene(SceneInitializer sceneInitializer, boolean playPhysics, String levelName)
 	{
 		Vector2f originCameraPosition = null;
 		if (currentScene != null)
@@ -79,7 +79,7 @@ public class Window implements Observer
 			originCameraPosition = currentScene.getCamera().getPosition();
 			currentScene.destroy();
 		}
-		currentScene = new Scene(sceneInitializer, playPhysics);
+		currentScene = new Scene(sceneInitializer, playPhysics, levelName);
 		currentScene.load();
 		currentScene.init(originCameraPosition);
 		currentScene.start();
@@ -140,13 +140,13 @@ public class Window implements Observer
 			{
 				Window.getImGuiLayer().getPropertiesWindow().clearSelected();
 				currentScene.save();
-				Window.changeScene(new LevelSceneInitializer(), true);
+				Window.changeScene(new LevelSceneInitializer(), true, "level.json");
 				this.runtimePlaying = true;
 			}
 			case GAME_ENGINE_STOP_PLAY ->
 			{
 				Window.getImGuiLayer().getPropertiesWindow().clearSelected();
-				Window.changeScene(new LevelEditorSceneInitializer(), false);
+				Window.changeScene(new LevelEditorSceneInitializer(), false, "level.json");
 				AssetPool.getAllSounds().forEach(Sound::stop);
 				this.runtimePlaying = false;
 			}
@@ -160,14 +160,14 @@ public class Window implements Observer
 			}
 			case LOAD_LEVEL ->
 			{
-				Window.changeScene(new LevelEditorSceneInitializer(), true);
+				Window.changeScene(new LevelEditorSceneInitializer(), true, "level.json");
 			}
 		}
 	}
 
 	public void run()
 	{
-		System.out.printf("Hello LWJGL %s!%n", Version.getVersion());
+//		System.out.printf("Hello LWJGL %s!%n", Version.getVersion());
 
 		init();
 		loop();
@@ -254,11 +254,11 @@ public class Window implements Observer
 		if (RELEASE_BUILD)
 		{
 			runtimePlaying = true;
-			Window.changeScene(new LevelSceneInitializer(), true);
+			Window.changeScene(new LevelSceneInitializer(), true, "level.json");
 		}
 		else
 		{
-			Window.changeScene(new LevelEditorSceneInitializer(), false);
+			Window.changeScene(new LevelEditorSceneInitializer(), false, "level.json");
 		}
 	}
 

@@ -30,10 +30,11 @@ public class Scene
 	private boolean isRunning;
 	private final List<GameObject> gameObjects;
 	private List<GameObject> pendingObjects;
+	private String levelName;
 
 	private SceneInitializer sceneInitializer;
 
-	public Scene(SceneInitializer sceneInitializer, boolean playPhysics)
+	public Scene(SceneInitializer sceneInitializer, boolean playPhysics, String levelName)
 	{
 		this.sceneInitializer = sceneInitializer;
 		this.physics2D = new Physics2D(playPhysics);
@@ -41,6 +42,7 @@ public class Scene
 		this.gameObjects = new ArrayList<>();
 		this.pendingObjects = new ArrayList<>();
 		this.isRunning = false;
+		this.levelName = levelName;
 	}
 
 	public void init(Vector2f startCameraPosition)
@@ -213,7 +215,7 @@ public class Scene
 
 		try
 		{
-			FileWriter writer = new FileWriter("level.json");
+			FileWriter writer = new FileWriter(this.levelName);
 			writer.write(gson.toJson(gameObjects.stream().filter(GameObject::doSerialization).toList()));
 			writer.close();
 		}
@@ -231,7 +233,7 @@ public class Scene
 		String inFile;
 		try
 		{
-			inFile = new String(Files.readAllBytes(Paths.get("level.json")));
+			inFile = new String(Files.readAllBytes(Paths.get(this.levelName)));
 		}
 		catch (NoSuchFileException e)
 		{
