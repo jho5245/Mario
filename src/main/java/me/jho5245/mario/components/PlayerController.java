@@ -121,7 +121,7 @@ public class PlayerController extends Component
 	private float maxMapSizeY = -1f;
 
 	// 모든 스테이지를 다 깸(다음 레벨 이름이 goal인 맵의 깃대에 닿음)
-	private boolean hasWon;
+	private transient boolean hasWon;
 
 	public float getMaxMapSizeX()
 	{
