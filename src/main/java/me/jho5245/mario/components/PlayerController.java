@@ -228,8 +228,8 @@ public class PlayerController extends Component
 			}
 		}
 
-		isSprinting = !isSitting && KeyListener.isKeyPressed(GLFW_KEY_X);
-		if (KeyListener.isKeyPressed(GLFW_KEY_RIGHT))
+		isSprinting = !isSitting && (KeyListener.keyBeginPress(GLFW_KEY_X) || KeyListener.keyBeginPress(GLFW_KEY_LEFT_SHIFT));
+		if (KeyListener.isKeyPressed(GLFW_KEY_RIGHT) || KeyListener.isKeyPressed(GLFW_KEY_D))
 		{
 			this.gameObject.transform.scale.x = playerWidth;
 			if (!isSitting)
@@ -246,7 +246,7 @@ public class PlayerController extends Component
 				this.stateMachine.trigger("startRunning");
 			}
 		}
-		else if (KeyListener.isKeyPressed(GLFW_KEY_LEFT))
+		else if (KeyListener.isKeyPressed(GLFW_KEY_LEFT) || KeyListener.isKeyPressed(GLFW_KEY_A))
 		{
 			this.gameObject.transform.scale.x = -playerWidth;
 			if (!isSitting)
@@ -286,7 +286,7 @@ public class PlayerController extends Component
 		}
 
 		// fireball
-		if (KeyListener.keyBeginPress(GLFW_KEY_X) && (playerState == PlayerState.FIRE || previousState == PlayerState.FIRE) && Fireball.canSpawn())
+		if ((KeyListener.keyBeginPress(GLFW_KEY_X) || KeyListener.keyBeginPress(GLFW_KEY_LEFT_SHIFT)) && (playerState == PlayerState.FIRE || previousState == PlayerState.FIRE) && Fireball.canSpawn())
 		{
 			boolean goingRight = this.gameObject.transform.scale.x > 0;
 			Vector2f position = new Vector2f(this.gameObject.transform.position).add(new Vector2f(goingRight ? 0.25f : -0.25f, isSitting ? -0.3f : 0.3f));
@@ -362,7 +362,7 @@ public class PlayerController extends Component
 
 	private void jumpUpdate(float dt)
 	{
-		if ((KeyListener.isKeyPressed(GLFW_KEY_Z)) && (jumpTime > 0 || onGround || groundDebounce > 0))
+		if ((KeyListener.isKeyPressed(GLFW_KEY_Z) || KeyListener.isKeyPressed(GLFW_KEY_SPACE) || KeyListener.isKeyPressed(GLFW_KEY_W)) && (jumpTime > 0 || onGround || groundDebounce > 0))
 		{
 			if ((onGround || groundDebounce > 0) && jumpTime == 0)
 			{
@@ -463,7 +463,7 @@ public class PlayerController extends Component
 		if (playerState == PlayerState.BIG || playerState == PlayerState.FIRE || previousState == PlayerState.BIG || previousState == PlayerState.FIRE)
 		{
 			// 앉기 키를 누르거나/천장에 닿여있는 상태
-			isSitting = stopSittingTimeLeft <= 0 && (KeyListener.isKeyPressed(GLFW_KEY_DOWN) || upCeiling);
+			isSitting = stopSittingTimeLeft <= 0 && (KeyListener.isKeyPressed(GLFW_KEY_DOWN) || KeyListener.isKeyPressed(GLFW_KEY_S) || upCeiling);
 			if (isSitting)
 			{
 				stateMachine.trigger("sit");
