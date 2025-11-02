@@ -119,13 +119,13 @@ public class Fireball extends Component
 		if (object.getComponent(PlayerController.class) == null)
 		{
 			GoombaAI goombaAI = object.getComponent(GoombaAI.class);
-			if (goombaAI != null)
+			if (goombaAI != null && !goombaAI.isStompByForce)
 			{
 				disappear();
 				goombaAI.stompByForce(rb.getVelocity().x, AssetPool.getSound("assets/sounds/kick.ogg"));
 			}
 			TurtleAI turtleAI = object.getComponent(TurtleAI.class);
-			if (turtleAI != null)
+			if (turtleAI != null && !turtleAI.isStompByForce)
 			{
 				disappear();
 				turtleAI.stompByForce(rb.getVelocity().x, AssetPool.getSound("assets/sounds/kick.ogg"));
@@ -137,5 +137,6 @@ public class Fireball extends Component
 	{
 		fireballCount--;
 		gameObject.destroy();
+		AssetPool.getSound("assets/sounds/bump.ogg").play();
 	}
 }

@@ -25,6 +25,8 @@ public class Pipe extends Component
 	private boolean toggleUnderground;
 	private boolean lerpCamera = true;
 
+	private String changeLevelName = "";
+
 	private transient GameObject connectingPipeGameObject;
 	private transient Pipe connectingPipe;
 	transient final float entranceVectorTolerance = 0.6f;
@@ -60,18 +62,27 @@ public class Pipe extends Component
 	@Override
 	public void update(float dt)
 	{
-		if (connectingPipeName.startsWith("random:") && connectingPipe == null)
-		{
-			String[] split = connectingPipeName.substring("random:".length()).split(",");
-			connectingPipeGameObject = Window.getCurrentScene().getGameObject(split[(int) (split.length * Math.random())]);
-			connectingPipe =  connectingPipeGameObject.getComponent(Pipe.class);
-		}
-		if (connectingPipeGameObject == null || connectingPipe == null || playerController == null || playerGameObject == null)
+		if (!isEntrance)
 		{
 			return;
 		}
 
-		if (!isEntrance)
+		if (playerController == null || playerGameObject == null)
+		{
+			return;
+		}
+
+		if (connectingPipeName.startsWith("random:") && connectingPipe == null)
+		{
+			String[] split = connectingPipeName.substring("random:".length()).split(",");
+			connectingPipeGameObject = Window.getCurrentScene().getGameObject(split[(int) (split.length * Math.random())]);
+			if (connectingPipeGameObject != null)
+			{
+				connectingPipe = connectingPipeGameObject.getComponent(Pipe.class);
+			}
+		}
+
+		if ((connectingPipeGameObject == null || connectingPipe == null) && (changeLevelName == null || changeLevelName.isBlank()))
 		{
 			return;
 		}
@@ -132,6 +143,15 @@ public class Pipe extends Component
 		// 파이프 나오기 시작할 때 1번만 소리 재생
 		if (pipeUseAnimationTimeLeft <= pipeUseAnimationTime / 2)
 		{
+			if (changeLevelName != null && !changeLevelName.isBlank())
+			{
+				Window.playerState = playerController.getPlayerState();
+				playerController.stopSound();
+				Window.getInstance().setLevelName(changeLevelName + ".json");
+				Window.changeScene(new LevelSceneInitializer(), true);
+				return;
+			}
+
 			position = enteringPipe(connectingPipe.direction.inverse());
 			if (!pipeExited)
 			{
@@ -164,6 +184,7 @@ public class Pipe extends Component
 		{
 			position = enteringPipe(this.direction);
 		}
+
 		playerController.setPosition(position);
 
 		// 파이프 다 빠져나옴
@@ -196,8 +217,8 @@ public class Pipe extends Component
 	{
 		Vector2f enterPipePosition = gameObject.transform.position;
 		Vector2f enterPipeScale = gameObject.transform.scale;
-		Vector2f exitPipePosition = connectingPipeGameObject.transform.position;
-		Vector2f exitPipeScale = connectingPipeGameObject.transform.scale;
+		Vector2f exitPipePosition = connectingPipeGameObject != null ? connectingPipeGameObject.transform.position : new Vector2f();
+		Vector2f exitPipeScale = connectingPipeGameObject != null ? connectingPipeGameObject.transform.scale : new Vector2f();
 		Vector2f playerScale = new Vector2f(playerGameObject.transform.scale).absolute();
 
 		return switch (direction)

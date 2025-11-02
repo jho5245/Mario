@@ -9,6 +9,7 @@ import me.jho5245.mario.components.Transform;
 import me.jho5245.mario.jade.Camera;
 import me.jho5245.mario.jade.GameObject;
 import me.jho5245.mario.jade.GameObjectDeserializer;
+import me.jho5245.mario.jade.Window;
 import me.jho5245.mario.physics2d.Physics2D;
 import me.jho5245.mario.renderer.Renderer;
 import org.joml.Vector2f;
@@ -30,11 +31,10 @@ public class Scene
 	private boolean isRunning;
 	private final List<GameObject> gameObjects;
 	private List<GameObject> pendingObjects;
-	private String levelName;
 
 	private SceneInitializer sceneInitializer;
 
-	public Scene(SceneInitializer sceneInitializer, boolean playPhysics, String levelName)
+	public Scene(SceneInitializer sceneInitializer, boolean playPhysics)
 	{
 		this.sceneInitializer = sceneInitializer;
 		this.physics2D = new Physics2D(playPhysics);
@@ -42,7 +42,6 @@ public class Scene
 		this.gameObjects = new ArrayList<>();
 		this.pendingObjects = new ArrayList<>();
 		this.isRunning = false;
-		this.levelName = levelName;
 	}
 
 	public void init(Vector2f startCameraPosition)
@@ -210,12 +209,13 @@ public class Scene
 
 	public void save()
 	{
+		System.out.println(Window.getInstance().getLevelName().replace(".json", "") + " 레벨을 저장합니다.");
 		Gson gson = new GsonBuilder().setPrettyPrinting().registerTypeAdapter(Component.class, new ComponentDeserializer())
 				.registerTypeAdapter(GameObject.class, new GameObjectDeserializer()).enableComplexMapKeySerialization().create();
 
 		try
 		{
-			FileWriter writer = new FileWriter(this.levelName);
+			FileWriter writer = new FileWriter("levels/" + Window.getInstance().getLevelName());
 			writer.write(gson.toJson(gameObjects.stream().filter(GameObject::doSerialization).toList()));
 			writer.close();
 		}
@@ -233,11 +233,11 @@ public class Scene
 		String inFile;
 		try
 		{
-			inFile = new String(Files.readAllBytes(Paths.get(this.levelName)));
+			inFile = new String(Files.readAllBytes(Paths.get("levels/" + Window.getInstance().getLevelName())));
 		}
 		catch (NoSuchFileException e)
 		{
-			System.out.println("No file found! Making a new one..");
+			System.out.println("새 레벨 파일을 생성합니다.");
 			return;
 		}
 		catch (IOException e)

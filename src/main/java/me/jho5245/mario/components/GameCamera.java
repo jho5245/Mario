@@ -3,6 +3,8 @@ package me.jho5245.mario.components;
 import me.jho5245.mario.jade.Camera;
 import me.jho5245.mario.jade.GameObject;
 import me.jho5245.mario.jade.Window;
+import me.jho5245.mario.sounds.Sound;
+import me.jho5245.mario.util.AssetPool;
 import me.jho5245.mario.util.Settings;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
@@ -42,11 +44,20 @@ public class GameCamera extends Component
 	@Override
 	public void start()
 	{
+		AssetPool.getAllSounds().forEach(Sound::stop);
 		this.player = Window.getCurrentScene().getGameObjectWith(PlayerController.class);
 		this.playerController = Optional.ofNullable(player).orElse(new GameObject("what")).getComponent(PlayerController.class);
 		this.camera = Window.getCurrentScene().getCamera();
-		this.camera.clearColor.set(skyColor);
-		camera.getPosition().set(new Vector2f(-0.5f, -0.5f));
+		if (playerController != null && playerController.isUndergrond())
+		{
+			this.camera.clearColor.set(undergroundColor);
+			camera.getPosition().set(new Vector2f(-0.5f, undergroundYLevel));
+		}
+		else
+		{
+			this.camera.clearColor.set(skyColor);
+			camera.getPosition().set(new Vector2f(-0.5f, -0.5f));
+		}
 	}
 
 	private void limitCameraPosition()
@@ -76,6 +87,17 @@ public class GameCamera extends Component
 			{
 				yOffset = highestY;
 			}
+		}
+		float maxX = playerController.getMaxMapSizeX();
+		float maxY = playerController.getMapMaxSizeY();
+		// 0.5 빼는 이유: 블록이 0.5칸씩 중앙에 배치되어 있기 때문
+		if (maxX >= 0)
+		{
+			xOffset = Math.min(xOffset, maxX - 0.5f);
+		}
+		if (maxY >= 0)
+		{
+			yOffset = Math.min(yOffset, maxY - 0.5f);
 		}
 	}
 

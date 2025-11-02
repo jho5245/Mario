@@ -40,13 +40,13 @@ public class SceneHierarchyWindow
 				gameObject.name);
 		ImGui.popID();
 
-		if (ImGui.beginDragDropSource())
-		{
-			ImGui.setDragDropPayloadObject(payloadDragDropType, gameObject);
-			ImGui.text("Move " + gameObject.name + " to..");
-//			ImGui.button("Cancel");
-			ImGui.endDragDropSource();
-		}
+//		if (ImGui.beginDragDropSource())
+//		{
+//			ImGui.setDragDropPayloadObject(payloadDragDropType, gameObject);
+//			ImGui.text("Move " + gameObject.name + " to..");
+////			ImGui.button("Cancel");
+//			ImGui.endDragDropSource();
+//		}
 
 		if (ImGui.beginDragDropTarget())
 		{
@@ -55,7 +55,7 @@ public class SceneHierarchyWindow
 			{
 				if (payloadObject instanceof GameObject object)
 				{
-					System.out.println(object.name + " acc");
+
 				}
 			}
 			ImGui.endDragDropTarget();

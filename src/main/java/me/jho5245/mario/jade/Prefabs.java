@@ -5,6 +5,7 @@ import me.jho5245.mario.animations.StateMachine;
 import me.jho5245.mario.components.*;
 import me.jho5245.mario.components.ai.*;
 import me.jho5245.mario.components.block.*;
+import me.jho5245.mario.components.block.BreakableBrick.BlockType;
 import me.jho5245.mario.physics2d.components.Box2DCollider;
 import me.jho5245.mario.physics2d.components.CircleCollider;
 import me.jho5245.mario.physics2d.components.PillboxCollider;
@@ -466,10 +467,10 @@ public class Prefabs
 		return star;
 	}
 
-	public static GameObject generateBlockBreakFragment(int offset, Vector2f position)
+	public static GameObject generateBlockBreakFragment(int offset, Vector2f position, BlockType blockType)
 	{
-		SpriteSheet items = AssetPool.getSpriteSheet("assets/images/items.png");
-		GameObject fragment = generateSpriteObject(items.getSprite(5), Settings.GRID_WIDTH / 2, Settings.GRID_HEIGHT / 2);
+		SpriteSheet items = AssetPool.getSpriteSheet("assets/images/spritesheets/blockFragment.png");
+		GameObject fragment = generateSpriteObject(items.getSprite(blockType.getIndex()), Settings.GRID_WIDTH / 2, Settings.GRID_HEIGHT / 2);
 		Vector2f pos = new Vector2f(position.x, position.y);
 		switch (offset)
 		{
@@ -477,27 +478,27 @@ public class Prefabs
 			{
 				pos.x -= Settings.GRID_WIDTH / 4;
 				pos.y -= Settings.GRID_HEIGHT / 4;
-				fragment.transform.rotation = 20f;
+				fragment.transform.rotation = 40f;
 			}
 			case 1 ->
 			{
 
 				pos.x -= Settings.GRID_WIDTH / 4;
 				pos.y += Settings.GRID_HEIGHT / 4;
-				fragment.transform.rotation = 20f;
+				fragment.transform.rotation = 40f;
 			}
 			case 2 ->
 			{
 				pos.x += Settings.GRID_WIDTH / 4;
 				pos.y -= Settings.GRID_HEIGHT / 4;
-				fragment.transform.rotation = -20f;
+				fragment.transform.rotation = -40f;
 			}
 			case 3 ->
 			{
 
 				pos.x += Settings.GRID_WIDTH / 4;
 				pos.y += Settings.GRID_HEIGHT / 4;
-				fragment.transform.rotation = -20f;
+				fragment.transform.rotation = -40f;
 			}
 		}
 		fragment.transform.position = new Vector2f(pos);
@@ -519,7 +520,7 @@ public class Prefabs
 
 		AnimationState squashed = new AnimationState();
 		squashed.title = "Squashed";
-		squashed.addFrame(sprites.getSprite(16), 0.1f);
+		squashed.addFrame(sprites.getSprite(22), 0.1f);
 		squashed.setDoesLoop(false);
 
 		StateMachine stateMachine = new StateMachine();
@@ -584,9 +585,9 @@ public class Prefabs
 		return mushroom;
 	}
 
-	public static GameObject generateTurtle()
+	public static GameObject generateTurtle(boolean underground)
 	{
-		SpriteSheet sprites = AssetPool.getSpriteSheet("assets/images/turtle.png");
+		SpriteSheet sprites = AssetPool.getSpriteSheet(underground ? "assets/images/underground_turtle.png" : "assets/images/turtle.png");
 		GameObject turtle = generateSpriteObject(sprites.getSprite(0), Settings.GRID_WIDTH, Settings.GRID_HEIGHT * 1.4f);
 
 		AnimationState walk = new AnimationState();

@@ -5,6 +5,7 @@ import imgui.ImVec2;
 import me.jho5245.mario.animations.StateMachine;
 import me.jho5245.mario.components.*;
 import me.jho5245.mario.components.block.BreakableBrick;
+import me.jho5245.mario.components.block.BreakableBrick.BlockType;
 import me.jho5245.mario.components.gizmo.GizmoSystem;
 import me.jho5245.mario.jade.PipeDirection;
 import me.jho5245.mario.physics2d.components.Box2DCollider;
@@ -70,7 +71,8 @@ public class LevelEditorSceneInitializer extends SceneInitializer
 				for (int i = 0; i < sprites.size(); i++)
 				{
 					// skip for non box collider tiles
-					if (i == 34 || i >= 38 && i < 61) continue;
+					if (i == 34 || i >= 38 && i < 61)
+						continue;
 
 					Sprite sprite = sprites.getSprite(i);
 					float spriteWidth = sprite.getWidth() * 2;
@@ -91,9 +93,13 @@ public class LevelEditorSceneInitializer extends SceneInitializer
 						object.addComponent(box2DCollider);
 						object.addComponent(new Ground());
 						// breakable bricks
-						if (List.of(1, 5, 6, 12, 13).contains(i))
+						if (List.of(1, 5, 6).contains(i))
 						{
-							object.addComponent(new BreakableBrick());
+							object.addComponent(new BreakableBrick(BlockType.BROWN));
+						}
+						if (List.of(22, 26, 27).contains(i))
+						{
+							object.addComponent(new BreakableBrick(BlockType.BLUE));
 						}
 
 						levelEditorStuff.getComponent(MouseControls.class).pickUpObject(object);
@@ -125,7 +131,8 @@ public class LevelEditorSceneInitializer extends SceneInitializer
 				for (int i = 0; i < sprites.size(); i++)
 				{
 					// skip for box collider tiles
-					if (!(i == 34 || i >= 38 && i < 61)) continue;
+					if (!(i == 34 || i >= 38 && i < 61))
+						continue;
 
 					Sprite sprite = sprites.getSprite(i);
 					float spriteWidth = sprite.getWidth() * 2;
@@ -300,7 +307,26 @@ public class LevelEditorSceneInitializer extends SceneInitializer
 					ImGui.pushID(uid++);
 					if (ImGui.imageButton(id, spriteWidth, spriteHeight, texCoords[2].x, texCoords[0].y, texCoords[0].x, texCoords[2].y))
 					{
-						GameObject object = Prefabs.generateTurtle();
+						GameObject object = Prefabs.generateTurtle(false);
+						object.transform.zIndex = 10;
+						levelEditorStuff.getComponent(MouseControls.class).pickUpObject(object);
+					}
+					ImGui.popID();
+					ImGui.sameLine();
+				}
+				// Underground Turtle
+				{
+					SpriteSheet turtle = AssetPool.getSpriteSheet("assets/images/underground_turtle.png");
+					Sprite sprite = turtle.getSprite(0);
+					float spriteWidth = sprite.getWidth() * 2;
+					float spriteHeight = sprite.getHeight() * 2;
+					int id = sprite.getTexId();
+					Vector2f[] texCoords = sprite.getTexCoords();
+
+					ImGui.pushID(uid++);
+					if (ImGui.imageButton(id, spriteWidth, spriteHeight, texCoords[2].x, texCoords[0].y, texCoords[0].x, texCoords[2].y))
+					{
+						GameObject object = Prefabs.generateTurtle(true);
 						object.transform.zIndex = 10;
 						levelEditorStuff.getComponent(MouseControls.class).pickUpObject(object);
 					}

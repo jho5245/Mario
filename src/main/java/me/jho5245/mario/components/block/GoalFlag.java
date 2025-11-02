@@ -10,6 +10,10 @@ public class GoalFlag extends Component
 {
 	private boolean isFlag;
 
+	private boolean playWinAnimation = true;
+
+	private String nextLevelName = "nextLevel";
+
 	public GoalFlag(boolean isFlag)
 	{
 		this.isFlag = isFlag;
@@ -21,7 +25,7 @@ public class GoalFlag extends Component
 		PlayerController playerController = object.getComponent(PlayerController.class);
 		if (playerController != null)
 		{
-			playerController.playWinAnimation(this.gameObject);
+			playerController.playWinAnimation(this.gameObject, nextLevelName, playWinAnimation);
 		}
 	}
 

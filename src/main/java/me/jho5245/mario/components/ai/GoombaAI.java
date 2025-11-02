@@ -24,7 +24,7 @@ public class GoombaAI extends Component
 	private transient Vector2f terminalVelocity = new Vector2f(8.4f, 12.4f);
 	private transient boolean onGround = false;
 	private transient boolean isDead;
-	private transient boolean isStompByStar;
+	public transient boolean isStompByForce;
 	/**
 	 * 별을 먹은 마리오한테 닿아 죽었을 때 마리오의 x축 속력(굼바 죽는 모션 표현에 사용)
  	 */
@@ -52,7 +52,7 @@ public class GoombaAI extends Component
 
 		if (isDead)
 		{
-			if (isStompByStar)
+			if (isStompByForce)
 			{
 				gameObject.transform.position.x += starForce / 200f;
 				gameObject.transform.position.y = (float) (2 + deadY - 16 * Math.pow(3.666 - timeToKill, 2));
@@ -170,7 +170,7 @@ public class GoombaAI extends Component
 	public void stompByForce(float force, Sound forceSound)
 	{
 		this.isDead = true;
-		this.isStompByStar = true;
+		this.isStompByForce = true;
 		this.timeToKill = 4f;
 		this.starForce = force;
 		this.deadY = gameObject.transform.position.y;

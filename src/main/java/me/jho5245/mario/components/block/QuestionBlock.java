@@ -52,12 +52,12 @@ public class QuestionBlock extends Block
 
 	private void doPowerUp(PlayerController playerController)
 	{
-		PlayerState playerState = playerController.getPlayerState(), previousState = playerController.getPreviousState();
-		if (playerState == PlayerState.SMALL || previousState == PlayerState.SMALL)
+		PlayerState playerState = playerController.getPlayerState();
+		if (playerState == PlayerState.SMALL)
 		{
 			spawnMushroom();
 		}
-		else if (playerState == PlayerState.BIG || previousState == PlayerState.BIG || playerState == PlayerState.FIRE  || previousState == PlayerState.FIRE)
+		else if (playerState == PlayerState.BIG || playerState == PlayerState.FIRE)
 		{
 			spawnFlower();
 		}

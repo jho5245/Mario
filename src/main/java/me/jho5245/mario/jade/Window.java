@@ -1,5 +1,6 @@
 package me.jho5245.mario.jade;
 
+import me.jho5245.mario.components.PlayerController.PlayerState;
 import me.jho5245.mario.observers.Observer;
 import me.jho5245.mario.observers.ObserverHandler;
 import me.jho5245.mario.observers.events.Event;
@@ -14,7 +15,6 @@ import me.jho5245.mario.sounds.Sound;
 import me.jho5245.mario.util.AssetPool;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
-import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.openal.AL;
 import org.lwjgl.openal.ALC;
@@ -31,7 +31,7 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Window implements Observer
 {
-	public static boolean RELEASE_BUILD;
+	public static boolean PLAY_MODE;
 
 	private int width, height;
 	private final String title;
@@ -48,9 +48,13 @@ public class Window implements Observer
 	private long audioContext;
 	private long audioDevice;
 
+	private String levelName;
+
+	public static PlayerState playerState = PlayerState.SMALL;
+
 	private Window(boolean releaseBuild)
 	{
-		Window.RELEASE_BUILD = releaseBuild;
+		Window.PLAY_MODE = releaseBuild;
 		this.width = 1920;
 		this.height = 1060;
 		this.title = "Mario";
@@ -71,7 +75,7 @@ public class Window implements Observer
 		return window;
 	}
 
-	public static void changeScene(SceneInitializer sceneInitializer, boolean playPhysics, String levelName)
+	public static void changeScene(SceneInitializer sceneInitializer, boolean playPhysics)
 	{
 		Vector2f originCameraPosition = null;
 		if (currentScene != null)
@@ -79,10 +83,14 @@ public class Window implements Observer
 			originCameraPosition = currentScene.getCamera().getPosition();
 			currentScene.destroy();
 		}
-		currentScene = new Scene(sceneInitializer, playPhysics, levelName);
+		currentScene = new Scene(sceneInitializer, playPhysics);
 		currentScene.load();
 		currentScene.init(originCameraPosition);
 		currentScene.start();
+		if (!PLAY_MODE)
+		{
+			glfwSetWindowTitle(getInstance().glfwWindow, getInstance().title + " [편집 모드] %s".formatted(getInstance().levelName));
+		}
 	}
 
 	public static Physics2D getPhysics()
@@ -140,15 +148,16 @@ public class Window implements Observer
 			{
 				Window.getImGuiLayer().getPropertiesWindow().clearSelected();
 				currentScene.save();
-				Window.changeScene(new LevelSceneInitializer(), true, "level.json");
+				Window.changeScene(new LevelSceneInitializer(), true);
 				this.runtimePlaying = true;
 			}
 			case GAME_ENGINE_STOP_PLAY ->
 			{
 				Window.getImGuiLayer().getPropertiesWindow().clearSelected();
-				Window.changeScene(new LevelEditorSceneInitializer(), false, "level.json");
+				Window.changeScene(new LevelEditorSceneInitializer(), false);
 				AssetPool.getAllSounds().forEach(Sound::stop);
 				this.runtimePlaying = false;
+				Window.playerState = PlayerState.SMALL;
 			}
 			case TOGGLE_PHYSICS_DEBUG_DRAW ->
 			{
@@ -160,7 +169,8 @@ public class Window implements Observer
 			}
 			case LOAD_LEVEL ->
 			{
-				Window.changeScene(new LevelEditorSceneInitializer(), true, "level.json");
+				Window.changeScene(new LevelEditorSceneInitializer(), true);
+				Window.playerState = PlayerState.SMALL;
 			}
 		}
 	}
@@ -251,14 +261,18 @@ public class Window implements Observer
 
 		loadResources();
 
-		if (RELEASE_BUILD)
+		if (PLAY_MODE)
 		{
+			if (levelName == null)
+			{
+				levelName = "level.json";
+			}
 			runtimePlaying = true;
-			Window.changeScene(new LevelSceneInitializer(), true, "level.json");
+			Window.changeScene(new LevelSceneInitializer(), true);
 		}
 		else
 		{
-			Window.changeScene(new LevelEditorSceneInitializer(), false, "level.json");
+			ObserverHandler.notify(null, new Event(EventType.LOAD_LEVEL));
 		}
 	}
 
@@ -267,8 +281,10 @@ public class Window implements Observer
 		AssetPool.getShader("assets/shaders/default.glsl");
 
 		AssetPool.addSpriteSheet("assets/images/spritesheets/decorationsAndBlocks.png", 16, 16, 81, 0);
+		AssetPool.addSpriteSheet("assets/images/spritesheets/blockFragment.png", 8, 8, 2, 0);
 		AssetPool.addSpriteSheet("assets/images/spritesheet.png", 16, 16, 26, 0);
 		AssetPool.addSpriteSheet("assets/images/turtle.png", 16, 24, 4, 0);
+		AssetPool.addSpriteSheet("assets/images/underground_turtle.png", 16, 24, 4, 0);
 		AssetPool.addSpriteSheet("assets/images/bigSpritesheet.png", 16, 32, 42, 0);
 		AssetPool.addSpriteSheet("assets/images/pipes.png", 32, 32, 4, 0);
 		AssetPool.addSpriteSheet("assets/images/items.png", 16, 16, 43, 0);
@@ -289,6 +305,7 @@ public class Window implements Observer
 		AssetPool.addSound("assets/sounds/powerup.ogg", false);
 		AssetPool.addSound("assets/sounds/powerup_appears.ogg", false);
 		AssetPool.addSound("assets/sounds/stage_clear.ogg", false);
+		AssetPool.addSound("assets/sounds/world_clear.ogg", false);
 		AssetPool.addSound("assets/sounds/stomp.ogg", false);
 		AssetPool.addSound("assets/sounds/kick.ogg", false);
 		AssetPool.addSound("assets/sounds/invincible.ogg", true);
@@ -372,7 +389,7 @@ public class Window implements Observer
 
 			this.frameBuffer.unbind();
 
-			if (RELEASE_BUILD)
+			if (PLAY_MODE)
 			{
 				// NOTE: This is the most complicated piece for release builds. In release builds
 				//       we want to just blit the framebuffer to the main window so we can see the game
@@ -395,5 +412,15 @@ public class Window implements Observer
 			dt = endTime - beginTime;
 			beginTime = endTime;
 		}
+	}
+
+	public String getLevelName()
+	{
+		return levelName;
+	}
+
+	public void setLevelName(String levelName)
+	{
+		this.levelName = levelName;
 	}
 }

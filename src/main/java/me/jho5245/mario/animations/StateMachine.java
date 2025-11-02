@@ -55,7 +55,6 @@ public class StateMachine extends Component
 				}
 			}
 		}
-		System.out.println("Unable to find state: " + defaultStateTitle);
 	}
 
 	public void trigger(String trigger)

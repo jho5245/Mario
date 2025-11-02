@@ -12,6 +12,7 @@ import me.jho5245.mario.observers.events.EventType;
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
 
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_F5;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 
 public class GameViewWindow
@@ -24,19 +25,19 @@ public class GameViewWindow
 		ImGui.begin("Game Viewport", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.MenuBar);
 
 		ImGui.beginMenuBar();
-		if (ImGui.menuItem("Play", "", isPlaying, !isPlaying))
+		if (!isPlaying && ImGui.menuItem("Play (F5)", "", false, true))
 		{
 			isPlaying = true;
 			ObserverHandler.notify(null, new Event(EventType.GAME_ENGINE_START_PLAY));
 		}
-		if (ImGui.menuItem("Stop", "", !isPlaying, isPlaying))
+		else if (isPlaying && ImGui.menuItem("Stop (F5)", "", false, true))
 		{
 			isPlaying = false;
 			ObserverHandler.notify(null, new Event(EventType.GAME_ENGINE_STOP_PLAY));
 		}
 		ImGui.endMenuBar();
 
-		if (KeyListener.keyBeginPress(GLFW_KEY_SPACE))
+		if (KeyListener.keyBeginPress(GLFW_KEY_F5))
 		{
 			ObserverHandler.notify(null, new Event(isPlaying ? EventType.GAME_ENGINE_STOP_PLAY : EventType.GAME_ENGINE_START_PLAY));
 			isPlaying = !isPlaying;

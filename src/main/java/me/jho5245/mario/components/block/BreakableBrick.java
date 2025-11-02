@@ -9,6 +9,31 @@ import me.jho5245.mario.util.AssetPool;
 
 public class BreakableBrick extends Block
 {
+	public enum BlockType
+	{
+		BROWN, BLUE,
+		;
+
+		public int getIndex()
+		{
+			return switch (this)
+			{
+				case BROWN -> 0;
+				case BLUE -> 1;
+			};
+		}
+	}
+
+	private BlockType blockType = BlockType.BROWN;
+
+	public BreakableBrick()
+	{
+	}
+
+	public BreakableBrick(BlockType type)
+	{
+		this.blockType = type;
+	}
 
 	@Override
 	void playerHit(PlayerController playerController)
@@ -20,13 +45,9 @@ public class BreakableBrick extends Block
 			gameObject.destroy();
 			for (int i = 0; i < 4; i++)
 			{
-				GameObject blockBreakFragment = Prefabs.generateBlockBreakFragment(i, gameObject.transform.position);
+				GameObject blockBreakFragment = Prefabs.generateBlockBreakFragment(i, gameObject.transform.position, blockType);
 				Window.getCurrentScene().addGameObject(blockBreakFragment);
 			}
-		}
-//		else
-		{
-
 		}
 	}
 }

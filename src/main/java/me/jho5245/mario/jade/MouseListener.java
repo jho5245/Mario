@@ -2,9 +2,7 @@ package me.jho5245.mario.jade;
 
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
-import org.joml.Vector2i;
 import org.joml.Vector4f;
-import org.lwjgl.system.CallbackI.S;
 
 import java.util.Arrays;
 
@@ -37,7 +35,7 @@ public class MouseListener
 
 	public static void mousePosCallback(long window, double xPos, double yPos)
 	{
-		if (!Window.RELEASE_BUILD)
+		if (!Window.PLAY_MODE)
 		{
 			if (!Window.getImGuiLayer().getGameViewWindow().getWantCaptureMouse())
 			{

@@ -25,8 +25,7 @@ public class TurtleAI extends Component
 	private transient Vector2f terminalVelocity = new Vector2f(8.4f, 12.4f);
 	private transient final float shellTime = 5f;
 	private transient float shellTimeLeft;
-	private transient boolean isStompByStar;
-	private transient boolean isStompByShell;
+	public transient boolean isStompByForce;
 	/**
 	 * 별을 먹은 마리오한테 닿아 죽었을 때 마리오의 x축 속력(엉금엉금 죽는 모션 표현에 사용)
 	 */
@@ -63,7 +62,7 @@ public class TurtleAI extends Component
 			return;
 		}
 
-		if (isStompByStar || isStompByShell)
+		if (isStompByForce)
 		{
 			gameObject.transform.position.x += starForce / 200f;
 			gameObject.transform.position.y = (float) (2 + deadY - 16 * Math.pow(3.666 - timeToKill, 2));
@@ -95,8 +94,6 @@ public class TurtleAI extends Component
 
 		if (isDead && !isMoving)
 		{
-			if (isStompByStar || isStompByShell)
-				return;
 			shellTimeLeft -= dt;
 
 			if (shellTimeLeft <= 2 && shellTimeLeft > 0)
@@ -156,7 +153,7 @@ public class TurtleAI extends Component
 	public void stompByForce(float force, Sound forceSound)
 	{
 		this.isDead = true;
-		this.isStompByShell = true;
+		this.isStompByForce = true;
 		this.starForce = force;
 		this.deadY = gameObject.transform.position.y;
 		this.rb.setVelocity(new Vector2f(0f, 0f));
@@ -171,7 +168,7 @@ public class TurtleAI extends Component
 	@Override
 	public void beginCollision(GameObject obj, Contact contact, Vector2f contactNormal)
 	{
-		if (isStompByShell || isStompByStar)
+		if (isStompByForce)
 			return;
 
 		PlayerController playerController = obj.getComponent(PlayerController.class);
@@ -252,7 +249,7 @@ public class TurtleAI extends Component
 	@Override
 	public void preSolve(GameObject obj, Contact contact, Vector2f contactNormal)
 	{
-		if (isStompByShell || isStompByStar)
+		if (isStompByForce)
 			return;
 
 		GoombaAI goomba = obj.getComponent(GoombaAI.class);

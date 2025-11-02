@@ -15,9 +15,6 @@ import org.jbox2d.dynamics.contacts.Contact;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 
-import javax.swing.tree.TreeNode;
-import java.security.Key;
-import java.util.Currency;
 import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -29,7 +26,6 @@ public class PlayerController extends Component
 		SMALL,
 		BIG,
 		FIRE,
-		INVINCIBLE
 	}
 
 	public transient float walkSpeed = 3.6f;
@@ -39,13 +35,14 @@ public class PlayerController extends Component
 	public transient float slowDownForce = 0.1f;
 	public transient Vector2f terminalVelocity = new Vector2f(8.4f, 12.4f);
 	public transient Vector2f terminalSprintingVelocity = new Vector2f(12.4f, 12.4f);
-	private transient PlayerState playerState = PlayerState.SMALL;
+	private transient PlayerState playerState;
 
 	private transient boolean isSprinting;
 	public transient boolean onGround = false;
 	private transient float groundDebounce;
 	private transient final float groundDebounceTime = 0.1f;
 	public transient Rigidbody2D rb;
+	public transient PillboxCollider pb;
 	private transient StateMachine stateMachine;
 	private transient final float bigJumpBoostFactor = 1.1f;
 	private transient float playerWidth;
@@ -60,14 +57,13 @@ public class PlayerController extends Component
 	private transient int enemyBounce = 0;
 
 	public transient Sound backgroundMusic, starMusic, undergroundMusic;
-	private transient Sound powerUpSound, dieSound, hurtSound, oneUpSound, smallJumpSound, superJumpSound, stageClearSound, flagPoleSound;
+	private transient Sound powerUpSound, dieSound, hurtSound, oneUpSound, smallJumpSound, superJumpSound, stageClearSound, flagPoleSound, worldClearSound;
 
 	private transient final float starTimeColorFlickerTime = 0.1f;
 	private transient float starTimeColorFlickerTimeLeft;
 	private transient final float starTime = 10f;
 
 	private transient float starTimeLeft;
-	private transient PlayerState previousState;
 
 	private final transient List<String> runningTitle = List.of("Run", "BigRun", "FireRun");
 
@@ -102,10 +98,12 @@ public class PlayerController extends Component
 	private transient int startZIndex;
 
 	// 지하에 있니?
-	private transient boolean isUndergrond;
+	private boolean isUndergrond;
+
+	private transient boolean shouldPlayWinAnimation = true;
 
 	// 깃대 잡는 연출 중이니?
-	private transient boolean playWinAnimation;
+	private transient boolean playingWinAnimation;
 
 	// 깃대 잡고 내려와서 걷는 중이니?
 	private transient boolean isGoaled;
@@ -115,14 +113,37 @@ public class PlayerController extends Component
 		return isGoaled;
 	}
 
+	private transient String levelName;
+
+	private transient boolean stoppingSound;
+
+	private float maxMapSizeX = -1f;
+	private float maxMapSizeY = -1f;
+
+	// 모든 스테이지를 다 깸(다음 레벨 이름이 goal인 맵의 깃대에 닿음)
+	private boolean hasWon;
+
+	public float getMaxMapSizeX()
+	{
+		return maxMapSizeX;
+	}
+
+	public float getMapMaxSizeY()
+	{
+		return maxMapSizeY;
+	}
+
 	@Override
 	public void start()
 	{
+		this.playerState = Window.playerState;
+		this.stateMachine = gameObject.getComponent(StateMachine.class);
+		this.levelName = Window.getInstance().getLevelName();
 		this.playerWidth = Math.abs(gameObject.transform.scale.x);
 		this.playerHeight = Math.abs(gameObject.transform.scale.y);
 		this.rb = gameObject.getComponent(Rigidbody2D.class);
-		this.stateMachine = gameObject.getComponent(StateMachine.class);
 		this.rb.setGravityScale(0f);
+		this.pb = gameObject.getComponent(PillboxCollider.class);
 		this.backgroundMusic = AssetPool.getSound("assets/sounds/main-theme-overworld.ogg");
 		this.undergroundMusic = AssetPool.getSound("assets/sounds/main-theme-underground.ogg");
 		this.starMusic = AssetPool.getSound("assets/sounds/invincible.ogg");
@@ -134,6 +155,7 @@ public class PlayerController extends Component
 		this.superJumpSound = AssetPool.getSound("assets/sounds/jump-super.ogg");
 		this.flagPoleSound = AssetPool.getSound("assets/sounds/flagpole.ogg");
 		this.stageClearSound = AssetPool.getSound("assets/sounds/stage_clear.ogg");
+		this.worldClearSound = AssetPool.getSound("assets/sounds/world_clear.ogg");
 
 		this.startZIndex = gameObject.transform.zIndex;
 	}
@@ -141,8 +163,24 @@ public class PlayerController extends Component
 	@Override
 	public void update(float dt)
 	{
-		if (playWinAnimation)
+		if (playerState != PlayerState.SMALL)
 		{
+			String title = stateMachine.getCurrentTitle().toLowerCase();
+			if (!title.contains("big"))
+			{
+				stateMachine.trigger("powerup");
+			}
+			if (playerState == PlayerState.FIRE && !title.contains("fire"))
+			{
+				stateMachine.trigger("powerup");
+			}
+			gameObject.transform.scale.y = playerHeight * 2;
+		}
+
+		if (playingWinAnimation)
+		{
+			if (!shouldPlayWinAnimation)
+				return;
 			checkOnGround();
 			// 왼쪽을 바라보게 하기(깃대 잡기)
 			// 깃대를 타고 내려오는 중
@@ -173,15 +211,38 @@ public class PlayerController extends Component
 					setPosition(new Vector2f(gameObject.transform.position.x + dt * 2, gameObject.transform.position.y));
 					stateMachine.trigger("startRunning");
 				}
-				if (stageClearSound != null && !stageClearSound.isPlaying())
+				if (hasWon)
 				{
-					stageClearSound.play();
-					stageClearSound = null;
+					if (worldClearSound != null && !worldClearSound.isPlaying())
+					{
+						worldClearSound.play();
+						worldClearSound = null;
+					}
+				}
+				else
+				{
+					if (stageClearSound != null && !stageClearSound.isPlaying())
+					{
+						stageClearSound.play();
+						stageClearSound = null;
+					}
 				}
 				if (timeToCastle < 0)
 				{
-					Window.changeScene(new LevelSceneInitializer(), true, "level.json");
+					// 모든 스테이지를 다 깸
+					if (hasWon)
+					{
+						Window.playerState = PlayerState.SMALL;
+						levelName = "level.json";
+					}
+					else
+					{
+						Window.playerState = this.playerState;
+					}
+					Window.getInstance().setLevelName(levelName);
+					Window.changeScene(new LevelSceneInitializer(), true);
 					AssetPool.getAllSounds().forEach(Sound::stop);
+
 				}
 			}
 			return;
@@ -211,12 +272,12 @@ public class PlayerController extends Component
 			}
 			if (dieAnimationTime > 3f)
 			{
-				Window.changeScene(new LevelSceneInitializer(), true, "level.json");
+				Window.changeScene(new LevelSceneInitializer(), true);
 				AssetPool.getAllSounds().forEach(Sound::stop);
 			}
 			return;
 		}
-		if (starTimeLeft <= 0)
+		if (starTimeLeft <= 0 && !stoppingSound)
 		{
 			if (isUndergrond && !undergroundMusic.isPlaying())
 			{
@@ -286,7 +347,8 @@ public class PlayerController extends Component
 		}
 
 		// fireball
-		if ((KeyListener.keyBeginPress(GLFW_KEY_X) || KeyListener.keyBeginPress(GLFW_KEY_LEFT_SHIFT)) && (playerState == PlayerState.FIRE || previousState == PlayerState.FIRE) && Fireball.canSpawn())
+		if (Window.getPhysics().isPlaying() && (KeyListener.keyBeginPress(GLFW_KEY_X) || KeyListener.keyBeginPress(GLFW_KEY_LEFT_SHIFT)) && (playerState
+				== PlayerState.FIRE) && Fireball.canSpawn())
 		{
 			boolean goingRight = this.gameObject.transform.scale.x > 0;
 			Vector2f position = new Vector2f(this.gameObject.transform.position).add(new Vector2f(goingRight ? 0.25f : -0.25f, isSitting ? -0.3f : 0.3f));
@@ -308,7 +370,7 @@ public class PlayerController extends Component
 		// 앉아서 일어날 때 크기를 천천히 키움(안그러면 바닥에 낑겨서 갑자기 점프해버리는 버그 발생)
 		{
 			PillboxCollider pb = gameObject.getComponent(PillboxCollider.class);
-			if (!isSitting && playerState != PlayerState.SMALL && previousState != PlayerState.SMALL)
+			if (!isSitting && playerState != PlayerState.SMALL)
 			{
 				if (pb.offset.y != 0)
 				{
@@ -362,11 +424,12 @@ public class PlayerController extends Component
 
 	private void jumpUpdate(float dt)
 	{
-		if ((KeyListener.isKeyPressed(GLFW_KEY_Z) || KeyListener.isKeyPressed(GLFW_KEY_SPACE) || KeyListener.isKeyPressed(GLFW_KEY_W)) && (jumpTime > 0 || onGround || groundDebounce > 0))
+		if ((KeyListener.isKeyPressed(GLFW_KEY_Z) || KeyListener.isKeyPressed(GLFW_KEY_SPACE) || KeyListener.isKeyPressed(GLFW_KEY_W)) && (jumpTime > 0 || onGround
+				|| groundDebounce > 0))
 		{
 			if ((onGround || groundDebounce > 0) && jumpTime == 0)
 			{
-				if (previousState == PlayerState.SMALL || playerState == PlayerState.SMALL)
+				if (playerState == PlayerState.SMALL)
 				{
 					smallJumpSound.play();
 				}
@@ -455,12 +518,12 @@ public class PlayerController extends Component
 		}
 
 		float innerPlayerWidth = this.playerWidth * 0.6f;
-		float yValue = playerState == PlayerState.SMALL || previousState == PlayerState.SMALL ? -0.54f : -1.04f;
+		float yValue = playerState == PlayerState.SMALL ? -0.54f : -1.04f;
 		lastUpCeiling = upCeiling;
 		upCeiling = Physics2D.checkCeling(gameObject, innerPlayerWidth, yValue);
 
 		PillboxCollider pb = gameObject.getComponent(PillboxCollider.class);
-		if (playerState == PlayerState.BIG || playerState == PlayerState.FIRE || previousState == PlayerState.BIG || previousState == PlayerState.FIRE)
+		if (playerState == PlayerState.BIG || playerState == PlayerState.FIRE)
 		{
 			// 앉기 키를 누르거나/천장에 닿여있는 상태
 			isSitting = stopSittingTimeLeft <= 0 && (KeyListener.isKeyPressed(GLFW_KEY_DOWN) || KeyListener.isKeyPressed(GLFW_KEY_S) || upCeiling);
@@ -482,13 +545,13 @@ public class PlayerController extends Component
 		if (powerUpSimulationTimeLeft > 0)
 		{
 			powerUpSimulationTimeLeft -= dt;
-			if (playerState == PlayerState.BIG || previousState == PlayerState.BIG)
+			if (playerState == PlayerState.BIG)
 			{
 				gameObject.transform.scale.y = playerHeight * (2f - powerUpSimulationTimeLeft * 2);
 				setPosition(new Vector2f(gameObject.transform.position.x, powerUpStartY + (0.5f - powerUpSimulationTimeLeft)));
 			}
 			boolean isFire = false;
-			if (playerState == PlayerState.FIRE || previousState == PlayerState.FIRE)
+			if (playerState == PlayerState.FIRE)
 			{
 				isFire = true;
 				if ((int) (powerUpSimulationTimeLeft * 20) % 2 == 0)
@@ -515,7 +578,7 @@ public class PlayerController extends Component
 		if (hurtSimulationTimeLeft > 0)
 		{
 			hurtSimulationTimeLeft -= dt;
-			if (playerState == PlayerState.SMALL || previousState == PlayerState.SMALL)
+			if (playerState == PlayerState.SMALL)
 			{
 				gameObject.transform.scale.y = playerHeight * (hurtSimulationTimeLeft + 0.5f) * 2;
 				setPosition(new Vector2f(gameObject.transform.position.x, hurtStartY - (0.5f - hurtSimulationTimeLeft)));
@@ -579,7 +642,6 @@ public class PlayerController extends Component
 				hurtInvincibleTimeLeft = hurtInvincibleTime;
 				gameObject.getComponent(SpriteRenderer.class).setColor(new Vector4f(1f));
 				starTimeLeft = 0;
-				playerState = previousState;
 				starMusic.stop();
 				if (isUndergrond)
 				{
@@ -587,7 +649,6 @@ public class PlayerController extends Component
 				}
 				else
 				{
-
 					backgroundMusic.play();
 				}
 			}
@@ -609,7 +670,7 @@ public class PlayerController extends Component
 	public void checkOnGround()
 	{
 		float innerPlayerWidth = this.playerWidth * 0.6f;
-		float yValue = playerState == PlayerState.SMALL || previousState == PlayerState.SMALL ? -0.54f : -1.04f;
+		float yValue = playerState == PlayerState.SMALL ? -0.54f : -1.04f;
 		onGround = Physics2D.checkOnGround(gameObject, innerPlayerWidth, yValue);
 	}
 
@@ -640,11 +701,6 @@ public class PlayerController extends Component
 		return this.playerState;
 	}
 
-	public PlayerState getPreviousState()
-	{
-		return this.previousState;
-	}
-
 	/**
 	 * 마리오가 버섯/꽃을 먹음
 	 */
@@ -652,16 +708,15 @@ public class PlayerController extends Component
 	{
 		powerUpSound.play();
 		powerUpStartY = gameObject.transform.position.y;
-		if (!(playerState == PlayerState.FIRE || previousState == PlayerState.FIRE))
+		if (!(playerState == PlayerState.FIRE))
 		{
 			stateMachine.trigger("powerup");
 			powerUpSimulationTimeLeft = powerUpSimulationTime;
 		}
 
-		if (playerState == PlayerState.SMALL || previousState == PlayerState.SMALL)
+		if (playerState == PlayerState.SMALL)
 		{
 			playerState = PlayerState.BIG;
-			previousState = PlayerState.BIG;
 			gameObject.transform.scale.y = playerHeight * 2f;
 			PillboxCollider pb = gameObject.getComponent(PillboxCollider.class);
 			if (pb != null)
@@ -673,10 +728,9 @@ public class PlayerController extends Component
 				pb.setHeight(2f);
 			}
 		}
-		else if (playerState == PlayerState.BIG || previousState == PlayerState.BIG)
+		else if (playerState == PlayerState.BIG)
 		{
 			playerState = PlayerState.FIRE;
-			previousState = PlayerState.FIRE;
 		}
 	}
 
@@ -693,11 +747,6 @@ public class PlayerController extends Component
 	 */
 	public void useStar()
 	{
-		if (playerState != PlayerState.INVINCIBLE)
-		{
-			previousState = this.playerState;
-			playerState = PlayerState.INVINCIBLE;
-		}
 		this.backgroundMusic.stop();
 		this.undergroundMusic.stop();
 		if (!this.starMusic.isPlaying())
@@ -754,6 +803,7 @@ public class PlayerController extends Component
 	public void kill()
 	{
 		playerState = PlayerState.SMALL;
+		Window.playerState = PlayerState.SMALL;
 		hurt();
 	}
 
@@ -776,7 +826,6 @@ public class PlayerController extends Component
 			{
 				hurtSound.play();
 				playerState = PlayerState.SMALL;
-				previousState = PlayerState.SMALL;
 				gameObject.transform.scale.y = playerHeight;
 				PillboxCollider pb = gameObject.getComponent(PillboxCollider.class);
 				if (pb != null)
@@ -796,7 +845,6 @@ public class PlayerController extends Component
 			{
 				hurtSound.play();
 				this.playerState = PlayerState.BIG;
-				this.previousState = PlayerState.BIG;
 				hurtSimulationTimeLeft = hurtSimulationTime;
 				hurtInvincibleTimeLeft = hurtInvincibleTime;
 				stateMachine.trigger("damage");
@@ -864,10 +912,18 @@ public class PlayerController extends Component
 	private transient float timeToCastle = 8f;
 	private transient float walkTime = 5f;
 
-	public void playWinAnimation(GameObject flag)
+	public void playWinAnimation(GameObject flag, String nextLevelName, boolean playWinAnimation)
 	{
-		if (playWinAnimation)
+		if (this.playingWinAnimation)
 			return;
+
+		if (nextLevelName != null && !nextLevelName.isBlank())
+			this.levelName = nextLevelName + ".json";
+		else
+			this.levelName = "level.json";
+
+		hasWon = this.levelName.equals("goal.json");
+		shouldPlayWinAnimation = hasWon || playWinAnimation;
 
 		// 적 전부 삭제
 		for (GameObject o : Window.getCurrentScene().getGameObjects())
@@ -881,8 +937,16 @@ public class PlayerController extends Component
 		starMusic.stop();
 		undergroundMusic.stop();
 		backgroundMusic.stop();
-		playWinAnimation = true;
 		Window.getPhysics().setPlaying(false);
+		this.playingWinAnimation = true;
+		if (!playWinAnimation && !hasWon)
+		{
+			Window.playerState = this.playerState;
+			Window.getInstance().setLevelName(levelName);
+			Window.changeScene(new LevelSceneInitializer(), true);
+			AssetPool.getAllSounds().forEach(Sound::stop);
+			return;
+		}
 		velocity.set(0, 0);
 		rb.setBodyType(BodyType.STATIC);
 		setPosition(new Vector2f(flag.transform.position.x, gameObject.transform.position.y));
@@ -892,4 +956,13 @@ public class PlayerController extends Component
 		stateMachine.trigger("goalDown");
 		stateMachine.setSpeed(0.75f);
 	}
+
+	public void stopSound()
+	{
+		stoppingSound = true;
+		backgroundMusic.stop();
+		undergroundMusic.stop();
+		starMusic.stop();
+	}
+
 }
