@@ -3,6 +3,7 @@ package me.jho5245.mario.jade;
 import me.jho5245.mario.observers.Observer;
 import me.jho5245.mario.observers.ObserverHandler;
 import me.jho5245.mario.observers.events.Event;
+import me.jho5245.mario.observers.events.EventType;
 import me.jho5245.mario.physics2d.Physics2D;
 import me.jho5245.mario.renderer.*;
 import me.jho5245.mario.scenes.LevelEditorSceneInitializer;
@@ -25,10 +26,13 @@ import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.openal.ALC10.*;
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Window implements Observer
 {
+	public static boolean RELEASE_BUILD;
+
 	private int width, height;
 	private final String title;
 	private long glfwWindow;
@@ -44,8 +48,9 @@ public class Window implements Observer
 	private long audioContext;
 	private long audioDevice;
 
-	private Window()
+	private Window(boolean releaseBuild)
 	{
+		Window.RELEASE_BUILD = releaseBuild;
 		this.width = 1920;
 		this.height = 1060;
 		this.title = "Mario";
@@ -54,9 +59,14 @@ public class Window implements Observer
 
 	public static Window getInstance()
 	{
+		return getInstance(false);
+	}
+
+	public static Window getInstance(boolean releaseBuild)
+	{
 		if (window == null)
 		{
-			window = new Window();
+			window = new Window(releaseBuild);
 		}
 		return window;
 	}
@@ -239,7 +249,50 @@ public class Window implements Observer
 		this.imGuiLayer = new ImGuiLayer(glfwWindow, pickingTexture);
 		this.imGuiLayer.initImGui();
 
-		Window.changeScene(new LevelEditorSceneInitializer(), false);
+		loadResources();
+
+		if (RELEASE_BUILD)
+		{
+			runtimePlaying = true;
+			Window.changeScene(new LevelSceneInitializer(), true);
+		}
+		else
+		{
+			Window.changeScene(new LevelEditorSceneInitializer(), false);
+		}
+	}
+
+	private void loadResources()
+	{
+		AssetPool.getShader("assets/shaders/default.glsl");
+
+		AssetPool.addSpriteSheet("assets/images/spritesheets/decorationsAndBlocks.png", 16, 16, 81, 0);
+		AssetPool.addSpriteSheet("assets/images/spritesheet.png", 16, 16, 26, 0);
+		AssetPool.addSpriteSheet("assets/images/turtle.png", 16, 24, 4, 0);
+		AssetPool.addSpriteSheet("assets/images/bigSpritesheet.png", 16, 32, 42, 0);
+		AssetPool.addSpriteSheet("assets/images/pipes.png", 32, 32, 4, 0);
+		AssetPool.addSpriteSheet("assets/images/items.png", 16, 16, 43, 0);
+		AssetPool.addSpriteSheet("assets/images/gizmos.png", 24, 48, 3, 0);
+
+		AssetPool.addSound("assets/sounds/main-theme-overworld.ogg", true);
+		AssetPool.addSound("assets/sounds/main-theme-underground.ogg", true);
+		AssetPool.addSound("assets/sounds/flagpole.ogg", false);
+		AssetPool.addSound("assets/sounds/fireball.ogg", false);
+		AssetPool.addSound("assets/sounds/break_block.ogg", false);
+		AssetPool.addSound("assets/sounds/bump.ogg", false);
+		AssetPool.addSound("assets/sounds/coin.ogg", false);
+		AssetPool.addSound("assets/sounds/gameover.ogg", false);
+		AssetPool.addSound("assets/sounds/jump-small.ogg", false);
+		AssetPool.addSound("assets/sounds/jump-super.ogg", false);
+		AssetPool.addSound("assets/sounds/mario_die.ogg", false);
+		AssetPool.addSound("assets/sounds/pipe.ogg", false);
+		AssetPool.addSound("assets/sounds/powerup.ogg", false);
+		AssetPool.addSound("assets/sounds/powerup_appears.ogg", false);
+		AssetPool.addSound("assets/sounds/stage_clear.ogg", false);
+		AssetPool.addSound("assets/sounds/stomp.ogg", false);
+		AssetPool.addSound("assets/sounds/kick.ogg", false);
+		AssetPool.addSound("assets/sounds/invincible.ogg", true);
+		AssetPool.addSound("assets/sounds/1-up.ogg", false);
 	}
 
 	private void destroy()
@@ -319,7 +372,20 @@ public class Window implements Observer
 
 			this.frameBuffer.unbind();
 
-			this.imGuiLayer.update(dt, currentScene);
+			if (RELEASE_BUILD)
+			{
+				// NOTE: This is the most complicated piece for release builds. In release builds
+				//       we want to just blit the framebuffer to the main window so we can see the game
+				//
+				//       In non-release builds, we usually draw the framebuffer to an ImGui component as an image.
+				glBindFramebuffer(GL_READ_FRAMEBUFFER, frameBuffer.getFboID());
+				glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+				glBlitFramebuffer(0, 0, frameBuffer.width, frameBuffer.height, 0, 0, this.width, this.height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+			}
+			else
+			{
+				this.imGuiLayer.update(dt, currentScene);
+			}
 
 			MouseListener.endFrame();
 			KeyListener.endFrame();

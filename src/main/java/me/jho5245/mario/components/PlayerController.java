@@ -118,8 +118,8 @@ public class PlayerController extends Component
 	@Override
 	public void start()
 	{
-		this.playerWidth = gameObject.transform.scale.x;
-		this.playerHeight = gameObject.transform.scale.y;
+		this.playerWidth = Math.abs(gameObject.transform.scale.x);
+		this.playerHeight = Math.abs(gameObject.transform.scale.y);
 		this.rb = gameObject.getComponent(Rigidbody2D.class);
 		this.stateMachine = gameObject.getComponent(StateMachine.class);
 		this.rb.setGravityScale(0f);
@@ -229,6 +229,8 @@ public class PlayerController extends Component
 		}
 
 		isSprinting = !isSitting && KeyListener.isKeyPressed(GLFW_KEY_X);
+
+		System.out.println(playerWidth);
 
 		if (KeyListener.isKeyPressed(GLFW_KEY_RIGHT))
 		{

@@ -2,15 +2,14 @@ package me.jho5245.mario.jade;
 
 import java.util.Arrays;
 
-import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
-import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
+import static org.lwjgl.glfw.GLFW.*;
 
 public class KeyListener
 {
 	private static KeyListener instance;
 
-	private final boolean[] keyPressed = new boolean[350];
-	private final boolean[] keyBeginPress = new boolean[350];
+	private final boolean[] keyPressed = new boolean[GLFW_KEY_LAST + 1];
+	private final boolean[] keyBeginPress = new boolean[GLFW_KEY_LAST + 1];
 
 	private KeyListener()
 	{
@@ -31,6 +30,8 @@ public class KeyListener
 
 	public static void keyCallback(long window, int keyCode, int scanCode, int action, int mods)
 	{
+		if (keyCode < 0 || keyCode > GLFW_KEY_LAST)
+			return;
 		if (action == GLFW_PRESS)
 		{
 			get().keyBeginPress[keyCode] = true;
@@ -45,6 +46,8 @@ public class KeyListener
 
 	public static boolean isKeyPressed(int keyCode)
 	{
+		if (keyCode < 0 || keyCode > GLFW_KEY_LAST)
+			return false;
 		if (keyCode < get().keyPressed.length)
 			return get().keyPressed[keyCode];
 		return false;
@@ -52,6 +55,8 @@ public class KeyListener
 
 	public static boolean keyBeginPress(int keyCode)
 	{
+		if (keyCode < 0 || keyCode > GLFW_KEY_LAST)
+			return false;
 		return get().keyBeginPress[keyCode];
 	}
 }

@@ -6,7 +6,7 @@ public class Main
 {
 	public static void main(String[] args)
 	{
-		Window window = Window.getInstance();
+		Window window = args.length == 1 ? Window.getInstance(Boolean.parseBoolean(args[0])) : Window.getInstance();
 		window.run();
 	}
 }

@@ -44,6 +44,7 @@ public class GameCamera extends Component
 	{
 		this.player = Window.getCurrentScene().getGameObjectWith(PlayerController.class);
 		this.playerController = Optional.ofNullable(player).orElse(new GameObject("what")).getComponent(PlayerController.class);
+		this.camera = Window.getCurrentScene().getCamera();
 		this.camera.clearColor.set(skyColor);
 		camera.getPosition().set(new Vector2f(-0.5f, -0.5f));
 	}

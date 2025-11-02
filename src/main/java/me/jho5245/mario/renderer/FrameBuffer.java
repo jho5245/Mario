@@ -8,8 +8,13 @@ public class FrameBuffer
 
 	private Texture texture;
 
+	public int width;
+	public int height;
+
 	public FrameBuffer(int width, int height)
 	{
+		this.width = width;
+		this.height = height;
 		// generate frame buffer
 		fboID = glGenFramebuffers();
 		glBindFramebuffer(GL_FRAMEBUFFER, fboID);
