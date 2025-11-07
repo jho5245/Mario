@@ -28,11 +28,11 @@ public class PlayerController extends Component
 		FIRE,
 	}
 
-	public transient float walkSpeed = 3.6f;
-	public transient float sprintSpeed = 6.6f;
-	public transient float jumpBoost = 1f;
-	public transient float jumpImpulse = 8f;
-	public transient float slowDownForce = 0.1f;
+	public float walkSpeed = 3.6f;
+	public float sprintSpeed = 6.6f;
+	public float jumpBoost = 1f;
+	public float jumpImpulse = 8f;
+	public float slowDownForce = 0.1f;
 	public transient Vector2f terminalVelocity = new Vector2f(8.4f, 12.4f);
 	public transient Vector2f terminalSprintingVelocity = new Vector2f(12.4f, 12.4f);
 	private transient PlayerState playerState;
@@ -44,24 +44,25 @@ public class PlayerController extends Component
 	public transient Rigidbody2D rb;
 	public transient PillboxCollider pb;
 	private transient StateMachine stateMachine;
-	private transient final float bigJumpBoostFactor = 1.1f;
+	private final float bigJumpBoostFactor = 1.1f;
 	private transient float playerWidth;
 	private transient float playerHeight;
-	private transient float maxJumpTime = 70;
-	private transient float maxSprintingJumpTime = 80;
+	private float maxJumpTime = 70;
+	private float maxSprintingJumpTime = 80;
 	private transient float jumpTime;
 	private transient final Vector2f acceleration = new Vector2f();
 	public transient Vector2f velocity = new Vector2f();
 
 	private transient boolean isDead;
-	private transient int enemyBounce = 0;
+	private final int enemyBounce = 16;
+	private transient int enemyBounceLeft = 0;
 
 	public transient Sound backgroundMusic, starMusic, undergroundMusic;
 	private transient Sound powerUpSound, dieSound, hurtSound, oneUpSound, smallJumpSound, superJumpSound, stageClearSound, flagPoleSound, worldClearSound;
 
 	private transient final float starTimeColorFlickerTime = 0.1f;
 	private transient float starTimeColorFlickerTimeLeft;
-	private transient final float starTime = 10f;
+	private final float starTime = 10f;
 
 	private transient float starTimeLeft;
 
@@ -79,7 +80,7 @@ public class PlayerController extends Component
 	// 피해를 입었을 당시 마리오의 Y축 좌표
 	private transient float hurtStartY;
 
-	private transient final float hurtInvincibleTime = 2f;
+	private final float hurtInvincibleTime = 2f;
 	public transient float hurtInvincibleTimeLeft;
 	private transient final float hurtTimeColorFlickerTime = 0.1f;
 	private transient float hurtTimeColorFlickerTimeLeft;
@@ -477,10 +478,10 @@ public class PlayerController extends Component
 			}
 			groundDebounce = 0;
 		}
-		else if (enemyBounce > 0)
+		else if (enemyBounceLeft > 0)
 		{
-			enemyBounce--;
-			this.velocity.y = ((enemyBounce / 2.2f) * jumpBoost);
+			enemyBounceLeft--;
+			this.velocity.y = ((enemyBounceLeft / 2.2f) * jumpBoost);
 		}
 		else if (!onGround)
 		{
@@ -797,7 +798,7 @@ public class PlayerController extends Component
 	 */
 	public void enemyBounce()
 	{
-		this.enemyBounce = 16;
+		this.enemyBounceLeft = this.enemyBounce;
 	}
 
 	public void kill()

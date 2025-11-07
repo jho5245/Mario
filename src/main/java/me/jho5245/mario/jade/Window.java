@@ -78,7 +78,7 @@ public class Window implements Observer
 	public static void changeScene(SceneInitializer sceneInitializer, boolean playPhysics)
 	{
 		Vector2f originCameraPosition = null;
-		if (currentScene != null)
+		if (currentScene != null && (!(sceneInitializer instanceof LevelEditorSceneInitializer) || !playPhysics))
 		{
 			originCameraPosition = currentScene.getCamera().getPosition();
 			currentScene.destroy();
